@@ -1,3 +1,5 @@
+import { mat4 } from 'gl-matrix'
+
 import VAO from './vao'
 import {
   createProgram,
@@ -13,10 +15,13 @@ gl.isWebGL2 = gl instanceof WebGL2RenderingContext
 document.body.appendChild(canvas)
 
 const vertexShaderSource = `#version 300 es
+  uniform mat4 u_projectionMatrix;
+  uniform mat4 u_modelViewMatrix;
+
   in vec4 a_position;
 
   void main () {
-    gl_Position = a_position;
+    gl_Position = u_projectionMatrix * u_modelViewMatrix * a_position;
   }
 `
 const fragmentShaderSource = `#version 300 es
@@ -29,7 +34,24 @@ const fragmentShaderSource = `#version 300 es
   }
 `
 
+const projection = mat4.create()
+const modelView = mat4.create()
+
+
 const glProgram = createProgram(gl, vertexShaderSource, fragmentShaderSource)
+
+gl.useProgram(glProgram)
+const u_projectionMatrixLoc = gl.getUniformLocation(glProgram, 'u_projectionMatrix')
+const u_modelViewMatrixLoc = gl.getUniformLocation(glProgram, 'u_modelViewMatrix')
+
+mat4.perspective(projection, Math.PI / 5, innerWidth / innerHeight, 0.1, 10)
+
+mat4.lookAt(modelView, [3, 3, 3], [0, 0, 0], [0, 1, 0])
+
+gl.uniformMatrix4fv(u_projectionMatrixLoc, false, projection)
+gl.uniformMatrix4fv(u_modelViewMatrixLoc, false, modelView)
+
+gl.useProgram(null)
 
 const vao = new VAO(gl)
 
@@ -42,7 +64,7 @@ const positions = new Float32Array(count * 3)
 for (let i = 0; i < count; i++) {
   positions[i * 3 + 0] = (Math.random() * 2 - 1)
   positions[i * 3 + 1] = (Math.random() * 2 - 1)
-  positions[i * 3 + 2] = (Math.random() * 2 - 1)
+  positions[i * 3 + 2] = (Math.random() * 2 - 1) * 4
 }
 
 vao.bind()
@@ -64,6 +86,10 @@ function updateFrame (ts) {
 
   vao.bind()
   gl.useProgram(glProgram)
+
+  mat4.lookAt(modelView, [Math.sin(ts / 100) * 3, 3, 3], [0, 0, 0], [0, 1, 0])
+  gl.uniformMatrix4fv(u_modelViewMatrixLoc, false, modelView)
+
   gl.drawArrays(gl.LINE_STRIP, 0, count)
   gl.useProgram(null)
   vao.unbind()
