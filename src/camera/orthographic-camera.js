@@ -1,6 +1,6 @@
 import { mat4 } from 'gl-matrix'
 
-export default class Camera {
+export default class PerspectiveCamera {
   static UP_VECTOR = [0, 1, 0]
 
   constructor (gl, fieldOfView, aspect, near, far) {
@@ -27,7 +27,7 @@ export default class Camera {
   }
 
   lookAt (target) {
-    mat4.lookAt(this._modelViewMatrix, this._position, target, Camera.UP_VECTOR)
+    mat4.lookAt(this._modelViewMatrix, this._position, target, PerspectiveCamera.UP_VECTOR)
   }
   
 }

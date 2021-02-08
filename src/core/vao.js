@@ -1,4 +1,4 @@
-import { getExtension } from './gl-utils'
+import { getExtension } from '../utils/gl-utils'
 
 export default class VAO {
   static makeWebGL2VAO (gl) {
