@@ -2,12 +2,6 @@ import {
   STATIC_DRAW,
 } from './gl-constants'
 
-/**
- * 
- * @param {WebGL2RenderingContext|WebGLRenderingContent} gl 
- * @param {*} shaderType 
- * @param {*} shaderSource 
- */
 export function compileShader (gl, shaderType, shaderSource) {
   const shader = gl.createShader(shaderType)
   gl.shaderSource(shader, shaderSource)
@@ -32,6 +26,11 @@ export function createProgram (gl, vertexShaderSource, fragmentShaderSource) {
   gl.linkProgram(program)
 
   if (gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    // It is safe to detach and delete shaders once a program is linked 
+    gl.detachShader(vertexShader)
+    gl.deleteShader(vertexShader)
+    gl.detachShader(fragmentShader)
+    gl.deleteShader(fragmentShader)
     return program
   }
   console.error(gl.getProgramInfoLog(program))
@@ -44,6 +43,14 @@ export function createBuffer (gl, data, usage = STATIC_DRAW) {
   gl.bufferData(gl.ARRAY_BUFFER, data, usage)
 
   return buffer
+}
+
+export function createIndexBuffer (gl, indices, usage = STATIC_DRAW) {
+  const buffer = gl.createBuffer()
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer)
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, usage)
+  const count = indices.length
+  return { count, buffer }
 }
 
 const cachedExtensions = new Map()
