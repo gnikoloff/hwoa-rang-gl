@@ -27,9 +27,9 @@ export function createProgram (gl, vertexShaderSource, fragmentShaderSource) {
 
   if (gl.getProgramParameter(program, gl.LINK_STATUS)) {
     // It is safe to detach and delete shaders once a program is linked 
-    gl.detachShader(vertexShader)
+    gl.detachShader(program, vertexShader)
     gl.deleteShader(vertexShader)
-    gl.detachShader(fragmentShader)
+    gl.detachShader(program, fragmentShader)
     gl.deleteShader(fragmentShader)
     return program
   }
