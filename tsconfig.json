@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "module": "ES2015",
+    "allowJs": true,
+    "outDir": "dist",
+    "strict": true,
+    "sourceMap": true,
+    "allowSyntheticDefaultImports": true,
+    "strictNullChecks": false,
+    "lib": ["ES2015", "ES2016", "ES2017", "DOM"]
+  },
+  "include": [
+    "src"
+  ]
+}

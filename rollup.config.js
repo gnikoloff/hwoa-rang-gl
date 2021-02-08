@@ -1,48 +1,32 @@
 import { nodeResolve } from '@rollup/plugin-node-resolve'
-import { terser } from 'rollup-plugin-terser'
-import babel from '@rollup/plugin-babel'
+import commonjs from 'rollup-plugin-commonjs'
+import typescript from 'rollup-plugin-typescript2'
+import sourcemaps from 'rollup-plugin-sourcemaps'
 
 import pkg from './package.json'
 
-const input = ['src/index.js'];
-export default [
-  {
-    // UMD
-    input,
-    plugins: [
-      nodeResolve(),
-      babel({
-        babelHelpers: 'bundled',
-      }),
-      terser(),
-    ],
-    output: {
-      file: `dist/${pkg.name}.min.js`,
-      format: 'umd',
-      name: 'hwoaRangGL', // this is the name of the global object
-      esModule: false,
-      exports: 'named',
-      sourcemap: true,
-    },
-  },
-  // ESM and CJS
-  {
-    input,
-    plugins: [nodeResolve()],
-    output: [
-      {
-        dir: 'dist/esm',
-        format: 'esm',
-        exports: 'named',
-        sourcemap: true,
-      },
-      {
-        dir: 'dist/cjs',
-        format: 'cjs',
-        exports: 'named',
-        sourcemap: true,
-      },
-    ],
-  },
+const input = ['src/index.ts'];
+
+const sharedPlugins = [
+  typescript()
 ]
+
+export default {
+	input,
+	output: [
+		{ file: pkg.main, name: 'hwoaRangGL', format: 'umd', sourcemap: true },
+		{ file: pkg.module, format: 'es', sourcemap: true }
+	],
+	// Indicate here external modules you don't wanna include in your bundle (i.e.: 'lodash')
+	external: [],
+	watch: {
+		include: 'src/**'
+	},
+	plugins: [
+		typescript(),
+		commonjs(),
+		nodeResolve(),
+		sourcemaps()
+	]
+};
 
