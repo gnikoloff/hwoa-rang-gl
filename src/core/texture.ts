@@ -1,9 +1,10 @@
 import type { WebGLContext } from '../ts-types'
 
+import { getExtension } from '../utils/gl-utils'
+
 function isPowerOf2 (value: number) {
 	return (value & (value - 1)) === 0
 }
-
 export default class Texture {
   #texture
   #gl
@@ -14,7 +15,8 @@ export default class Texture {
     isFlip = false,
     useMipmaps = false,
     wrapS = gl.CLAMP_TO_EDGE,
-    wrapT = gl.CLAMP_TO_EDGE
+    wrapT = gl.CLAMP_TO_EDGE,
+    anisotropy = 0,
   }) {
     this.#gl = gl
     this.#texture = gl.createTexture()
@@ -31,6 +33,14 @@ export default class Texture {
     } else {
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+    }
+
+    if (anisotropy) {
+      gl.texParameterf(
+        gl.TEXTURE_2D,
+        (<any>getExtension(gl, 'EXT_texture_filter_anisotropic')).TEXTURE_MAX_ANISOTROPY_EXT,
+        anisotropy
+      )
     }
 
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrapS)
