@@ -5,6 +5,7 @@ import { getExtension } from '../utils/gl-utils'
 function isPowerOf2 (value: number) {
 	return (value & (value - 1)) === 0
 }
+
 export default class Texture {
   #texture
   #gl
@@ -28,7 +29,7 @@ export default class Texture {
 
     if (isPowerOf2(image.width) && isPowerOf2(image.height) && useMipmaps) {
       gl.generateMipmap(gl.TEXTURE_2D)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR)
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
     } else {
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
