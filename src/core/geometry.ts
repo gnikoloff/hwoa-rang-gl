@@ -3,7 +3,7 @@ import { mat4 } from 'gl-matrix'
 import type { WebGLContext } from '../ts-types'
 
 import VAO from './vao'
-import { createBuffer, createIndexBuffer, getExtension } from '../utils/gl-utils'
+import { createBuffer, createIndexBuffer } from '../utils/gl-utils'
 import { vec3 } from 'gl-matrix'
 
 export default class Geometry {
@@ -27,20 +27,14 @@ export default class Geometry {
   #vao
   #instanceCount = -1
   #hasIndices = false
-  #vertexCount: number
-  #instancedExtension
+  
+  
 
   constructor(gl: WebGLContext) {
     this.#gl = gl
     this.#vao = new VAO(gl)
-
-    this.#instancedExtension = getExtension(gl, 'ANGLE_instanced_arrays')
-
+    
     vec3.set(this.#scaleVec3, ...this.#scale)
-  }
-
-  set instanceCount (count: number) {
-    this.#instanceCount = count
   }
 
   setPosition ({ x = this.#position[0], y = this.#position[1], z = this.#position[2] }) {
@@ -82,32 +76,12 @@ export default class Geometry {
 
   draw () {
     if (this.#hasIndices) {
-      if (this.#instanceCount !== -1) {
-        if (this.#gl.isWebGL2) {
-          this.#gl.drawElementsInstanced(
-            this.#gl.TRIANGLES,
-            this.#vertexCount,
-            this.#gl.UNSIGNED_SHORT,
-            0,
-            this.#instanceCount
-          )
-        } else {
-          this.#instancedExtension.drawElementsInstancedANGLE(
-            this.#gl.TRIANGLES,
-            this.#vertexCount,
-            this.#gl.UNSIGNED_SHORT,
-            0,
-            this.#instanceCount
-          )
-        }
-      } else {
-        this.#gl.drawElements(
-          this.#gl.TRIANGLES,
-          this.#vertexCount,
-          this.#gl.UNSIGNED_SHORT,
-          0
-        )
-      }
+      this.#gl.drawElements(
+        this.#gl.TRIANGLES,
+        this.vertexCount,
+        this.#gl.UNSIGNED_SHORT,
+        0
+      )
     } else {
       // drawArrays
     }
@@ -117,41 +91,10 @@ export default class Geometry {
   addIndex ({ typedArray }) {
     const { count, buffer } = createIndexBuffer(this.#gl, typedArray)
     this.#hasIndices = true
-    this.#vertexCount = count
+    this.vertexCount = count
     this.attributes.set('index', {
       typedArray,
       buffer,
-    })
-    return this
-  }
-
-  addInstancedAttribute (key, {
-    typedArray,
-    location,
-    size = 1,
-    type = this.#gl.FLOAT,
-    normalized = false,
-    stride = 0,
-    offset = 0,
-    instancedDivisor = 1,
-  }) {
-    const buffer = createBuffer(this.#gl, typedArray)
-    this.#gl.vertexAttribPointer(location, size, type, normalized, stride, offset)
-    this.#gl.enableVertexAttribArray(location)
-    if (this.#gl.isWebGL2) {
-      this.#gl.vertexAttribDivisor(location, 1)
-    } else {
-      this.#instancedExtension.vertexAttribDivisorANGLE(location, instancedDivisor)
-    }
-    this.attributes.set(key, {
-      typedArray,
-      location,
-      size,
-      type,
-      normalized,
-      stride,
-      offset,
-      buffer
     })
     return this
   }
@@ -169,8 +112,8 @@ export default class Geometry {
     this.#gl.vertexAttribPointer(location, size, type, normalized, stride, offset)
     this.#gl.enableVertexAttribArray(location)
       
-    if (key === 'position' && !this.#vertexCount) {
-      this.#vertexCount = typedArray.length / typedArray.size
+    if (key === 'position' && !this.vertexCount) {
+      this.vertexCount = typedArray.length / typedArray.size
     }
     
     this.attributes.set(key, {
