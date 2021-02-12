@@ -1,8 +1,10 @@
+import type { WebGLContext } from '../ts-types'
+
 import {
   STATIC_DRAW,
 } from './gl-constants'
 
-type WebGLContext = WebGLRenderingContext|WebGL2RenderingContext
+
 
 export function compileShader (gl: WebGLContext, shaderType: number, shaderSource: string): WebGLShader {
   const shader: WebGLShader = gl.createShader(shaderType)
@@ -47,7 +49,7 @@ export function createBuffer (gl: WebGLContext, data: Float32Array|Float64Array,
   return buffer
 }
 
-export function createIndexBuffer (gl: WebGLContext, indices: Uint16Array|Uint32Array, usage: number = STATIC_DRAW): WebGLBuffer {
+export function createIndexBuffer (gl: WebGLContext, indices: Uint16Array|Uint32Array, usage: number = STATIC_DRAW) {
   const buffer = gl.createBuffer()
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer)
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, usage)
