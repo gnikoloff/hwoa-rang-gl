@@ -36,7 +36,15 @@ function buildPlane(vertices, normal, uv, indices, width, height, depth, wSegs, 
   }
 }
 
-export function createBox({ width = 1, height = 1, depth = 1, widthSegments = 1, heightSegments = 1, depthSegments = 1 } = {}) {
+export function createBox({
+  width = 1,
+  height = 1,
+  depth = 1,
+  widthSegments = 1,
+  heightSegments = 1,
+  depthSegments = 1,
+  separateFaces = false,
+} = {}) {
   const wSegs = widthSegments
   const hSegs = heightSegments
   const dSegs = depthSegments
@@ -49,107 +57,231 @@ export function createBox({ width = 1, height = 1, depth = 1, widthSegments = 1,
   const uv = new Float32Array(num * 2)
   const indices = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices)
 
+  const sidesData = []
+
   let i = 0
   let ii = 0
 
-  buildPlane(vertices, normal, uv, indices, depth, height, width, dSegs, hSegs, 2, 1, 0, -1, -1, i, ii)
-  buildPlane(
-    vertices,
-    normal,
-    uv,
-    indices,
-    depth,
-    height,
-    -width,
-    dSegs,
-    hSegs,
-    2,
-    1,
-    0,
-    1,
-    -1,
-    (i += (dSegs + 1) * (hSegs + 1)),
-    (ii += dSegs * hSegs)
-  )
-  buildPlane(
-    vertices,
-    normal,
-    uv,
-    indices,
-    width,
-    depth,
-    height,
-    dSegs,
-    hSegs,
-    0,
-    2,
-    1,
-    1,
-    1,
-    (i += (dSegs + 1) * (hSegs + 1)),
-    (ii += dSegs * hSegs)
-  )
-  buildPlane(
-    vertices,
-    normal,
-    uv,
-    indices,
-    width,
-    depth,
-    -height,
-    dSegs,
-    hSegs,
-    0,
-    2,
-    1,
-    1,
-    -1,
-    (i += (wSegs + 1) * (dSegs + 1)),
-    (ii += wSegs * dSegs)
-  )
+  {
+    // RIGHT
+    if (separateFaces) {
+      const num = (dSegs + 1) * (hSegs + 1)
+      const numIndices = dSegs * hSegs * 6
+      const vertices = new Float32Array(num * 3)
+      const normal = new Float32Array(num * 3)
+      const uv = new Float32Array(num * 2)
+      const indices = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices)
+      buildPlane(vertices, normal, uv, indices, depth, height, width, dSegs, hSegs, 2, 1, 0, -1, -1, i, ii)
+      sidesData.push({
+        orientation: 'right',
+        vertices,
+        normal,
+        uv,
+        indices,
+      })
+    } else {
+      buildPlane(vertices, normal, uv, indices, depth, height, width, dSegs, hSegs, 2, 1, 0, -1, -1, i, ii)
+    }
+  }
+  {
+    // LEFT
+    if (separateFaces) {
+      const num = (dSegs + 1) * (hSegs + 1)
+      const numIndices = dSegs * hSegs * 6
+      const vertices = new Float32Array(num * 3)
+      const normal = new Float32Array(num * 3)
+      const uv = new Float32Array(num * 2)
+      const indices = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices)
+      buildPlane(vertices, normal, uv, indices, depth, height, -width, dSegs, hSegs, 2, 1, 0, 1, -1, i, ii)
+      sidesData.push({
+        orientation: 'left',
+        vertices,
+        normal,
+        uv,
+        indices,
+      })
+    } else {
+      buildPlane(
+        vertices,
+        normal,
+        uv,
+        indices,
+        depth,
+        height,
+        -width,
+        dSegs,
+        hSegs,
+        2,
+        1,
+        0,
+        1,
+        -1,
+        (i += (dSegs + 1) * (hSegs + 1)),
+        (ii += dSegs * hSegs)
+      )
+    }
+  }
+  {
+    // TOP
+    if (separateFaces) {
+      const num = (dSegs + 1) * (hSegs + 1)
+      const numIndices = dSegs * hSegs * 6
+      const vertices = new Float32Array(num * 3)
+      const normal = new Float32Array(num * 3)
+      const uv = new Float32Array(num * 2)
+      const indices = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices)
+      buildPlane(vertices, normal, uv, indices, width, depth, height, dSegs, hSegs, 0, 2, 1, 1, 1, i, ii)
+      sidesData.push({
+        orientation: 'top',
+        vertices,
+        normal,
+        uv,
+        indices,
+      })
+    } else {
+      buildPlane(
+        vertices,
+        normal,
+        uv,
+        indices,
+        width,
+        depth,
+        height,
+        dSegs,
+        hSegs,
+        0,
+        2,
+        1,
+        1,
+        1,
+        (i += (dSegs + 1) * (hSegs + 1)),
+        (ii += dSegs * hSegs)
+      )
+    }
+  }
+  {
+    // BOTTOM
+    if (separateFaces) {
+      const num = (dSegs + 1) * (wSegs + 1)
+      const numIndices = dSegs * wSegs * 6
+      const vertices = new Float32Array(num * 3)
+      const normal = new Float32Array(num * 3)
+      const uv = new Float32Array(num * 2)
+      const indices = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices)
+      buildPlane(vertices, normal, uv, indices, width, depth, -height, dSegs, hSegs, 0, 2, 1, 1, -1, i, ii)
+      sidesData.push({
+        orientation: 'bottom',
+        vertices,
+        normal,
+        uv,
+        indices,
+      })
+    } else {
+      buildPlane(
+        vertices,
+        normal,
+        uv,
+        indices,
+        width,
+        depth,
+        -height,
+        dSegs,
+        hSegs,
+        0,
+        2,
+        1,
+        1,
+        -1,
+        (i += (wSegs + 1) * (dSegs + 1)),
+        (ii += wSegs * dSegs)
+      )
+    }
+  }
+  {
+    // BACK
+    if (separateFaces) {
+      const num = (wSegs + 1) * (dSegs + 1)
+      const numIndices = wSegs * dSegs * 6
+      const vertices = new Float32Array(num * 3)
+      const normal = new Float32Array(num * 3)
+      const uv = new Float32Array(num * 2)
+      const indices = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices)
+      buildPlane(vertices, normal, uv, indices, width, height, -depth, wSegs, hSegs, 0, 1, 2, -1, -1, i, ii)
+      sidesData.push({
+        orientation: 'back',
+        vertices,
+        normal,
+        uv,
+        indices,
+      })
+    } else {
+      buildPlane(
+        vertices,
+        normal,
+        uv,
+        indices,
+        width,
+        height,
+        -depth,
+        wSegs,
+        hSegs,
+        0,
+        1,
+        2,
+        -1,
+        -1,
+        (i += (wSegs + 1) * (dSegs + 1)),
+        (ii += wSegs * dSegs)
+      )
+    }
+  }
+  {
+    // FRONT
+    if (separateFaces) {
+      const num = (wSegs + 1) * (hSegs + 1)
+      const numIndices = wSegs * hSegs * 6
+      const vertices = new Float32Array(num * 3)
+      const normal = new Float32Array(num * 3)
+      const uv = new Float32Array(num * 2)
+      const indices = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices)
+      buildPlane(vertices, normal, uv, indices, width, height, depth, wSegs, hSegs, 0, 1, 2, 1, -1, i, ii)
+      sidesData.push({
+        orientation: 'front',
+        vertices,
+        normal,
+        uv,
+        indices,
+      })
+    } else {
+      buildPlane(
+        vertices,
+        normal,
+        uv,
+        indices,
+        width,
+        height,
+        depth,
+        wSegs,
+        hSegs,
+        0,
+        1,
+        2,
+        1,
+        -1,
+        (i += (wSegs + 1) * (hSegs + 1)),
+        (ii += wSegs * hSegs)
+      )
+    }
+  }
 
-  // front, back
-  buildPlane(
-    vertices,
-    normal,
-    uv,
-    indices,
-    width,
-    height,
-    -depth,
-    wSegs,
-    hSegs,
-    0,
-    1,
-    2,
-    -1,
-    -1,
-    (i += (wSegs + 1) * (dSegs + 1)),
-    (ii += wSegs * dSegs)
-  )
-  buildPlane(
-    vertices,
-    normal,
-    uv,
-    indices,
-    width,
-    height,
-    depth,
-    wSegs,
-    hSegs,
-    0,
-    1,
-    2,
-    1,
-    -1,
-    (i += (wSegs + 1) * (hSegs + 1)),
-    (ii += wSegs * hSegs)
-  )
-
-  return {
-    vertices,
-    normal,
-    uv,
-    indices,
+  if (separateFaces) {
+    return sidesData
+  } else {
+    return {
+      vertices,
+      normal,
+      uv,
+      indices,
+    }
   }
 }
