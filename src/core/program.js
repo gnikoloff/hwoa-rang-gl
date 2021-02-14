@@ -33,6 +33,7 @@ export default class Program {
       default:
         return
     }
+    return this
   }
 
   getAttribLocation(attribName) {
@@ -49,6 +50,7 @@ export default class Program {
 
   bind() {
     this._gl.useProgram(this._program)
+    return this
   }
 
   unbind() {
