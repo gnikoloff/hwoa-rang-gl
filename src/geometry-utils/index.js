@@ -162,8 +162,8 @@ export function createBox({
   {
     // BOTTOM
     if (separateFaces) {
-      const num = (dSegs + 1) * (wSegs + 1)
-      const numIndices = dSegs * wSegs * 6
+      const num = (dSegs + 1) * (hSegs + 1)
+      const numIndices = dSegs * hSegs * 6
       const vertices = new Float32Array(num * 3)
       const normal = new Float32Array(num * 3)
       const uv = new Float32Array(num * 2)
@@ -283,5 +283,12 @@ export function createBox({
       uv,
       indices,
     }
+  }
+}
+
+export function createFullscreenQuad() {
+  return {
+    vertices: new Float32Array([1, 1, -1, 1, -1, -1, -1, -1, 1, -1, 1, 1]),
+    uvs: new Float32Array([1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1]),
   }
 }
