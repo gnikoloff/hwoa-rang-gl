@@ -10,9 +10,12 @@ export default class Texture {
   #texture
   #gl
   constructor(gl: WebGLContext, {
-    image,
+    image = null,
+    width,
+    height,
     format = gl.RGB,
-    type,
+    internalFormat = format,
+    type = gl.UNSIGNED_BYTE,
     isFlip = false,
     useMipmaps = false,
     wrapS = gl.CLAMP_TO_EDGE,
@@ -23,15 +26,22 @@ export default class Texture {
     this.#texture = gl.createTexture()
 
     gl.bindTexture(gl.TEXTURE_2D, this.#texture)
+    
+    if (image) {
+      gl.texImage2D(gl.TEXTURE_2D, 0, format, format, type, image)
 
-    // gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, isFlip ? 0 : 1)
-    gl.texImage2D(gl.TEXTURE_2D, 0, format, format, type, image)
 
-    if (isPowerOf2(image.width) && isPowerOf2(image.height) && useMipmaps) {
-      gl.generateMipmap(gl.TEXTURE_2D)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-    } else {
+      if (isPowerOf2(image.width) && isPowerOf2(image.height) && useMipmaps) {
+        gl.generateMipmap(gl.TEXTURE_2D)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+      } else {
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+      }
+
+    } else if (width && height) {
+      gl.texImage2D(gl.TEXTURE_2D, 0, format, width, height, 0, format, type, null)
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
     }
@@ -50,11 +60,15 @@ export default class Texture {
     gl.bindTexture(gl.TEXTURE_2D, null)
   }
 
-  bind () {
+  public getTexture () {
+    return this.#texture
+  }
+
+  public bind () {
     this.#gl.bindTexture(this.#gl.TEXTURE_2D, this.#texture)
   }
 
-  unbind () {
+  public unbind () {
     this.#gl.bindTexture(this.#gl.TEXTURE_2D, null)
   }
 
