@@ -71,8 +71,6 @@ export default class InstancedGeometry extends Geometry {
       j++
     }
 
-    console.log(this.#instanceMatricesTypedArray)
-
     this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, this.#instanceMatricesBuffer)
     // TODO; use bufferSubData instead
     this.#gl.bufferData(this.#gl.ARRAY_BUFFER, this.#instanceMatricesTypedArray, this.#gl.STATIC_DRAW)
@@ -142,7 +140,7 @@ export default class InstancedGeometry extends Geometry {
   draw () {
     if (this.#gl.isWebGL2) {
       this.#gl.drawElementsInstanced(
-        this.#gl.TRIANGLES,
+        this.drawMode,
         this.vertexCount,
         this.#gl.UNSIGNED_SHORT,
         0,
@@ -150,7 +148,7 @@ export default class InstancedGeometry extends Geometry {
       )
     } else {
       this.#instancedExtension.drawElementsInstancedANGLE(
-        this.#gl.TRIANGLES,
+        this.drawMode,
         this.vertexCount,
         this.#gl.UNSIGNED_SHORT,
         0,

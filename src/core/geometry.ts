@@ -1,12 +1,16 @@
-import { mat4 } from 'gl-matrix'
+import { vec3, mat4 } from 'gl-matrix'
 
 import type { WebGLContext } from '../ts-types'
 
 import VAO from './vao'
 import { createBuffer, createIndexBuffer } from '../utils/gl-utils'
-import { vec3 } from 'gl-matrix'
+
+import {
+  TRIANGLES,
+} from '../utils/gl-constants'
 
 export default class Geometry {
+  public drawMode = TRIANGLES
   public attributes = new Map()
   public vertexCount = 0
   public modelMatrix = mat4.create()
@@ -77,13 +81,17 @@ export default class Geometry {
   draw () {
     if (this.#hasIndices) {
       this.#gl.drawElements(
-        this.#gl.TRIANGLES,
+        this.drawMode,
         this.vertexCount,
         this.#gl.UNSIGNED_SHORT,
         0
       )
     } else {
-      // drawArrays
+      this.#gl.drawArrays(
+        this.drawMode,
+        0,
+        this.vertexCount,
+      )
     }
     return this
   }
@@ -113,7 +121,7 @@ export default class Geometry {
     this.#gl.enableVertexAttribArray(location)
       
     if (key === 'position' && !this.vertexCount) {
-      this.vertexCount = typedArray.length / typedArray.size
+      this.vertexCount = typedArray.length / size
     }
     
     this.attributes.set(key, {
