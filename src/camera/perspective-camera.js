@@ -3,10 +3,10 @@ import { mat4 } from 'gl-matrix'
 export default class PerspectiveCamera {
   static UP_VECTOR = [0, 1, 0]
 
-  constructor(gl, fieldOfView, aspect, near, far) {
-    this._gl = gl
+  position = [0, 0, 0]
+  lookAtPosition = [0, 0, 0]
 
-    this._position = [0, 0, 0]
+  constructor(fieldOfView, aspect, near, far) {
     this._projectionMatrix = mat4.create()
     this._viewMatrix = mat4.create()
 
@@ -25,7 +25,13 @@ export default class PerspectiveCamera {
     this._position = position
   }
 
+  updateViewMatrix() {
+    mat4.lookAt(this._viewMatrix, this.position, this.lookAtPosition, PerspectiveCamera.UP_VECTOR)
+  }
+
   lookAt(target) {
-    mat4.lookAt(this._viewMatrix, this._position, target, PerspectiveCamera.UP_VECTOR)
+    console.log(target)
+    this.lookAtPosition = target
+    mat4.lookAt(this._viewMatrix, this.position, target, PerspectiveCamera.UP_VECTOR)
   }
 }
