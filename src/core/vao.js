@@ -15,7 +15,7 @@ export default class VAO {
   constructor(gl) {
     this._gl = gl
 
-    if (gl.isWebGL2) {
+    if (gl instanceof WebGL2RenderingContext) {
       this._vao = VAO.makeWebGL2VAO(gl)
     } else {
       const { vao, ext } = VAO.makeWebGL1VAO(gl)
@@ -25,7 +25,7 @@ export default class VAO {
   }
 
   bind() {
-    if (this._gl.isWebGL2) {
+    if (this._gl instanceof WebGL2RenderingContext) {
       this._gl.bindVertexArray(this._vao)
     } else {
       this._ext.bindVertexArrayOES(this._vao)
@@ -33,7 +33,7 @@ export default class VAO {
   }
 
   unbind() {
-    if (this._gl.isWebGL2) {
+    if (this._gl instanceof WebGL2RenderingContext) {
       this._gl.bindVertexArray(null)
     } else {
       this._ext.bindVertexArrayOES(null)
@@ -41,7 +41,7 @@ export default class VAO {
   }
 
   delete() {
-    if (this._gl.isWebGL2) {
+    if (this._gl instanceof WebGL2RenderingContext) {
       this._gl.deleteVertexArray(this._vao)
     } else {
       this._ext.deleteVertexArrayOES(this._vao)

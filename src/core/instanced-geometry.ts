@@ -119,7 +119,7 @@ export default class InstancedGeometry extends Geometry {
     const buffer = createBuffer(this.#gl, typedArray)
     this.#gl.vertexAttribPointer(location, size, type, normalized, stride, offset)
     this.#gl.enableVertexAttribArray(location)
-    if (this.#gl.isWebGL2) {
+    if (this.#gl instanceof WebGL2RenderingContext) {
       this.#gl.vertexAttribDivisor(location, 1)
     } else {
       this.#instancedExtension.vertexAttribDivisorANGLE(location, instancedDivisor)
@@ -138,7 +138,7 @@ export default class InstancedGeometry extends Geometry {
   }
 
   draw () {
-    if (this.#gl.isWebGL2) {
+    if (this.#gl instanceof WebGL2RenderingContext) {
       this.#gl.drawElementsInstanced(
         this.drawMode,
         this.vertexCount,
