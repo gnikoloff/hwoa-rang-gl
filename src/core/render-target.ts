@@ -2,11 +2,12 @@ import { WebGLContext } from '../ts-types'
 
 import Texture from './texture'
 
-export default class Framebuffer {
+export default class RenderTarget {
   public width
   public height
   #gl
   #buffer
+  #depthBuffer
   #textures = []
   constructor (gl, {
     width = gl.canvas.width,
@@ -17,7 +18,7 @@ export default class Framebuffer {
     type = gl.UNSIGNED_BYTE,
     format = gl.RGBA,
     internalFormat = format,
-
+    depth = true,
   }) {
     this.#gl = gl
     this.width = width
@@ -41,8 +42,15 @@ export default class Framebuffer {
     const level = 0
     const texture = tex.getTexture()
     gl.framebufferTexture2D(target, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, level)
-    
     gl.bindFramebuffer(target, null)
+
+    if (depth) {
+      this.#depthBuffer = this.#gl.createRenderbuffer()
+      this.#gl.bindRenderbuffer(this.#gl.RENDERBUFFER, this.#depthBuffer)
+      this.#gl.renderbufferStorage(this.#gl.RENDERBUFFER, this.#gl.DEPTH_COMPONENT16, width, height)
+      this.#gl.framebufferRenderbuffer(target, this.#gl.DEPTH_ATTACHMENT, this.#gl.RENDERBUFFER, this.#depthBuffer)
+    }
+
   }
   bind () {
     this.#gl.bindFramebuffer(this.#gl.FRAMEBUFFER, this.#buffer)
