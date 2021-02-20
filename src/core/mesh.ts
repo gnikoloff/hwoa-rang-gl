@@ -26,6 +26,7 @@ export default class Mesh {
   #geometry
   
   constructor (gl, geometry, {
+    uniforms = {},
     vertexShaderSource,
     fragmentShaderSource,
   }: any = {}) {
@@ -34,6 +35,12 @@ export default class Mesh {
     
     this.program = new Program(gl, { vertexShaderSource, fragmentShaderSource })
     this.vao = new VAO(gl)
+
+    this.program.bind()
+    for (const [key, value] of Object.entries(uniforms)) {
+      this.program.setUniform(key, value['type'], value['value'])
+    }
+    this.program.unbind()
 
     vec3.set(this.#scaleVec3, ...this.#scale)
 
@@ -47,15 +54,22 @@ export default class Mesh {
       stride,
       offset,
       buffer,
+      instancedDivisor,
     }, key) => {
       if (key === INDEX_ATTRIB_NAME) {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer)
         return
       }
       const location = this.program.getAttribLocation(key)
+      if (location === -1) {
+        return
+      }
       this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, buffer)
       this.#gl.vertexAttribPointer(location, size, type, normalized, stride, offset)
       this.#gl.enableVertexAttribArray(location)
+      if (instancedDivisor) {
+        this.#gl.vertexAttribDivisor(location, instancedDivisor)
+      }
     })
     this.vao.unbind()
     
