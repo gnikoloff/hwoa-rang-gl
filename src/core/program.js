@@ -1,8 +1,17 @@
 import { createProgram } from '../utils/gl-utils'
 
+import { vertexShaderSourceWebGL2Head, fragmentShaderSourceWebGL2Head } from '../utils/shader-snippets'
 export default class Program {
-  constructor(gl, { vertexShaderSource, fragmentShaderSource }) {
+  constructor(gl, { vertexShaderSource: inputVertexShaderSource, fragmentShaderSource: inputFragmentShaderSource }) {
     this._gl = gl
+
+    const vertexShaderSource = `${vertexShaderSourceWebGL2Head}
+      ${inputVertexShaderSource}
+    `
+    const fragmentShaderSource = `${fragmentShaderSourceWebGL2Head}
+      ${inputFragmentShaderSource}
+    `
+
     this._program = createProgram(gl, vertexShaderSource, fragmentShaderSource)
 
     this._attribLocations = new Map()
