@@ -1,4 +1,21 @@
-function buildPlane(vertices, normal, uv, indices, width, height, depth, wSegs, hSegs, u = 0, v = 1, w = 2, uDir = 1, vDir = -1, i = 0, ii = 0) {
+function buildPlane(
+  vertices,
+  normal,
+  uv,
+  indices,
+  width,
+  height,
+  depth,
+  wSegs,
+  hSegs,
+  u = 0,
+  v = 1,
+  w = 2,
+  uDir = 1,
+  vDir = -1,
+  i = 0,
+  ii = 0,
+) {
   const io = i
   const segW = width / wSegs
   const segH = height / hSegs
@@ -49,13 +66,18 @@ export function createBox({
   const hSegs = heightSegments
   const dSegs = depthSegments
 
-  const num = (wSegs + 1) * (hSegs + 1) * 2 + (wSegs + 1) * (dSegs + 1) * 2 + (hSegs + 1) * (dSegs + 1) * 2
-  const numIndices = (wSegs * hSegs * 2 + wSegs * dSegs * 2 + hSegs * dSegs * 2) * 6
+  const num =
+    (wSegs + 1) * (hSegs + 1) * 2 +
+    (wSegs + 1) * (dSegs + 1) * 2 +
+    (hSegs + 1) * (dSegs + 1) * 2
+  const numIndices =
+    (wSegs * hSegs * 2 + wSegs * dSegs * 2 + hSegs * dSegs * 2) * 6
 
   const vertices = new Float32Array(num * 3)
   const normal = new Float32Array(num * 3)
   const uv = new Float32Array(num * 2)
-  const indices = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices)
+  const indices =
+    num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices)
 
   const sidesData = []
 
@@ -70,8 +92,26 @@ export function createBox({
       const vertices = new Float32Array(num * 3)
       const normal = new Float32Array(num * 3)
       const uv = new Float32Array(num * 2)
-      const indices = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices)
-      buildPlane(vertices, normal, uv, indices, depth, height, width, dSegs, hSegs, 2, 1, 0, -1, -1, i, ii)
+      const indices =
+        num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices)
+      buildPlane(
+        vertices,
+        normal,
+        uv,
+        indices,
+        depth,
+        height,
+        width,
+        dSegs,
+        hSegs,
+        2,
+        1,
+        0,
+        -1,
+        -1,
+        i,
+        ii,
+      )
       sidesData.push({
         orientation: 'right',
         vertices,
@@ -80,7 +120,24 @@ export function createBox({
         indices,
       })
     } else {
-      buildPlane(vertices, normal, uv, indices, depth, height, width, dSegs, hSegs, 2, 1, 0, -1, -1, i, ii)
+      buildPlane(
+        vertices,
+        normal,
+        uv,
+        indices,
+        depth,
+        height,
+        width,
+        dSegs,
+        hSegs,
+        2,
+        1,
+        0,
+        -1,
+        -1,
+        i,
+        ii,
+      )
     }
   }
   {
@@ -91,8 +148,26 @@ export function createBox({
       const vertices = new Float32Array(num * 3)
       const normal = new Float32Array(num * 3)
       const uv = new Float32Array(num * 2)
-      const indices = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices)
-      buildPlane(vertices, normal, uv, indices, depth, height, -width, dSegs, hSegs, 2, 1, 0, 1, -1, i, ii)
+      const indices =
+        num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices)
+      buildPlane(
+        vertices,
+        normal,
+        uv,
+        indices,
+        depth,
+        height,
+        -width,
+        dSegs,
+        hSegs,
+        2,
+        1,
+        0,
+        1,
+        -1,
+        i,
+        ii,
+      )
       sidesData.push({
         orientation: 'left',
         vertices,
@@ -117,7 +192,7 @@ export function createBox({
         1,
         -1,
         (i += (dSegs + 1) * (hSegs + 1)),
-        (ii += dSegs * hSegs)
+        (ii += dSegs * hSegs),
       )
     }
   }
@@ -129,8 +204,26 @@ export function createBox({
       const vertices = new Float32Array(num * 3)
       const normal = new Float32Array(num * 3)
       const uv = new Float32Array(num * 2)
-      const indices = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices)
-      buildPlane(vertices, normal, uv, indices, width, depth, height, dSegs, hSegs, 0, 2, 1, 1, 1, i, ii)
+      const indices =
+        num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices)
+      buildPlane(
+        vertices,
+        normal,
+        uv,
+        indices,
+        width,
+        depth,
+        height,
+        dSegs,
+        hSegs,
+        0,
+        2,
+        1,
+        1,
+        1,
+        i,
+        ii,
+      )
       sidesData.push({
         orientation: 'top',
         vertices,
@@ -155,7 +248,7 @@ export function createBox({
         1,
         1,
         (i += (dSegs + 1) * (hSegs + 1)),
-        (ii += dSegs * hSegs)
+        (ii += dSegs * hSegs),
       )
     }
   }
@@ -167,8 +260,26 @@ export function createBox({
       const vertices = new Float32Array(num * 3)
       const normal = new Float32Array(num * 3)
       const uv = new Float32Array(num * 2)
-      const indices = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices)
-      buildPlane(vertices, normal, uv, indices, width, depth, -height, dSegs, hSegs, 0, 2, 1, 1, -1, i, ii)
+      const indices =
+        num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices)
+      buildPlane(
+        vertices,
+        normal,
+        uv,
+        indices,
+        width,
+        depth,
+        -height,
+        dSegs,
+        hSegs,
+        0,
+        2,
+        1,
+        1,
+        -1,
+        i,
+        ii,
+      )
       sidesData.push({
         orientation: 'bottom',
         vertices,
@@ -193,7 +304,7 @@ export function createBox({
         1,
         -1,
         (i += (wSegs + 1) * (dSegs + 1)),
-        (ii += wSegs * dSegs)
+        (ii += wSegs * dSegs),
       )
     }
   }
@@ -205,8 +316,26 @@ export function createBox({
       const vertices = new Float32Array(num * 3)
       const normal = new Float32Array(num * 3)
       const uv = new Float32Array(num * 2)
-      const indices = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices)
-      buildPlane(vertices, normal, uv, indices, width, height, -depth, wSegs, hSegs, 0, 1, 2, -1, -1, i, ii)
+      const indices =
+        num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices)
+      buildPlane(
+        vertices,
+        normal,
+        uv,
+        indices,
+        width,
+        height,
+        -depth,
+        wSegs,
+        hSegs,
+        0,
+        1,
+        2,
+        -1,
+        -1,
+        i,
+        ii,
+      )
       sidesData.push({
         orientation: 'back',
         vertices,
@@ -231,7 +360,7 @@ export function createBox({
         -1,
         -1,
         (i += (wSegs + 1) * (dSegs + 1)),
-        (ii += wSegs * dSegs)
+        (ii += wSegs * dSegs),
       )
     }
   }
@@ -243,8 +372,26 @@ export function createBox({
       const vertices = new Float32Array(num * 3)
       const normal = new Float32Array(num * 3)
       const uv = new Float32Array(num * 2)
-      const indices = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices)
-      buildPlane(vertices, normal, uv, indices, width, height, depth, wSegs, hSegs, 0, 1, 2, 1, -1, i, ii)
+      const indices =
+        num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices)
+      buildPlane(
+        vertices,
+        normal,
+        uv,
+        indices,
+        width,
+        height,
+        depth,
+        wSegs,
+        hSegs,
+        0,
+        1,
+        2,
+        1,
+        -1,
+        i,
+        ii,
+      )
       sidesData.push({
         orientation: 'front',
         vertices,
@@ -269,7 +416,7 @@ export function createBox({
         1,
         -1,
         (i += (wSegs + 1) * (hSegs + 1)),
-        (ii += wSegs * hSegs)
+        (ii += wSegs * hSegs),
       )
     }
   }

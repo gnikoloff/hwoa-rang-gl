@@ -1,8 +1,17 @@
 import { createProgram } from '../utils/gl-utils'
 
-import { vertexShaderSourceWebGL2Head, fragmentShaderSourceWebGL2Head } from '../utils/shader-snippets'
+import {
+  vertexShaderSourceWebGL2Head,
+  fragmentShaderSourceWebGL2Head,
+} from '../utils/shader-snippets'
 export default class Program {
-  constructor(gl, { vertexShaderSource: inputVertexShaderSource, fragmentShaderSource: inputFragmentShaderSource }) {
+  constructor(
+    gl,
+    {
+      vertexShaderSource: inputVertexShaderSource,
+      fragmentShaderSource: inputFragmentShaderSource,
+    },
+  ) {
     this._gl = gl
 
     const vertexShaderSource = `${vertexShaderSourceWebGL2Head}
@@ -50,9 +59,9 @@ export default class Program {
       return this._attribLocations.get(attribName)
     }
     const attribLocation = this._gl.getAttribLocation(this._program, attribName)
-    if (attribLocation === -1) {
-      console.warn(`Could not query attribute ${attribName} location.`)
-    }
+    // if (attribLocation === -1) {
+    //   console.warn(`Could not query attribute ${attribName} location.`)
+    // }
     this._attribLocations.set(attribName, attribLocation)
     return attribLocation
   }

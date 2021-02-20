@@ -1,0 +1,2 @@
+export type WebGLContext = WebGLRenderingContext|WebGL2RenderingContext
+export type WebGLVAO = WebGLVertexArrayObjectOES|WebGLVertexArrayObject

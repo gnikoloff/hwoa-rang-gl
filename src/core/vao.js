@@ -21,6 +21,15 @@ export default class VAO {
       const { vao, ext } = VAO.makeWebGL1VAO(gl)
       this._vao = vao
       this._ext = ext
+      this.a = {
+        a: {
+          b: {
+            c: {
+              2: { b: 4 + '' },
+            },
+          },
+        },
+      }
     }
   }
 
