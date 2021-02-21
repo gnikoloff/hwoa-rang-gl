@@ -1,4 +1,3 @@
-export { default as VAO } from './core/vao'
 export { default as Program } from './core/program'
 export { default as Geometry } from './core/geometry'
 export { default as Mesh } from './core/mesh'

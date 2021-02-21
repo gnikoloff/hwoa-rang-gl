@@ -1,7 +1,7 @@
 import { vec3, mat4 } from 'gl-matrix'
 
 import Program from './program'
-import VAO from './vao'
+import Geometry from './geometry'
 
 import {
   INDEX_ATTRIB_NAME,
@@ -11,52 +11,51 @@ import {
   VIEW_MATRIX_UNIFORM_NAME,
 } from '../utils/gl-constants'
 
-export default class Mesh {
-  public modelMatrix = mat4.create()
-  public program
-  public vao
-  public hasIndices
-  public drawMode = TRIANGLES
+import { MeshInterface, OES_vertex_array_objectInterface } from '../ts-types'
+import { getExtension } from '../utils/gl-utils'
 
-  #position = [0, 0, 0]
-  #positionVec3 = vec3.create()
+export default class Mesh {
+  #position: [number, number, number] = [0, 0, 0]
+  #positionVec3: vec3 = vec3.create()
 
   #scale: [number, number, number] = [1, 1, 1]
-  #scaleVec3 = vec3.create()
+  #scaleVec3: vec3 = vec3.create()
 
-  #rotationAxis = [0, 0, 0]
-  #rotationAxisVec3 = vec3.create()
+  #rotationAxis: [number, number, number] = [0, 0, 0]
+  #rotationAxisVec3: vec3 = vec3.create()
   #rotationAngle = 0
 
-  #gl
-  #geometry
+  #gl: WebGLRenderingContext
+  #geometry: Geometry
+
+  public modelMatrix: mat4 = mat4.create()
+  public program: Program
+  public vaoExtension: OES_vertex_array_objectInterface
+  public vao: WebGLVertexArrayObjectOES
+  public hasIndices: boolean
+  public drawMode = TRIANGLES
 
   constructor(
-    gl,
+    gl: WebGLRenderingContext,
     {
       geometry,
       uniforms = {},
       vertexShaderSource,
       fragmentShaderSource,
-    }: any = {},
+    }: MeshInterface,
   ) {
     this.#gl = gl
     this.#geometry = geometry
 
     this.program = new Program(gl, { vertexShaderSource, fragmentShaderSource })
-    this.vao = new VAO(gl)
-
-    this.program.bind()
-    for (const [key, value] of Object.entries(uniforms)) {
-      this.program.setUniform(key, value['type'], value['value'])
-    }
-    this.program.unbind()
+    this.vaoExtension = getExtension(gl, 'OES_vertex_array_object')
+    this.vao = this.vaoExtension.createVertexArrayOES()
 
     vec3.set(this.#scaleVec3, ...this.#scale)
 
     this.hasIndices = geometry.attributes.has(INDEX_ATTRIB_NAME)
 
-    this.vao.bind()
+    this.vaoExtension.bindVertexArrayOES(this.vao)
     geometry.attributes.forEach(
       (
         { size, type, normalized, stride, offset, buffer, instancedDivisor },
@@ -80,12 +79,9 @@ export default class Mesh {
           offset,
         )
         this.#gl.enableVertexAttribArray(location)
-        if (instancedDivisor) {
-          this.#gl.vertexAttribDivisor(location, instancedDivisor)
-        }
       },
     )
-    this.vao.unbind()
+    this.vaoExtension.bindVertexArrayOES(null)
 
     this.program.bind()
     this.program.setUniform(
@@ -96,11 +92,11 @@ export default class Mesh {
     this.program.unbind()
   }
 
-  get position() {
+  get position(): [number, number, number] {
     return this.#position
   }
 
-  get scale() {
+  get scale(): [number, number, number] {
     return this.#scale
   }
 
@@ -108,13 +104,25 @@ export default class Mesh {
     x = this.#position[0],
     y = this.#position[1],
     z = this.#position[2],
-  }) {
+  }: {
+    x?: number
+    y?: number
+    z?: number
+  }): this {
     this.#position = [x, y, z]
     vec3.set(this.#positionVec3, x, y, z)
     return this
   }
 
-  setScale({ x = this.#scale[0], y = this.#scale[1], z = this.#scale[2] }) {
+  setScale({
+    x = this.#scale[0],
+    y = this.#scale[1],
+    z = this.#scale[2],
+  }: {
+    x?: number
+    y?: number
+    z?: number
+  }): this {
     this.#scale = [x, y, z]
     vec3.set(this.#scaleVec3, x, y, z)
     return this
@@ -125,16 +133,20 @@ export default class Mesh {
       x = this.#rotationAxis[0],
       y = this.#rotationAxis[1],
       z = this.#rotationAxis[2],
+    }: {
+      x?: number
+      y?: number
+      z?: number
     },
-    rotationAngle,
-  ) {
+    rotationAngle: number,
+  ): this {
     this.#rotationAxis = [x, y, z]
     vec3.set(this.#rotationAxisVec3, x, y, z)
     this.#rotationAngle = rotationAngle
     return this
   }
 
-  updateModelMatrix() {
+  updateModelMatrix(): this {
     mat4.identity(this.modelMatrix)
     mat4.scale(this.modelMatrix, this.modelMatrix, this.#scaleVec3)
     mat4.rotate(
@@ -147,7 +159,7 @@ export default class Mesh {
     return this
   }
 
-  setCamera(camera) {
+  setCamera(camera): this {
     this.program.bind()
     this.program.setUniform(
       PROJECTION_MATRIX_UNIFORM_NAME,
@@ -160,11 +172,12 @@ export default class Mesh {
       camera.viewMatrix,
     )
     this.program.unbind()
+    return this
   }
 
-  draw() {
+  draw(): this {
     this.program.bind()
-    this.vao.bind()
+    this.vaoExtension.bindVertexArrayOES(this.vao)
 
     if (this.hasIndices) {
       this.#gl.drawElements(
@@ -177,7 +190,8 @@ export default class Mesh {
       this.#gl.drawArrays(this.drawMode, 0, this.#geometry.vertexCount)
     }
 
-    this.vao.unbind()
+    this.vaoExtension.bindVertexArrayOES(null)
     this.program.unbind()
+    return this
   }
 }

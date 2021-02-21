@@ -1,27 +1,28 @@
-import { WebGLContext } from '../ts-types'
+import type { RenderTargetInterface } from '../ts-types'
 
 import Texture from './texture'
 
 export default class RenderTarget {
-  public width
-  public height
   #gl
   #buffer
   #depthBuffer
   #textures = []
+
+  public width
+  public height
+
   constructor(
-    gl,
+    gl: WebGLRenderingContext,
     {
       width = gl.canvas.width,
       height = gl.canvas.height,
       target = gl.FRAMEBUFFER,
       wrapS = gl.CLAMP_TO_EDGE,
       wrapT = gl.CLAMP_TO_EDGE,
-      type = gl.UNSIGNED_BYTE,
       format = gl.RGBA,
       internalFormat = format,
       depth = true,
-    },
+    }: RenderTargetInterface,
   ) {
     this.#gl = gl
     this.width = width
@@ -71,16 +72,20 @@ export default class RenderTarget {
 
     gl.bindFramebuffer(target, null)
   }
-  bind() {
+  bind(): this {
     this.#gl.bindFramebuffer(this.#gl.FRAMEBUFFER, this.#buffer)
+    return this
   }
-  unbind() {
+  unbind(): this {
     this.#gl.bindFramebuffer(this.#gl.FRAMEBUFFER, null)
+    return this
   }
-  bindTexture() {
+  bindTexture(): this {
     this.#textures[0].bind()
+    return this
   }
-  unbindTexture() {
+  unbindTexture(): this {
     this.#textures[0].unbind()
+    return this
   }
 }

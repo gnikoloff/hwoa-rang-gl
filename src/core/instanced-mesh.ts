@@ -4,28 +4,31 @@ import Mesh from './mesh'
 
 import { INSTANCED_OFFSET_MODEL_MATRIX } from '../utils/gl-constants'
 import { getExtension } from '../utils/gl-utils'
+import Geometry from './geometry'
+import { MeshInterface } from '../ts-types'
 
 export default class InstancedMesh extends Mesh {
-  public instanceCount
-  public instanceAttributes = new Map()
-
-  #geometry
-  #gl
+  #geometry: Geometry
+  #gl: WebGLRenderingContext
   #instanceExtension
 
+  public instanceCount: number
+  public instanceAttributes = new Map()
+
   constructor(
-    gl,
+    gl: WebGLRenderingContext,
     {
       geometry,
+      uniforms,
       instanceCount = 1,
       vertexShaderSource,
       fragmentShaderSource,
-    }: any = {},
+    }: MeshInterface,
   ) {
-    super(gl, { geometry, vertexShaderSource, fragmentShaderSource })
-
+    super(gl, { geometry, uniforms, vertexShaderSource, fragmentShaderSource })
     this.#gl = gl
     this.#geometry = geometry
+    this.#instanceExtension = getExtension(gl, 'ANGLE_instanced_arrays')
 
     this.instanceCount = instanceCount
 
@@ -48,7 +51,20 @@ export default class InstancedMesh extends Mesh {
       }
     }
 
-    this.vao.bind()
+    this.vaoExtension.bindVertexArrayOES(this.vao)
+    geometry.attributes.forEach(({ instancedDivisor }, key) => {
+      if (instancedDivisor) {
+        const location = this.program.getAttribLocation(key)
+        if (location === -1) {
+          return
+        }
+        this.#instanceExtension.vertexAttribDivisorANGLE(
+          location,
+          instancedDivisor,
+        )
+      }
+    })
+
     const matrixBuffer = gl.createBuffer()
     gl.bindBuffer(gl.ARRAY_BUFFER, matrixBuffer)
     gl.bufferData(gl.ARRAY_BUFFER, matrixData, gl.DYNAMIC_DRAW)
@@ -65,13 +81,9 @@ export default class InstancedMesh extends Mesh {
         offset,
       )
 
-      if (gl instanceof WebGL2RenderingContext) {
-        gl.vertexAttribDivisor(location, 1)
-      } else {
-        // ...
-      }
+      this.#instanceExtension.vertexAttribDivisorANGLE(location, 1)
     }
-    this.vao.unbind()
+    this.vaoExtension.bindVertexArrayOES(null)
 
     this.instanceAttributes.set(INSTANCED_OFFSET_MODEL_MATRIX, {
       location: instanceMatrixLocation,
@@ -82,11 +94,9 @@ export default class InstancedMesh extends Mesh {
       instancedDivisor: 1,
     })
 
-    if (gl instanceof WebGLRenderingContext) {
-      this.#instanceExtension = getExtension(gl, 'ANGLE_instanced_arrays')
-    }
+    this.#instanceExtension = getExtension(gl, 'ANGLE_instanced_arrays')
   }
-  setMatrixAt(index, matrix): void {
+  setMatrixAt(index: number, matrix: Float32Array): void {
     const itemsPerInstance = 16
     const { buffer, typedArray } = this.instanceAttributes.get(
       INSTANCED_OFFSET_MODEL_MATRIX,
@@ -99,7 +109,7 @@ export default class InstancedMesh extends Mesh {
       typedArray[n] = matrix[j]
       j++
     }
-    this.vao.bind()
+    this.vaoExtension.bindVertexArrayOES(this.vao)
     this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, buffer)
     this.#gl.bufferData(
       this.#gl.ARRAY_BUFFER,
@@ -107,48 +117,29 @@ export default class InstancedMesh extends Mesh {
       this.#gl.DYNAMIC_DRAW,
     )
 
-    this.vao.unbind()
+    this.vaoExtension.bindVertexArrayOES(null)
   }
-  draw() {
+  draw(): this {
     this.program.bind()
-    this.vao.bind()
-    if (this.#gl instanceof WebGL2RenderingContext) {
-      if (this.hasIndices) {
-        this.#gl.drawElementsInstanced(
-          this.drawMode,
-          this.#geometry.vertexCount,
-          this.#gl.UNSIGNED_SHORT,
-          0,
-          this.instanceCount,
-        )
-      } else {
-        this.#gl.drawArraysInstanced(
-          this.drawMode,
-          0,
-          this.#geometry.vertexCount,
-          this.instanceCount,
-        )
-      }
+    this.vaoExtension.bindVertexArrayOES(this.vao)
+    if (this.hasIndices) {
+      this.#instanceExtension.drawElementsInstancedANGLE(
+        this.drawMode,
+        this.#geometry.vertexCount,
+        this.#gl.UNSIGNED_SHORT,
+        0,
+        this.instanceCount,
+      )
     } else {
-      if (this.hasIndices) {
-        this.#instanceExtension.drawElementsInstancedANGLE(
-          this.drawMode,
-          this.#geometry.vertexCount,
-          this.#gl.UNSIGNED_SHORT,
-          0,
-          this.instanceCount,
-        )
-      } else {
-        this.#gl.drawArraysInstancedANGLE(
-          this.drawMode,
-          0,
-          this.#geometry.vertexCount,
-          this.instanceCount,
-        )
-      }
+      this.#instanceExtension.drawArraysInstancedANGLE(
+        this.drawMode,
+        0,
+        this.#geometry.vertexCount,
+        this.instanceCount,
+      )
     }
     this.program.unbind()
-    this.vao.unbind()
+    this.vaoExtension.bindVertexArrayOES(null)
     return this
   }
 }

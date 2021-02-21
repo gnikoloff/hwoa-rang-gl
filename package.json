@@ -10,8 +10,8 @@
   },
   "keywords": [
     "webgl",
-    "webgl2",
-    "glsl"
+    "glsl",
+    "3d"
   ],
   "author": "Georgi Nikolov",
   "license": "MIT",

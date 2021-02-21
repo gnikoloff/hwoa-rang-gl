@@ -1,25 +1,18 @@
-import { vec3, mat4 } from 'gl-matrix'
-
-import type { WebGLContext } from '../ts-types'
-
 import { createBuffer, createIndexBuffer } from '../utils/gl-utils'
 
 import { INDEX_ATTRIB_NAME, POSITION_ATTRIB_NAME } from '../utils/gl-constants'
-
 export default class Geometry {
+  #gl: WebGLRenderingContext
+
   public attributes = new Map()
   public vertexCount = 0
 
-  #gl
-  #hasIndices = false
-
-  constructor(gl: WebGLContext) {
+  constructor(gl: WebGLRenderingContext) {
     this.#gl = gl
   }
 
-  addIndex({ typedArray }) {
+  addIndex({ typedArray }: { typedArray: Uint32Array | Uint16Array }): this {
     const { count, buffer } = createIndexBuffer(this.#gl, typedArray)
-    this.#hasIndices = true
     this.vertexCount = count
     this.attributes.set(INDEX_ATTRIB_NAME, {
       typedArray,
@@ -29,7 +22,7 @@ export default class Geometry {
   }
 
   addAttribute(
-    key,
+    key: string,
     {
       typedArray,
       size = 1,
@@ -38,8 +31,16 @@ export default class Geometry {
       stride = 0,
       offset = 0,
       instancedDivisor,
+    }: {
+      typedArray: Float32Array | Float64Array
+      size?: number
+      type?: number
+      normalized?: boolean
+      stride?: number
+      offset?: number
+      instancedDivisor: number | null
     },
-  ) {
+  ): this {
     const buffer = createBuffer(this.#gl, typedArray)
 
     if (key === POSITION_ATTRIB_NAME && !this.vertexCount) {
@@ -59,7 +60,7 @@ export default class Geometry {
     return this
   }
 
-  delete() {
+  delete(): void {
     this.attributes.forEach(({ buffer }) => {
       this.#gl.deleteBuffer(buffer)
     })

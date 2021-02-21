@@ -1,5 +1,4 @@
-import type { WebGLContext } from '../ts-types'
-
+import { OES_vertex_array_objectInterface } from '../ts-types'
 import { STATIC_DRAW } from './gl-constants'
 
 /**
@@ -10,7 +9,7 @@ import { STATIC_DRAW } from './gl-constants'
  * @returns {WebGLShader}
  */
 export function compileShader(
-  gl: WebGLContext,
+  gl: WebGLRenderingContext,
   shaderType: number,
   shaderSource: string,
 ): WebGLShader {
@@ -36,7 +35,7 @@ export function compileShader(
  * @returns {WebGLProgram}
  */
 export function createProgram(
-  gl: WebGLContext,
+  gl: WebGLRenderingContext,
   vertexShaderSource: string,
   fragmentShaderSource: string,
 ): WebGLProgram {
@@ -76,7 +75,7 @@ export function createProgram(
  * @returns {WebGLBuffer}
  */
 export function createBuffer(
-  gl: WebGLContext,
+  gl: WebGLRenderingContext,
   data: Float32Array | Float64Array,
   usage: number = STATIC_DRAW,
 ): WebGLBuffer {
@@ -95,7 +94,7 @@ export function createBuffer(
  * @returns {WebGLBuffer}
  */
 export function createIndexBuffer(
-  gl: WebGLContext,
+  gl: WebGLRenderingContext,
   indices: Uint16Array | Uint32Array,
   usage: number = STATIC_DRAW,
 ): {
@@ -116,9 +115,9 @@ const cachedExtensions = new Map()
  * @param {string} extensionName
  */
 export function getExtension(
-  gl: WebGLContext,
+  gl: WebGLRenderingContext,
   extensionName: string,
-): WebGLObject {
+): OES_vertex_array_objectInterface {
   if (cachedExtensions.has(extensionName)) {
     return cachedExtensions.get(extensionName)
   }

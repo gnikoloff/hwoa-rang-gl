@@ -1,5 +1,3 @@
-import type { WebGLContext } from '../ts-types'
-
 import { getExtension } from '../utils/gl-utils'
 
 function isPowerOf2(value: number) {
@@ -10,7 +8,7 @@ export default class Texture {
   #texture
   #gl
   constructor(
-    gl: WebGLContext,
+    gl: WebGLRenderingContext,
     {
       image = null,
       width,
