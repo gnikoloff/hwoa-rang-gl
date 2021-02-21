@@ -35,6 +35,11 @@ export default class Mesh {
   public hasIndices: boolean
   public drawMode = TRIANGLES
 
+  /**
+   *
+   * @param gl
+   * @param param1
+   */
   constructor(
     gl: WebGLRenderingContext,
     {
@@ -100,6 +105,12 @@ export default class Mesh {
     return this.#scale
   }
 
+  setUniform(uniformName, uniformType, uniformValue): void {
+    this.program.bind()
+    this.program.setUniform(uniformName, uniformType, uniformValue)
+    this.program.unbind()
+  }
+
   setPosition({
     x = this.#position[0],
     y = this.#position[1],
@@ -156,6 +167,13 @@ export default class Mesh {
       this.#rotationAxisVec3,
     )
     mat4.translate(this.modelMatrix, this.modelMatrix, this.#positionVec3)
+    this.program.bind()
+    this.program.setUniform(
+      MODEL_MATRIX_UNIFORM_NAME,
+      'matrix4fv',
+      this.modelMatrix,
+    )
+    this.program.unbind()
     return this
   }
 
