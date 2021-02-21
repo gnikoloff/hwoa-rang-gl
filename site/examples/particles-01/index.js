@@ -49,13 +49,13 @@ const mesh = new hwoaRangGL.Mesh(gl, {
     void main () {
       gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(
         sin(time + position.x) * movementMaxRadius,
-        cos(time + position.x * spacing) * movementMaxRadius,
-        cos(time + position.x * 20.0) * movementMaxRadius,
+        cos(time + position.x) * movementMaxRadius,
+        cos(time + position.x * spacing * 20.0) * movementMaxRadius,
         position.w
       );
 
       float dist = distance(cameraPosition, gl_Position);
-      gl_PointSize = dist * 0.2;
+      gl_PointSize = dist * 0.175;
     }
   `,
   fragmentShaderSource: `
@@ -73,8 +73,7 @@ mesh.setCamera(camera)
 
 document.body.appendChild(canvas)
 setInterval(() => {
-  const available = new Array(8).fill(0).map((_, i) => (i + 1) / 8)
-  spacingTarget = available[Math.floor(Math.random() * available.length)]
+  spacingTarget = Math.random() * 0.85 + 0.15
 }, 5000)
 requestAnimationFrame(updateFrame)
 resize()
@@ -88,7 +87,7 @@ function updateFrame(ts) {
   gl.clearColor(0.9, 0.9, 0.9, 1)
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-  spacing += (spacingTarget - spacing) * (dt * 5)
+  spacing += (spacingTarget - spacing) * (dt * 20)
 
   mesh.setUniform('time', 'float', ts)
   mesh.setUniform('spacing', 'float', spacing)
