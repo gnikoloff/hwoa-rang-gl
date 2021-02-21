@@ -18,7 +18,7 @@ export default class Texture {
       format = gl.RGB,
       internalFormat = format,
       type = gl.UNSIGNED_BYTE,
-      isFlip = false,
+      isFlip = true,
       useMipmaps = false,
       wrapS = gl.CLAMP_TO_EDGE,
       wrapT = gl.CLAMP_TO_EDGE,
@@ -30,6 +30,10 @@ export default class Texture {
     this.texture = gl.createTexture()
 
     gl.bindTexture(gl.TEXTURE_2D, this.texture)
+
+    if (isFlip) {
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
+    }
 
     if (image) {
       gl.texImage2D(gl.TEXTURE_2D, 0, format, format, type, image)
