@@ -42,21 +42,35 @@
 
 
   <script>
+    let currentExampleTitle = 'Particles 01'
+
     let viewerIframe
+    let appNav
 
     function setIframeSrc () {
       if (viewerIframe && location.hash) {
         const exampleName = location.hash.substring(1)
         viewerIframe.setAttribute('src', `/site/examples/${exampleName}/index.html`)
+        viewerIframe.setAttribute('title', currentExampleTitle)
       }
     }
 
-    window.onhashchange = setIframeSrc
+    function onNavClick (e) {
+      if (e.target.nodeName === 'A') {
+        currentExampleTitle = e.target.dataset.title
+      }
+    }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    function onDOMLoad () {
       viewerIframe = document.getElementById('preview-iframe')
+      appNav = document.getElementById('app-nav')
       setIframeSrc()
-    })
+
+      appNav.addEventListener('click', onNavClick)
+    }
+
+    window.onhashchange = setIframeSrc
+    document.addEventListener('DOMContentLoaded', onDOMLoad)
 
   </script>
   
@@ -66,15 +80,43 @@
     <aside class="app-aside">
       <h1>hwoa-rang-gl</h1>
       <h4>By <a href="https://github.com/gnikoloff" target="_blank">Georgi Nikolov</a></h4>
-      <nav>
+      <nav id="app-nav">
         <h3>Particles</h3>
         <ul>
-          <li><a href="#particles-01">Particles 01</a></li>
+          <li>
+            <a
+              data-title="Particle 01"
+              href="#particles-01">
+              Particles 01
+            </a>
+          </li>
         </ul>
         <h3>Geometry</h3>
         <ul>
-          <li><a href="#geometry">Geometry</a></li>
-          <li><a href="#instanced-geometry">Instanced Geometry</a></li>
+          <li>
+            <a
+              data-title="Geometry"
+              href="#geometry">
+              Geometry
+            </a>
+          </li>
+          <li>
+            <a
+              data-title="Instanced Geometry"
+              href="#instanced-geometry">
+              Instanced Geometry
+            </a>
+          </li>
+        </ul>
+        <h3>Texture</h3>
+        <ul>
+          <li>
+            <a
+              data-title="Texture"
+              href="#texture">
+              Texture
+            </a>
+          </li>
         </ul>
       </nav>
     </aside>
