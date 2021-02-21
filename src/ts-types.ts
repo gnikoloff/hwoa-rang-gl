@@ -27,6 +27,11 @@ export interface OES_vertex_array_objectInterface {
   bindVertexArrayOES(arrayObject: WebGLVertexArrayObjectOES | null): void
 }
 
+export interface ProgramInterface {
+  vertexShaderSource: string
+  fragmentShaderSource: string
+}
+
 export type WebGLVAO = WebGLVertexArrayObjectOES | WebGLVertexArrayObject
 
-export type UniformType = 'matrix4fv' | 'float' | 'int'
+export type UniformType = 'matrix4fv' | 'vec2' | 'float' | 'int'

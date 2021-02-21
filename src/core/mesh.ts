@@ -62,10 +62,7 @@ export default class Mesh {
 
     this.vaoExtension.bindVertexArrayOES(this.vao)
     geometry.attributes.forEach(
-      (
-        { size, type, normalized, stride, offset, buffer, instancedDivisor },
-        key,
-      ) => {
+      ({ size, type, normalized, stride, offset, buffer }, key) => {
         if (key === INDEX_ATTRIB_NAME) {
           gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer)
           return
@@ -89,6 +86,9 @@ export default class Mesh {
     this.vaoExtension.bindVertexArrayOES(null)
 
     this.program.bind()
+    for (const [key, uniform] of Object.entries(uniforms)) {
+      this.program.setUniform(key, uniform['type'], uniform['value'])
+    }
     this.program.setUniform(
       MODEL_MATRIX_UNIFORM_NAME,
       'matrix4fv',
