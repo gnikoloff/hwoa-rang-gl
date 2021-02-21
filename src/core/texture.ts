@@ -5,8 +5,10 @@ function isPowerOf2(value: number) {
 }
 
 export default class Texture {
-  #texture
-  #gl
+  #gl: WebGLRenderingContext
+
+  public texture: WebGLTexture
+
   constructor(
     gl: WebGLRenderingContext,
     {
@@ -24,9 +26,10 @@ export default class Texture {
     },
   ) {
     this.#gl = gl
-    this.#texture = gl.createTexture()
 
-    gl.bindTexture(gl.TEXTURE_2D, this.#texture)
+    this.texture = gl.createTexture()
+
+    gl.bindTexture(gl.TEXTURE_2D, this.texture)
 
     if (image) {
       gl.texImage2D(gl.TEXTURE_2D, 0, format, format, type, image)
@@ -62,7 +65,7 @@ export default class Texture {
     if (anisotropy) {
       gl.texParameterf(
         gl.TEXTURE_2D,
-        (<any>getExtension(gl, 'EXT_texture_filter_anisotropic'))
+        getExtension(gl, 'EXT_texture_filter_anisotropic')
           .TEXTURE_MAX_ANISOTROPY_EXT,
         anisotropy,
       )
@@ -74,15 +77,13 @@ export default class Texture {
     gl.bindTexture(gl.TEXTURE_2D, null)
   }
 
-  public getTexture() {
-    return this.#texture
+  public bind(): this {
+    this.#gl.bindTexture(this.#gl.TEXTURE_2D, this.texture)
+    return this
   }
 
-  public bind() {
-    this.#gl.bindTexture(this.#gl.TEXTURE_2D, this.#texture)
-  }
-
-  public unbind() {
+  public unbind(): this {
     this.#gl.bindTexture(this.#gl.TEXTURE_2D, null)
+    return this
   }
 }

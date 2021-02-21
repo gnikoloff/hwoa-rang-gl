@@ -1,3 +1,5 @@
+import { ProgramInterface } from '../ts-types'
+
 import { UniformType } from '../ts-types'
 import { createProgram } from '../utils/gl-utils'
 
@@ -5,11 +7,6 @@ import {
   vertexShaderSourceWebGL2Head,
   fragmentShaderSourceWebGL2Head,
 } from '../utils/shader-snippets'
-
-export interface ProgramInterface {
-  vertexShaderSource: string
-  fragmentShaderSource: string
-}
 
 export default class Program {
   #gl: WebGLRenderingContext

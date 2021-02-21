@@ -1,4 +1,3 @@
-import { OES_vertex_array_objectInterface } from '../ts-types'
 import { STATIC_DRAW } from './gl-constants'
 
 /**
@@ -117,7 +116,7 @@ const cachedExtensions = new Map()
 export function getExtension(
   gl: WebGLRenderingContext,
   extensionName: string,
-): OES_vertex_array_objectInterface {
+): any {
   if (cachedExtensions.has(extensionName)) {
     return cachedExtensions.get(extensionName)
   }

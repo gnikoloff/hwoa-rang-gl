@@ -44,7 +44,7 @@ export default class RenderTarget {
     gl.bindFramebuffer(target, this.#buffer)
 
     const level = 0
-    const texture = tex.getTexture()
+    const texture = tex.texture
     gl.framebufferTexture2D(
       target,
       gl.COLOR_ATTACHMENT0,
