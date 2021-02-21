@@ -4,6 +4,9 @@ const dpr = devicePixelRatio
 const canvas = document.createElement('canvas')
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
 
+const stats = new Stats()
+document.body.appendChild(stats.domElement)
+
 let oldTime = 0
 let mouseX = 0
 let mouseY = 0
@@ -79,6 +82,9 @@ function updateFrame(ts) {
   ts /= 1000
   const dt = ts - oldTime
   oldTime = ts
+
+  stats.begin()
+
   gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)
   gl.clearColor(0.9, 0.9, 0.9, 1)
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
@@ -107,6 +113,8 @@ function updateFrame(ts) {
 
   mesh.setCamera(camera)
   mesh.draw()
+
+  stats.end()
 
   requestAnimationFrame(updateFrame)
 }
