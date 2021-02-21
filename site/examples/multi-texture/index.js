@@ -30,7 +30,7 @@ const camera = new hwoaRangGL.PerspectiveCamera(
   0.1,
   100,
 )
-camera.position = [0, 0, 40]
+camera.position = [20, 20, 20]
 camera.lookAt([0, 0, 0])
 
 new hwoaRangGL.CameraController(camera)
