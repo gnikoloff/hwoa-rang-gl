@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>hwoa-rang-gl</title>
+  
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    
+    #app {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+    }
+
+    .app-aside {
+      width: 30%;
+      height: 100vh;
+      padding: 24px 18px;
+    }
+
+    .app-main {
+      width: 70%;
+      height: 100vh;
+    }
+
+    .iframe {
+      display: block;;
+      width: 100%;
+      height: 100%;
+    }
+
+  </style>
+
+
+  <script>
+    let viewerIframe
+
+    function setIframeSrc () {
+      if (viewerIframe && location.hash) {
+        const exampleName = location.hash.substring(1)
+        viewerIframe.setAttribute('src', `/site/examples/${exampleName}/index.html`)
+      }
+    }
+
+    window.onhashchange = setIframeSrc
+
+    document.addEventListener('DOMContentLoaded', () => {
+      viewerIframe = document.getElementById('preview-iframe')
+      setIframeSrc()
+    })
+
+  </script>
+  
+</head>
+<body>
+  <div id="app">
+    <aside class="app-aside">
+      <h1>hwoa-rang-gl</h1>
+      <h4>By <a href="https://github.com/gnikoloff" target="_blank">Georgi Nikolov</a></h4>
+      <nav>
+        <h3>Particles</h3>
+        <a href="#particles-01">Particles 01</a>
+        <h3>Geometry</h3>
+        <a href="#geometry">Geometry</a>
+      </nav>
+    </aside>
+    <main class="app-main">
+      <iframe
+        class="iframe"
+        id="preview-iframe"
+        src="https://wikipedia.com"
+      />
+    </main>
+  </div>
+</body>
+</html>

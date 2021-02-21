@@ -6,7 +6,8 @@
   "module": "dist/esm/index.js",
   "scripts": {
     "watch": "rollup -c -w",
-    "build": "rollup -c"
+    "build": "rollup -c",
+    "start:examples:dev": "http-serve ."
   },
   "keywords": [
     "webgl",
@@ -32,6 +33,7 @@
     "eslint-config-prettier": "^7.2.0",
     "eslint-plugin-prettier": "^3.3.1",
     "gl-matrix": "^3.3.0",
+    "http-serve": "^1.0.1",
     "rollup-plugin-sourcemaps": "^0.6.3"
   }
 }
