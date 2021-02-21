@@ -23,8 +23,6 @@ const camera = new hwoaRangGL.PerspectiveCamera(
 camera.position = [0, 0, 10]
 camera.lookAt([0, 0, 0])
 
-new hwoaRangGL.CameraController(camera)
-
 const { indices, vertices, uv } = hwoaRangGL.GeometryUtils.createBox()
 const geometry = new hwoaRangGL.Geometry(gl)
 geometry
