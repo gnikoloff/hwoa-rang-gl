@@ -159,14 +159,14 @@ export default class Mesh {
 
   updateModelMatrix(): this {
     mat4.identity(this.modelMatrix)
-    mat4.scale(this.modelMatrix, this.modelMatrix, this.#scaleVec3)
+    mat4.translate(this.modelMatrix, this.modelMatrix, this.#positionVec3)
     mat4.rotate(
       this.modelMatrix,
       this.modelMatrix,
       this.#rotationAngle,
       this.#rotationAxisVec3,
     )
-    mat4.translate(this.modelMatrix, this.modelMatrix, this.#positionVec3)
+    mat4.scale(this.modelMatrix, this.modelMatrix, this.#scaleVec3)
     this.program.bind()
     this.program.setUniform(
       MODEL_MATRIX_UNIFORM_NAME,
