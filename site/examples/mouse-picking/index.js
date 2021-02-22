@@ -186,14 +186,6 @@ function updateFrame(ts) {
     mesh.draw()
   })
 
-  const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight
-  const top = Math.tan(fieldOfViewRadians * 0.5) * near
-  const bottom = -top
-  const left = aspect * bottom
-  const right = aspect * top
-  const width = Math.abs(right - left)
-  const height = Math.abs(top - bottom)
-
   const pixelX = (mouseX * canvas.width) / innerWidth
   const pixelY = canvas.height - (mouseY * canvas.height) / innerHeight - 1
 
