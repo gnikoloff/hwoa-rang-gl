@@ -34,4 +34,4 @@ export interface ProgramInterface {
 
 export type WebGLVAO = WebGLVertexArrayObjectOES | WebGLVertexArrayObject
 
-export type UniformType = 'matrix4fv' | 'vec2' | 'float' | 'int'
+export type UniformType = 'matrix4fv' | 'vec2' | 'vec4' | 'float' | 'int'
