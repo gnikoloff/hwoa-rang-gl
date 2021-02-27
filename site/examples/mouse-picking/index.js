@@ -117,7 +117,6 @@ for (let i = 0; i < SHAPE_COUNT; ++i) {
   mesh.setPosition({ x: randX, y: randY, z: randZ })
   mesh.setRotation({ x: randRotX, y: randRotY }, rotAngle)
 
-  mesh.updateModelMatrix()
   meshes.push(mesh)
 
   const id = i + 1
@@ -149,7 +148,6 @@ for (let i = 0; i < SHAPE_COUNT; ++i) {
   hoverMesh.setScale({ x: scale, y: scale, z: scale })
   hoverMesh.setPosition({ x: randX, y: randY, z: randZ })
   hoverMesh.setRotation({ x: randRotX, y: randRotY }, rotAngle)
-  hoverMesh.updateModelMatrix()
   hoverMeshes.push(hoverMesh)
 }
 

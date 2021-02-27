@@ -112,7 +112,6 @@ function updateFrame(ts) {
     },
     ts * 0.5,
   )
-  boxMesh.updateModelMatrix()
   boxMesh.draw()
 
   stats.end()

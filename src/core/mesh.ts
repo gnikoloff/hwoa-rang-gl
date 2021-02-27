@@ -25,6 +25,8 @@ export default class Mesh {
   #rotationAxisVec3: vec3 = vec3.create()
   #rotationAngle = 0
 
+  #modelMatrixNeedsUpdate = false
+
   #gl: WebGLRenderingContext
   #geometry: Geometry
 
@@ -122,6 +124,7 @@ export default class Mesh {
   }): this {
     this.#position = [x, y, z]
     vec3.set(this.#positionVec3, x, y, z)
+    this.#modelMatrixNeedsUpdate = true
     return this
   }
 
@@ -136,6 +139,7 @@ export default class Mesh {
   }): this {
     this.#scale = [x, y, z]
     vec3.set(this.#scaleVec3, x, y, z)
+    this.#modelMatrixNeedsUpdate = true
     return this
   }
 
@@ -154,6 +158,7 @@ export default class Mesh {
     this.#rotationAxis = [x, y, z]
     vec3.set(this.#rotationAxisVec3, x, y, z)
     this.#rotationAngle = rotationAngle
+    this.#modelMatrixNeedsUpdate = true
     return this
   }
 
@@ -194,6 +199,11 @@ export default class Mesh {
   }
 
   draw(): this {
+    if (this.#modelMatrixNeedsUpdate) {
+      this.updateModelMatrix()
+      this.#modelMatrixNeedsUpdate = false
+    }
+
     this.program.bind()
     this.vaoExtension.bindVertexArrayOES(this.vao)
 

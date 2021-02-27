@@ -69,7 +69,6 @@ new hwoaRangGL.CameraController(camera)
     fragmentShaderSource: regularFragmentShader,
   })
   boxMesh.setPosition({ x: -3 })
-  boxMesh.updateModelMatrix()
 }
 
 /* --------- Line Geometry --------- */
@@ -104,7 +103,6 @@ new hwoaRangGL.CameraController(camera)
   lineMesh.drawMode = gl.LINE_LOOP
 
   lineMesh.setPosition({ x: -1 })
-  lineMesh.updateModelMatrix()
 }
 
 /* --------- Sphere Geometry --------- */
@@ -130,7 +128,6 @@ new hwoaRangGL.CameraController(camera)
     fragmentShaderSource: regularFragmentShader,
   })
   sphereMesh.setPosition({ x: 1 })
-  sphereMesh.updateModelMatrix()
 }
 
 /* --------- Plane Geometry --------- */
@@ -153,7 +150,6 @@ new hwoaRangGL.CameraController(camera)
     fragmentShaderSource: regularFragmentShader,
   })
   planeMesh.setPosition({ x: 3 })
-  planeMesh.updateModelMatrix()
 }
 
 document.body.appendChild(canvas)
