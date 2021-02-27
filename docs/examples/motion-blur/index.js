@@ -30,9 +30,9 @@ let currentRenderTarget = new hwoaRangGL.RenderTarget(gl, {
 })
 let oldTime = 0
 
-// gl.enable(gl.BLEND)
-// gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
-gl.enable(gl.DEPTH_TEST)
+gl.enable(gl.BLEND)
+gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+// gl.enable(gl.DEPTH_TEST)
 gl.enable(gl.CULL_FACE)
 gl.depthFunc(gl.LEQUAL)
 
@@ -97,7 +97,7 @@ geometry
     size: 2,
   })
 
-const currentTargetMesh = new hwoaRangGL.Mesh(gl, {
+const fadeMesh = new hwoaRangGL.Mesh(gl, {
   geometry,
   uniforms: {
     diffuse: { type: 'int', value: 0 },
@@ -109,12 +109,12 @@ const currentTargetMesh = new hwoaRangGL.Mesh(gl, {
 
     void main () {
       vec4 fadeColor = vec4(0.9, 0.9, 0.9, 1.0);
-      gl_FragColor = mix(texture2D(diffuse, v_uv), fadeColor, 0.05);
+      gl_FragColor = mix(texture2D(diffuse, v_uv), fadeColor, 0.2);
     }
   `,
 })
 
-const resultTargetMesh = new hwoaRangGL.Mesh(gl, {
+const resultMesh = new hwoaRangGL.Mesh(gl, {
   geometry,
   uniforms: {
     diffuse: { type: 'int', value: 0 },
@@ -165,18 +165,20 @@ function updateFrame(ts) {
 
   {
     currentRenderTarget.bind()
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+    // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+
+    prevRenderTarget.bindTexture()
+    fadeMesh.draw()
 
     boxMesh.setCamera(camera)
     boxMesh.draw()
 
-    prevRenderTarget.bindTexture()
-    currentTargetMesh.draw()
     currentRenderTarget.unbind()
   }
 
   currentRenderTarget.bindTexture()
-  resultTargetMesh.draw()
+  resultMesh.draw()
+
   const temp = prevRenderTarget
   prevRenderTarget = currentRenderTarget
   currentRenderTarget = temp
