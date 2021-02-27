@@ -15,7 +15,7 @@ export default {
         name: 'hwoaRangGL',
         format: 'iife',
         sourcemap: true,
-        file: 'site/examples/library/index.js',
+        file: 'docs/examples/library/index.js',
       }
     : [
         { file: pkg.main, name: 'hwoaRangGL', format: 'umd', sourcemap: true },

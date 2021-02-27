@@ -1,13 +1,16 @@
 {
   "compilerOptions": {
-    "module": "ES2015",
+    "module": "ES6",
+    "target": "ES6",
     "allowJs": true,
     "outDir": "dist",
-    "strict": true,
-    "sourceMap": true,
+    "strict": false,
+    // "inlineSourceMap": true,
     "allowSyntheticDefaultImports": true,
     "strictNullChecks": false,
-    "lib": ["ES2015", "ES2016", "ES2017", "DOM"]
+    "lib": ["ES2016", "ES2017", "DOM"],
+    "noImplicitAny": false,
+    "declaration": true,
   },
   "include": [
     "src"

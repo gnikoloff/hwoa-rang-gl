@@ -8,7 +8,7 @@
     "watch": "rollup -c -w",
     "build": "rollup -c",
     "watch:examples": "rollup -c -w --environment EXAMPLES",
-    "serve:examples": "http-serve site/examples",
+    "serve:examples": "http-serve docs/examples",
     "start:examples:dev": "run-p watch:examples serve:examples"
   },
   "keywords": [
