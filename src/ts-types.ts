@@ -17,6 +17,7 @@ export interface RenderTargetInterface {
   format?: number
   internalFormat?: number
   depth?: boolean
+  type: number
 }
 
 export interface OES_vertex_array_objectInterface {
@@ -34,4 +35,10 @@ export interface ProgramInterface {
 
 export type WebGLVAO = WebGLVertexArrayObjectOES | WebGLVertexArrayObject
 
-export type UniformType = 'matrix4fv' | 'vec2' | 'vec4' | 'float' | 'int'
+export type UniformType =
+  | 'matrix4fv'
+  | 'vec2'
+  | 'vec3'
+  | 'vec4'
+  | 'float'
+  | 'int'

@@ -57,6 +57,14 @@ export default class Program {
       case 'vec2':
         this.#gl.uniform2f(uniformLocation, uniformValue[0], uniformValue[1])
         break
+      case 'vec3':
+        this.#gl.uniform3f(
+          uniformLocation,
+          uniformValue[0],
+          uniformValue[1],
+          uniformValue[2],
+        )
+        break
       case 'vec4':
         this.#gl.uniform4f(
           uniformLocation,
