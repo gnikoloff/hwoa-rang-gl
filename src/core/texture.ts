@@ -36,7 +36,7 @@ export default class Texture {
     }
 
     if (image) {
-      gl.texImage2D(gl.TEXTURE_2D, 0, format, format, type, image)
+      gl.texImage2D(gl.TEXTURE_2D, 0, internalFormat, format, type, image)
 
       if (isPowerOf2(image.width) && isPowerOf2(image.height) && useMipmaps) {
         gl.generateMipmap(gl.TEXTURE_2D)
