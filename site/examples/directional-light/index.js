@@ -50,7 +50,7 @@ const camera = new hwoaRangGL.PerspectiveCamera(
   0.1,
   100,
 )
-camera.position = [0, 4, 6]
+camera.position = [0, 2, 3]
 camera.lookAt([0, 0, 0])
 
 new hwoaRangGL.CameraController(camera)
@@ -110,7 +110,7 @@ function updateFrame(ts) {
     {
       y: 1,
     },
-    ts,
+    ts * 0.5,
   )
   boxMesh.updateModelMatrix()
   boxMesh.draw()
