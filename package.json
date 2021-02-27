@@ -7,7 +7,9 @@
   "scripts": {
     "watch": "rollup -c -w",
     "build": "rollup -c",
-    "start:examples:dev": "http-serve ."
+    "watch:examples": "rollup -c -w --environment EXAMPLES",
+    "serve:examples": "http-serve site/examples",
+    "start:examples:dev": "run-p watch:examples serve:examples"
   },
   "keywords": [
     "webgl",
@@ -21,6 +23,7 @@
     "@typescript-eslint/eslint-plugin": "^4.15.0",
     "@typescript-eslint/parser": "^4.15.0",
     "eslint": "^7.19.0",
+    "npm-run-all": "^4.1.5",
     "prettier": "^2.2.1",
     "rollup": "^2.28.2",
     "rollup-plugin-typescript2": "^0.29.0",

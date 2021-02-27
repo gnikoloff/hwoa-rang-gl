@@ -1,32 +1,3 @@
-const regularVertexShader = `
-
-  attribute vec4 position;
-  attribute vec2 uv;
-  attribute vec3 normal;
-
-  varying vec2 v_uv;
-  varying vec3 v_normal;
-
-  void main () {
-    gl_Position = projectionMatrix * viewMatrix * modelMatrix * position;
-    v_uv = uv;
-    v_normal = mat3(modelMatrix) * normal;
-  }
-`
-const regularFragmentShader = `
-  uniform vec3 lightDirection;
-
-  varying vec2 v_uv;
-  varying vec3 v_normal;
-
-  void main () {
-    vec3 normal = normalize(v_normal);
-    float light = dot(normal, lightDirection);
-    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-    gl_FragColor.rgb *= light;
-  }
-`
-
 const stats = new Stats()
 document.body.appendChild(stats.domElement)
 
@@ -35,7 +6,7 @@ const canvas = document.createElement('canvas')
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
 
 let boxMesh
-let sphereMesh
+let texture
 let oldTime = 0
 
 gl.enable(gl.BLEND)
@@ -81,12 +52,50 @@ vec3.normalize(lightDirection, lightDirection)
   boxMesh = new hwoaRangGL.Mesh(gl, {
     geometry,
     uniforms: {
+      diffuse: { type: 'int', value: 0 },
       lightDirection: { type: 'vec3', value: lightDirection },
     },
-    vertexShaderSource: regularVertexShader,
-    fragmentShaderSource: regularFragmentShader,
+    vertexShaderSource: `
+      attribute vec4 position;
+      attribute vec2 uv;
+      attribute vec3 normal;
+
+      varying vec2 v_uv;
+      varying vec3 v_normal;
+
+      void main () {
+        gl_Position = projectionMatrix * viewMatrix * modelMatrix * position;
+        v_uv = uv;
+        v_normal = mat3(modelMatrix) * normal;
+      }
+    `,
+    fragmentShaderSource: `
+      uniform sampler2D diffuse;
+      uniform vec3 lightDirection;
+
+      varying vec2 v_uv;
+      varying vec3 v_normal;
+
+      void main () {
+        vec3 normal = normalize(v_normal);
+        float light = dot(normal, lightDirection);
+        gl_FragColor = texture2D(diffuse, v_uv);
+        gl_FragColor.rgb *= light;
+      }
+    `,
   })
 }
+
+const image = new Image()
+image.onload = () => {
+  texture = new hwoaRangGL.Texture(gl, {
+    image,
+    isFlip: true,
+    width: image.naturalWidth,
+    height: image.naturalHeight,
+  })
+}
+image.src = '/assets/images/webgl-logo-pot.png'
 
 document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)
@@ -112,6 +121,9 @@ function updateFrame(ts) {
     },
     ts * 0.5,
   )
+  if (texture) {
+    texture.bind()
+  }
   boxMesh.draw()
 
   stats.end()

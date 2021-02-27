@@ -78,7 +78,7 @@ image.onload = () => {
     height: image.naturalHeight,
   })
 }
-image.src = '/site/examples/assets/images/zhang-kaiyv-unsplash.jpg'
+image.src = '/assets/images/zhang-kaiyv-unsplash.jpg'
 
 document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)

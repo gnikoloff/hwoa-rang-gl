@@ -81,7 +81,7 @@
       if (viewerIframe) {
         if (location.hash) {
           const exampleName = location.hash.substring(1)
-          viewerIframe.setAttribute('src', `/site/examples/${exampleName}/index.html`)
+          viewerIframe.setAttribute('src', `/${exampleName}/index.html`)
           viewerIframe.setAttribute('title', currentExampleTitle)
         } else {
           location.hash = 'particles-01'
@@ -167,6 +167,13 @@
               data-title="Directional Light"
               href="#directional-light">
               Directional Light
+            </a>
+          </li>
+          <li>
+            <a
+              data-title="Spot Light"
+              href="#spot-light">
+              Spot Light
             </a>
           </li>
         </ul>
