@@ -11,8 +11,36 @@
     * { box-sizing: border-box; }
 
     body {
+      line-height: 1.5rem;
       margin: 0;
       padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    }
+
+    h1 {
+      margin-bottom: 0;
+    }
+
+    h2 {
+      margin-top: 0.5rem;
+      margin-bottom: 0;
+      font-size: 1rem;
+      font-weight: 400;
+    }
+
+    h3 {
+      font-size: 1rem;
+    }
+
+    h4 {
+      font-weight: 400;
+      margin-top: 0.5rem;
+      margin-bottom: 4rem;
+      font-size: 0.85rem;
+    }
+
+    li {
+      font-size: 0.9rem;
     }
     
     #app {
@@ -22,13 +50,13 @@
     }
 
     .app-aside {
-      width: 30%;
+      width: 300px;
       height: 100vh;
       padding: 24px 18px;
     }
 
     .app-main {
-      width: 70%;
+      width: calc(100vw - 300px);
       height: 100vh;
     }
 
@@ -36,6 +64,7 @@
       display: block;;
       width: 100%;
       height: 100%;
+      border: none;
     }
 
   </style>
@@ -48,10 +77,15 @@
     let appNav
 
     function setIframeSrc () {
-      if (viewerIframe && location.hash) {
-        const exampleName = location.hash.substring(1)
-        viewerIframe.setAttribute('src', `/site/examples/${exampleName}/index.html`)
-        viewerIframe.setAttribute('title', currentExampleTitle)
+      
+      if (viewerIframe) {
+        if (location.hash) {
+          const exampleName = location.hash.substring(1)
+          viewerIframe.setAttribute('src', `/site/examples/${exampleName}/index.html`)
+          viewerIframe.setAttribute('title', currentExampleTitle)
+        } else {
+          location.hash = 'particles-01'
+        }
       }
     }
 
@@ -79,6 +113,7 @@
   <div id="app">
     <aside class="app-aside">
       <h1>hwoa-rang-gl</h1>
+      <h2>minimal webgl library</h2>
       <h4>By <a href="https://github.com/gnikoloff" target="_blank">Georgi Nikolov</a></h4>
       <nav id="app-nav">
         <h3>Particles</h3>
@@ -119,12 +154,48 @@
           </li>
           <li>
             <a
-              data-title="Multi Texture"
+              data-title="Multi Face Texture"
               href="#multi-texture">
-              Multi Texture
+              Multi Face Texture
             </a>
           </li>
         </ul>
+        <h3>Framebuffer</h3>
+        <ul>
+          <li>
+            <a
+              data-title="Godrays"
+              href="#godrays">
+              Godrays
+            </a>
+          </li>
+          <li>
+            <a
+              data-title="Motion Blur"
+              href="#motion-blur">
+              Motion Blur
+            </a>
+          </li>
+        </ul>
+
+        <h3>Extras</h3>
+        <ul>
+          <li>
+            <a
+              data-title="Mouse Picking"
+              href="#mouse-picking">
+              Mouse picking
+            </a>
+          </li>
+          <li>
+            <a
+              data-title="Text"
+              href="#text">
+              Text
+            </a>
+          </li>
+        </ul>
+        
       </nav>
     </aside>
     <main class="app-main">
