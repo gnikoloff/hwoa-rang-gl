@@ -4,6 +4,15 @@ const NUM_BALLS = BALLS_COUNT_SIZE * BALLS_COUNT_SIZE * BALLS_COUNT_SIZE
 const stats = new Stats()
 document.body.appendChild(stats.domElement)
 
+const gui = new dat.GUI()
+
+const OPTIONS = {
+  shininess: 128,
+  specularFactor: 1,
+  lightColor: [201, 0, 0],
+  specularColor: [255, 0, 0],
+}
+
 const dpr = devicePixelRatio
 const canvas = document.createElement('canvas')
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
@@ -12,6 +21,7 @@ const instanceMatrix = mat4.create()
 const translateVector = vec3.create()
 
 let sphereMesh
+let lightMesh
 let texture
 let oldTime = 0
 
@@ -30,13 +40,13 @@ const camera = new hwoaRangGL.PerspectiveCamera(
 camera.position = [0, 0, 20]
 camera.lookAt([0, 0, 0])
 
-new hwoaRangGL.CameraController(camera)
+new hwoaRangGL.CameraController(camera, canvas)
 
 const lightWorldPosition = vec3.create()
-vec3.set(lightWorldPosition, 0, 40, 40)
+vec3.set(lightWorldPosition, 0, 0, 0)
 
 const lightDirection = vec3.create()
-vec3.set(lightDirection, 0, 1, 1)
+vec3.set(lightDirection, 0, 5, 5)
 vec3.normalize(lightDirection, lightDirection)
 
 {
@@ -62,11 +72,24 @@ vec3.normalize(lightDirection, lightDirection)
     instanceCount: NUM_BALLS,
     uniforms: {
       eyePosition: { type: 'vec3', value: camera.position },
-      lightWorldPosition: { type: 'vec3', value: lightWorldPosition },
       lightDirection: { type: 'vec3', value: lightDirection },
+      'PointLight.worldPosition': { type: 'vec3', value: lightWorldPosition },
+      'PointLight.shininess': { type: 'float', value: OPTIONS.shininess },
+      'PointLight.lightColor': { type: 'vec3', value: normalizeColor(OPTIONS.lightColor) },
+      'PointLight.specularColor': { type: 'vec3', value: normalizeColor(OPTIONS.specularColor) },
+      'PointLight.specularFactor': { type: 'float', value: OPTIONS.specularFactor },
     },
     vertexShaderSource: `
-        uniform vec3 lightWorldPosition;
+        struct PointLightInfo {
+          float shininess;
+          vec3 lightColor;
+          vec3 specularColor;
+          float specularFactor;
+          vec3 worldPosition;
+        };
+
+        uniform PointLightInfo PointLight;
+
         uniform vec3 eyePosition;
 
         attribute vec4 position;
@@ -83,18 +106,26 @@ vec3.normalize(lightDirection, lightDirection)
           v_normal = mat3(modelMatrix * instanceModelMatrix) * normal;
 
           vec3 surfaceWorldPosition = (modelMatrix * instanceModelMatrix * position).xyz;
-          v_surfaceToLight = lightWorldPosition - surfaceWorldPosition;
+          v_surfaceToLight = PointLight.worldPosition - surfaceWorldPosition;
           v_surfaceToView = eyePosition - surfaceWorldPosition;
         }
       `,
       fragmentShaderSource: `
+        struct PointLightInfo {
+          float shininess;
+          vec3 lightColor;
+          vec3 specularColor;
+          float specularFactor;
+          vec3 worldPosition;
+        };
+
+        uniform PointLightInfo PointLight;
+
         uniform vec3 lightDirection;
 
         varying vec3 v_normal;
         varying vec3 v_surfaceToLight;
         varying vec3 v_surfaceToView;
-        
-        const float shininess = 100.0;
 
         void main () {
           vec3 normal = normalize(v_normal);
@@ -102,19 +133,17 @@ vec3.normalize(lightDirection, lightDirection)
           vec3 surfaceToViewDirection = normalize(v_surfaceToView);
 
           vec3 halfVector = normalize(surfaceToLightDirection + surfaceToViewDirection);
-
           float pointLight = dot(normal, surfaceToLightDirection);
           float directionalLight = dot(normal, lightDirection);
-
           float specular = 0.0;
+
           if (pointLight > 0.0) {
-            specular = pow(dot(normal, halfVector), shininess);
+            specular = pow(dot(normal, halfVector), PointLight.shininess);
           }
           
-          gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-          gl_FragColor.rgb *= pointLight;
-          gl_FragColor.rgb += specular;
-
+          gl_FragColor = vec4(1.0);
+          gl_FragColor.rgb *= pointLight * PointLight.lightColor + directionalLight * 0.05;
+          gl_FragColor.rgb += specular * PointLight.specularColor * PointLight.specularFactor;
         }
       `
   })
@@ -135,19 +164,56 @@ vec3.normalize(lightDirection, lightDirection)
       }
     }
   }
-
-  // for (let i = 0; i < NUM_BALLS; i++) {
-  //   const x = i / (BALLS_COUNT_SIZE * BALLS_COUNT_SIZE) % BALLS_COUNT_SIZE - BALLS_COUNT_SIZE / 2
-  //   const y = i / BALLS_COUNT_SIZE % BALLS_COUNT_SIZE - BALLS_COUNT_SIZE / 2
-  //   const z = i % BALLS_COUNT_SIZE - BALLS_COUNT_SIZE / 2
-    
-  // }
 }
+
+{
+  const { vertices, indices } = hwoaRangGL.GeometryUtils.createSphere({ radius: 0.1 })
+  const geometry = new hwoaRangGL.Geometry(gl)
+  geometry
+    .addIndex({ typedArray: indices })
+    .addAttribute('position', {
+      typedArray: vertices,
+      size: 3
+    })
+  lightMesh = new hwoaRangGL.Mesh(gl, {
+    geometry,
+    vertexShaderSource: `
+      attribute vec4 position;
+
+      void main () {
+        gl_Position = projectionMatrix * viewMatrix * modelMatrix * position;
+      }
+    `,
+    fragmentShaderSource: `
+      void main () {
+        gl_FragColor = vec4(1.0);
+      }
+    `
+  })
+}
+
+gui.add(OPTIONS, 'shininess').min(2).max(256).step(1).onChange(val => {
+  sphereMesh.setUniform('PointLight.shininess', 'float', val)
+})
+gui.add(OPTIONS, 'specularFactor').min(0).max(1).step(0.05).onChange(val => {
+  sphereMesh.setUniform('PointLight.specularFactor', 'float', val)
+})
+gui.addColor(OPTIONS, 'lightColor').onChange(newColor => {
+  sphereMesh.setUniform('PointLight.lightColor', 'vec3', normalizeColor(newColor))
+})
+gui.addColor(OPTIONS, 'specularColor').onChange(newColor => {
+  sphereMesh.setUniform('PointLight.specularColor', 'vec3', normalizeColor(newColor))
+})
 
 document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)
 resize()
 window.addEventListener('resize', resize)
+
+
+function normalizeColor (color) {
+  return [color[0] / 255, color[1] / 255, color[2] / 255]
+}
 
 function updateFrame(ts) {
   ts /= 1000
@@ -160,9 +226,19 @@ function updateFrame(ts) {
   gl.clearColor(0.05, 0.05, 0.05, 1)
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-  vec3.set(lightWorldPosition, lightWorldPosition[0], 0, Math.sin(ts * 0.3) * 8)
-  sphereMesh.setUniform('lightWorldPosition', 'vec3', lightWorldPosition)
+  vec3.set(lightWorldPosition, 0, 0, Math.sin(ts * 0.8) * 8)
+
+  lightMesh.setPosition({
+    x: lightWorldPosition[0],
+    y: lightWorldPosition[1],
+    z: lightWorldPosition[2]
+  })
+  lightMesh.setCamera(camera)
+  lightMesh.draw()
+
+  sphereMesh.setUniform('PointLight.worldPosition', 'vec3', lightWorldPosition)
   sphereMesh.setUniform('eyePosition', 'vec3', camera.position)
+
   sphereMesh.setCamera(camera)
   sphereMesh.draw()  
 
