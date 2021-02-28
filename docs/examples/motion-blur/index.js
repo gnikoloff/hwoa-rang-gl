@@ -150,8 +150,8 @@ function updateFrame(ts) {
   gl.clearColor(0.9, 0.9, 0.9, 1)
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-  mousePos.x += (mousePosTarget.x - mousePos.x) * (dt * 5)
-  mousePos.y += (mousePosTarget.y - mousePos.y) * (dt * 5)
+  mousePos.x += (mousePosTarget.x - mousePos.x) * (dt * 2)
+  mousePos.y += (mousePosTarget.y - mousePos.y) * (dt * 2)
 
   const dx = -mousePosTarget.x
   const dy = -mousePosTarget.y
