@@ -110,7 +110,7 @@ function updateFrame(ts) {
   stats.begin()
 
   gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)
-  gl.clearColor(0.9, 0.9, 0.9, 1)
+  gl.clearColor(0.1, 0.1, 0.1, 1)
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
   boxMesh.setUniform('lightDirection', 'vec3', lightDirection)
@@ -118,8 +118,9 @@ function updateFrame(ts) {
   boxMesh.setRotation(
     {
       y: 1,
+      x: -1,
     },
-    ts * 0.5,
+    ts * 1.5,
   )
   if (texture) {
     texture.bind()
