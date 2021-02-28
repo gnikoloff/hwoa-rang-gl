@@ -7,8 +7,8 @@ document.body.appendChild(stats.domElement)
 const gui = new dat.GUI()
 
 const OPTIONS = {
-  shininess: 128,
-  specularFactor: 1,
+  shininess: 38,
+  specularFactor: 0.4,
   lightColor: [201, 0, 0],
   specularColor: [255, 0, 0],
 }
