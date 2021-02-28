@@ -6,6 +6,7 @@ const canvas = document.createElement('canvas')
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
 
 let boxMesh
+let floorHelperMesh
 let texture
 let oldTime = 0
 
@@ -21,13 +22,13 @@ const camera = new hwoaRangGL.PerspectiveCamera(
   0.1,
   100,
 )
-camera.position = [0, 2, 3]
+camera.position = [4, 3, 3]
 camera.lookAt([0, 0, 0])
 
 new hwoaRangGL.CameraController(camera)
 
 const lightDirection = vec3.create()
-vec3.set(lightDirection, 0, 1, 1)
+vec3.set(lightDirection, 1, 1, 1)
 vec3.normalize(lightDirection, lightDirection)
 
 {
@@ -84,6 +85,9 @@ vec3.normalize(lightDirection, lightDirection)
       }
     `,
   })
+  boxMesh.setPosition({
+    y: 0.5
+  })
 }
 
 const image = new Image()
@@ -96,6 +100,68 @@ image.onload = () => {
   })
 }
 image.src = '../assets/images/webgl-logo-pot.png'
+
+// Floor helper
+{
+  const FLOOR_HELPER_LINES_COUNT = 20
+  const FLOOR_HELPER_RADIUS = 10
+  const vertexCount = FLOOR_HELPER_LINES_COUNT * FLOOR_HELPER_LINES_COUNT * 2
+  const vertices = new Float32Array(vertexCount * 3)
+
+  const scale = FLOOR_HELPER_RADIUS / FLOOR_HELPER_LINES_COUNT
+
+  for (let i = 0; i <= FLOOR_HELPER_LINES_COUNT; i += 2) {
+    {
+      const x1 = i * scale
+      const y1 = 0
+      const x2 = i * scale
+      const y2 = FLOOR_HELPER_RADIUS
+      vertices[i * 6 + 0] = x1 - FLOOR_HELPER_RADIUS / 2
+      vertices[i * 6 + 1] = y1 - FLOOR_HELPER_RADIUS / 2
+      vertices[i * 6 + 2] = 0
+      vertices[i * 6 + 3] = x2 - FLOOR_HELPER_RADIUS / 2
+      vertices[i * 6 + 4] = y2 - FLOOR_HELPER_RADIUS / 2
+      vertices[i * 6 + 5] = 0
+    }
+    {
+      const x1 = 0
+      const y1 = i * scale
+      const x2 = FLOOR_HELPER_RADIUS
+      const y2 = i * scale
+      vertices[i * 6 + 6] = x1 - FLOOR_HELPER_RADIUS / 2
+      vertices[i * 6 + 7] = y1 - FLOOR_HELPER_RADIUS / 2
+      vertices[i * 6 + 8] = 0
+      vertices[i * 6 + 9] = x2 - FLOOR_HELPER_RADIUS / 2
+      vertices[i * 6 + 10] = y2 - FLOOR_HELPER_RADIUS / 2
+      vertices[i * 6 + 11] = 0
+    }
+  }
+
+  const geometry = new hwoaRangGL.Geometry(gl)
+  geometry
+    .addAttribute('position', {
+      typedArray: vertices,
+      size: 3
+    })
+  floorHelperMesh = new hwoaRangGL.Mesh(gl, {
+    geometry,
+    vertexShaderSource: `
+      attribute vec4 position;
+      void main () {
+        gl_Position = projectionMatrix * viewMatrix * modelMatrix * position;
+      }
+    `,
+    fragmentShaderSource: `
+      void main () {
+        gl_FragColor = vec4(0.5, 0.5, 0.5, 1.0);
+      }
+    `
+  })
+  floorHelperMesh.drawMode = gl.LINES
+  floorHelperMesh.setRotation({
+    x: 1
+  }, Math.PI / 2)
+}
 
 document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)
@@ -118,14 +184,16 @@ function updateFrame(ts) {
   boxMesh.setRotation(
     {
       y: 1,
-      x: -1,
     },
-    ts * 1.5,
+    ts * 0.5,
   )
   if (texture) {
     texture.bind()
   }
   boxMesh.draw()
+
+  floorHelperMesh.setCamera(camera)
+  floorHelperMesh.draw()
 
   stats.end()
 
