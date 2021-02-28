@@ -3,6 +3,7 @@ import Program from './program';
 import { MeshInterface, OES_vertex_array_objectInterface } from '../ts-types';
 export default class Mesh {
     #private;
+    modelMatrixNeedsUpdate: boolean;
     modelMatrix: mat4;
     program: Program;
     vaoExtension: OES_vertex_array_objectInterface;

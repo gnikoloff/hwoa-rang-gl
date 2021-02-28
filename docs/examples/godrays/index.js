@@ -1,8 +1,8 @@
 const COUNT_SIDE = 12
 const BOXES_COUNT = COUNT_SIDE * COUNT_SIDE
-const BLUR_ITERATIONS = 16
+const BLUR_ITERATIONS = 24
 const BACKGROUND_COLOR = [0.1, 0.1, 0.1, 1.9]
-const SCALE_DOWN_POSTFX = 5
+const SCALE_DOWN_POSTFX = 10
 
 const OPTS = {
   debugMode: false,
@@ -278,7 +278,7 @@ function updateFrame(ts) {
 
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)
     gl.clearColor(...BACKGROUND_COLOR)
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+    // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
     readBuffer.bindTexture()
 

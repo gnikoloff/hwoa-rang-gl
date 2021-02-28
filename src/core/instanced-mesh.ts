@@ -120,6 +120,11 @@ export default class InstancedMesh extends Mesh {
     this.vaoExtension.bindVertexArrayOES(null)
   }
   draw(): this {
+
+    if (this.modelMatrixNeedsUpdate) {
+      this.updateModelMatrix()
+      this.modelMatrixNeedsUpdate = false
+    }
     this.program.bind()
     this.vaoExtension.bindVertexArrayOES(this.vao)
     if (this.hasIndices) {

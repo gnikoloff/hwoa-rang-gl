@@ -8,7 +8,7 @@ export function createPlane({ width, height, widthSegments, heightSegments, attr
     vertices: Float32Array;
     normal: Float32Array;
     uv: Float32Array;
-    indices: Uint32Array | Uint16Array;
+    indices: Uint16Array | Uint32Array;
 };
 export function createBox({ width, height, depth, widthSegments, heightSegments, depthSegments, separateFaces, }?: {
     width?: number;
@@ -23,12 +23,12 @@ export function createBox({ width, height, depth, widthSegments, heightSegments,
     vertices: Float32Array;
     normal: Float32Array;
     uv: Float32Array;
-    indices: Uint32Array | Uint16Array;
+    indices: Uint16Array | Uint32Array;
 }[] | {
     vertices: Float32Array;
     normal: Float32Array;
     uv: Float32Array;
-    indices: Uint32Array | Uint16Array;
+    indices: Uint16Array | Uint32Array;
 };
 export function createFullscreenQuad(): {
     vertices: Float32Array;
@@ -46,5 +46,5 @@ export function createSphere({ radius, widthSegments, heightSegments, phiStart, 
     vertices: Float32Array;
     normal: Float32Array;
     uv: Float32Array;
-    indices: Uint32Array | Uint16Array;
+    indices: Uint16Array | Uint32Array;
 };

@@ -755,7 +755,7 @@ var hwoaRangGL = (function (exports) {
       };
     }());
 
-    var _position, _positionVec3, _scale, _scaleVec3, _rotationAxis, _rotationAxisVec3, _rotationAngle, _modelMatrixNeedsUpdate, _gl$2, _geometry;
+    var _position, _positionVec3, _scale, _scaleVec3, _rotationAxis, _rotationAxisVec3, _rotationAngle, _gl$2, _geometry;
     class Mesh {
         /**
          *
@@ -770,9 +770,9 @@ var hwoaRangGL = (function (exports) {
             _rotationAxis.set(this, [0, 0, 0]);
             _rotationAxisVec3.set(this, create$1());
             _rotationAngle.set(this, 0);
-            _modelMatrixNeedsUpdate.set(this, false);
             _gl$2.set(this, void 0);
             _geometry.set(this, void 0);
+            this.modelMatrixNeedsUpdate = false;
             this.modelMatrix = create();
             this.drawMode = TRIANGLES;
             __classPrivateFieldSet(this, _gl$2, gl);
@@ -818,20 +818,20 @@ var hwoaRangGL = (function (exports) {
         setPosition({ x = __classPrivateFieldGet(this, _position)[0], y = __classPrivateFieldGet(this, _position)[1], z = __classPrivateFieldGet(this, _position)[2], }) {
             __classPrivateFieldSet(this, _position, [x, y, z]);
             set(__classPrivateFieldGet(this, _positionVec3), x, y, z);
-            __classPrivateFieldSet(this, _modelMatrixNeedsUpdate, true);
+            this.modelMatrixNeedsUpdate = true;
             return this;
         }
         setScale({ x = __classPrivateFieldGet(this, _scale)[0], y = __classPrivateFieldGet(this, _scale)[1], z = __classPrivateFieldGet(this, _scale)[2], }) {
             __classPrivateFieldSet(this, _scale, [x, y, z]);
             set(__classPrivateFieldGet(this, _scaleVec3), x, y, z);
-            __classPrivateFieldSet(this, _modelMatrixNeedsUpdate, true);
+            this.modelMatrixNeedsUpdate = true;
             return this;
         }
         setRotation({ x = __classPrivateFieldGet(this, _rotationAxis)[0], y = __classPrivateFieldGet(this, _rotationAxis)[1], z = __classPrivateFieldGet(this, _rotationAxis)[2], }, rotationAngle) {
             __classPrivateFieldSet(this, _rotationAxis, [x, y, z]);
             set(__classPrivateFieldGet(this, _rotationAxisVec3), x, y, z);
             __classPrivateFieldSet(this, _rotationAngle, rotationAngle);
-            __classPrivateFieldSet(this, _modelMatrixNeedsUpdate, true);
+            this.modelMatrixNeedsUpdate = true;
             return this;
         }
         updateModelMatrix() {
@@ -852,9 +852,9 @@ var hwoaRangGL = (function (exports) {
             return this;
         }
         draw() {
-            if (__classPrivateFieldGet(this, _modelMatrixNeedsUpdate)) {
+            if (this.modelMatrixNeedsUpdate) {
                 this.updateModelMatrix();
-                __classPrivateFieldSet(this, _modelMatrixNeedsUpdate, false);
+                this.modelMatrixNeedsUpdate = false;
             }
             this.program.bind();
             this.vaoExtension.bindVertexArrayOES(this.vao);
@@ -869,7 +869,7 @@ var hwoaRangGL = (function (exports) {
             return this;
         }
     }
-    _position = new WeakMap(), _positionVec3 = new WeakMap(), _scale = new WeakMap(), _scaleVec3 = new WeakMap(), _rotationAxis = new WeakMap(), _rotationAxisVec3 = new WeakMap(), _rotationAngle = new WeakMap(), _modelMatrixNeedsUpdate = new WeakMap(), _gl$2 = new WeakMap(), _geometry = new WeakMap();
+    _position = new WeakMap(), _positionVec3 = new WeakMap(), _scale = new WeakMap(), _scaleVec3 = new WeakMap(), _rotationAxis = new WeakMap(), _rotationAxisVec3 = new WeakMap(), _rotationAngle = new WeakMap(), _gl$2 = new WeakMap(), _geometry = new WeakMap();
 
     var _geometry$1, _gl$3, _instanceExtension;
     class InstancedMesh extends Mesh {
@@ -938,6 +938,10 @@ var hwoaRangGL = (function (exports) {
             this.vaoExtension.bindVertexArrayOES(null);
         }
         draw() {
+            if (this.modelMatrixNeedsUpdate) {
+                this.updateModelMatrix();
+                this.modelMatrixNeedsUpdate = false;
+            }
             this.program.bind();
             this.vaoExtension.bindVertexArrayOES(this.vao);
             if (this.hasIndices) {
