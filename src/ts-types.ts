@@ -1,5 +1,13 @@
 import Geometry from './core/geometry'
 
+import {
+  UNIFORM_TYPE_INT,
+  UNIFORM_TYPE_FLOAT,
+  UNIFORM_TYPE_VEC2,
+  UNIFORM_TYPE_VEC3,
+  UNIFORM_TYPE_VEC4,
+  UNIFORM_TYPE_MATRIX4X4,
+} from './utils/gl-constants'
 export interface MeshInterface {
   geometry: Geometry
   uniforms: Record<string, unknown>
@@ -36,9 +44,9 @@ export interface ProgramInterface {
 export type WebGLVAO = WebGLVertexArrayObjectOES | WebGLVertexArrayObject
 
 export type UniformType =
-  | 'matrix4fv'
-  | 'vec2'
-  | 'vec3'
-  | 'vec4'
-  | 'float'
-  | 'int'
+  | typeof UNIFORM_TYPE_INT
+  | typeof UNIFORM_TYPE_FLOAT
+  | typeof UNIFORM_TYPE_VEC2
+  | typeof UNIFORM_TYPE_VEC3
+  | typeof UNIFORM_TYPE_VEC4
+  | typeof UNIFORM_TYPE_MATRIX4X4

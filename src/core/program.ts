@@ -8,6 +8,14 @@ import {
   fragmentShaderSourceWebGL2Head,
 } from '../utils/shader-snippets'
 
+import {
+  UNIFORM_TYPE_INT,
+  UNIFORM_TYPE_FLOAT,
+  UNIFORM_TYPE_VEC2,
+  UNIFORM_TYPE_VEC3,
+  UNIFORM_TYPE_VEC4,
+  UNIFORM_TYPE_MATRIX4X4
+} from '../utils/gl-constants'
 export default class Program {
   #gl: WebGLRenderingContext
   #program: WebGLProgram
@@ -51,13 +59,13 @@ export default class Program {
       this.#uniformLocations.set(uniformName, uniformLocation)
     }
     switch (uniformType) {
-      case 'matrix4fv':
+      case UNIFORM_TYPE_MATRIX4X4:
         this.#gl.uniformMatrix4fv(uniformLocation, false, uniformValue)
         break
-      case 'vec2':
+      case UNIFORM_TYPE_VEC2:
         this.#gl.uniform2f(uniformLocation, uniformValue[0], uniformValue[1])
         break
-      case 'vec3':
+      case UNIFORM_TYPE_VEC3:
         this.#gl.uniform3f(
           uniformLocation,
           uniformValue[0],
@@ -65,7 +73,7 @@ export default class Program {
           uniformValue[2],
         )
         break
-      case 'vec4':
+      case UNIFORM_TYPE_VEC4:
         this.#gl.uniform4f(
           uniformLocation,
           uniformValue[0],
@@ -74,10 +82,10 @@ export default class Program {
           uniformValue[3],
         )
         break
-      case 'float':
+      case UNIFORM_TYPE_FLOAT:
         this.#gl.uniform1f(uniformLocation, uniformValue)
         break
-      case 'int':
+      case UNIFORM_TYPE_INT:
         this.#gl.uniform1i(uniformLocation, uniformValue)
         break
       default:
