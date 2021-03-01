@@ -98,23 +98,18 @@ export default class InstancedMesh extends Mesh {
   }
   setMatrixAt(index: number, matrix: Float32Array): void {
     const itemsPerInstance = 16
-    const { buffer, typedArray } = this.instanceAttributes.get(
-      INSTANCED_OFFSET_MODEL_MATRIX,
-    )
-    for (
-      let n = index * itemsPerInstance, j = 0;
-      n < index * itemsPerInstance + itemsPerInstance;
-      n++
-    ) {
-      typedArray[n] = matrix[j]
-      j++
+    const { buffer } = this.instanceAttributes.get(INSTANCED_OFFSET_MODEL_MATRIX)
+    const newArr = new Float32Array(itemsPerInstance)
+    for (let i = 0; i < itemsPerInstance; i++) {
+      newArr[i] = matrix[i]
     }
+
     this.vaoExtension.bindVertexArrayOES(this.vao)
     this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, buffer)
-    this.#gl.bufferData(
+    this.#gl.bufferSubData(
       this.#gl.ARRAY_BUFFER,
-      typedArray,
-      this.#gl.DYNAMIC_DRAW,
+      index * itemsPerInstance * Float32Array.BYTES_PER_ELEMENT,
+      newArr
     )
 
     this.vaoExtension.bindVertexArrayOES(null)
