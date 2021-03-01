@@ -42,7 +42,7 @@ requestAnimationFrame(updateFrame)
 resize()
 window.addEventListener('resize', resize)
 
-function loadModel (xhr) {
+function loadModel(xhr) {
   if (xhr.responseType === 'json') {
     gJson = xhr.response
   } else if (xhr.responseType === 'arraybuffer') {
@@ -58,21 +58,20 @@ function loadModel (xhr) {
   const geometry = new hwoaRangGL.Geometry(gl)
   geometry
     .addIndex({
-      typedArray: prim[0].indices.data
+      typedArray: prim[0].indices.data,
     })
     .addAttribute('position', {
       typedArray: prim[0].vertices.data,
-      size: 3
+      size: 3,
     })
     .addAttribute('uv', {
-      typedArray: prim[0].vertices.data,
-      size: 2
+      typedArray: prim[0].uv.data,
+      size: 2,
     })
     .addAttribute('normal', {
       typedArray: prim[0].normal.data,
-      size: 3
+      size: 3,
     })
-    
 
   gltfMesh = new hwoaRangGL.Mesh(gl, {
     geometry,
@@ -110,7 +109,7 @@ function loadModel (xhr) {
         gl_FragColor.rgb += normal * 0.5;
         gl_FragColor.rgb *= light;
       }
-    `
+    `,
   })
 
   const image = new Image()
@@ -118,11 +117,10 @@ function loadModel (xhr) {
     texture = new hwoaRangGL.Texture(gl, {
       image,
       width: image.naturalWidth,
-      height: image.naturalHeight
+      height: image.naturalHeight,
     })
   }
   image.src = './Suzanne_BaseColor.png'
-
 }
 
 function updateFrame(ts) {
@@ -143,7 +141,7 @@ function updateFrame(ts) {
     gltfMesh.setCamera(camera)
     gltfMesh.draw()
   }
-  
+
   stats.end()
 
   requestAnimationFrame(updateFrame)
@@ -156,23 +154,39 @@ function resize() {
   canvas.style.setProperty('height', `${innerHeight}px`)
 }
 
-function downloadFile (url, type, callback) {
+function downloadFile(url, type, callback) {
   const xhr = new XMLHttpRequest()
-  xhr.addEventListener('load', (e => {
-    if (xhr.status !== 200) {
+  xhr.addEventListener(
+    'load',
+    (e) => {
+      if (xhr.status !== 200) {
+        // ...
+      }
+      callback(xhr)
+    },
+    false,
+  )
+  xhr.addEventListener(
+    'error',
+    (e) => {
       // ...
-    }
-    callback(xhr)
-  }), false)
-  xhr.addEventListener('error', (e => {
-    // ...
-  }), false)
-  xhr.addEventListener('abort', (e => {
-    // ...
-  }), false)
-  xhr.addEventListener('timeout', (e => {
-    // ...
-  }), false)
+    },
+    false,
+  )
+  xhr.addEventListener(
+    'abort',
+    (e) => {
+      // ...
+    },
+    false,
+  )
+  xhr.addEventListener(
+    'timeout',
+    (e) => {
+      // ...
+    },
+    false,
+  )
 
   xhr.open('GET', url)
   xhr.responseType = type
