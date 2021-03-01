@@ -146,10 +146,6 @@ function updateFrame(ts) {
 
   stats.begin()
 
-  gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)
-  gl.clearColor(0.9, 0.9, 0.9, 1)
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-
   mousePos.x += (mousePosTarget.x - mousePos.x) * (dt * 2)
   mousePos.y += (mousePosTarget.y - mousePos.y) * (dt * 2)
 
@@ -164,6 +160,7 @@ function updateFrame(ts) {
   })
 
   {
+    gl.viewport(0, 0, innerWidth, innerHeight)
     currentRenderTarget.bind()
     // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
@@ -175,6 +172,10 @@ function updateFrame(ts) {
 
     currentRenderTarget.unbind()
   }
+
+  gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)
+  gl.clearColor(0.9, 0.9, 0.9, 1)
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
   currentRenderTarget.bindTexture()
   resultMesh.draw()
