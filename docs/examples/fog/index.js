@@ -4,8 +4,69 @@ const INSTANCE_COUNT_Z = 8
 const INSTANCE_COUNT = INSTANCE_COUNT_X * INSTANCE_COUNT_Y * INSTANCE_COUNT_Z
 const FOG_COLOR = [0.9, 0.9, 0.9, 1]
 
+const vertexShaderSource = `
+  uniform float time;
+
+  attribute vec4 position;
+  attribute vec3 normal;
+  attribute mat4 instanceModelMatrix;
+  attribute vec3 color;
+
+  varying vec3 v_normal;
+  varying vec3 v_color;
+  varying float v_fogDepth;
+  varying vec3 v_position;
+
+  void main () {
+    vec4 offsetPosition = instanceModelMatrix * position;
+    offsetPosition.y += sin(instanceModelMatrix[3][2] * 10.0 + time) * 1.0;
+
+    vec4 worldViewPosition = viewMatrix * modelMatrix * offsetPosition;
+
+    gl_Position = projectionMatrix * worldViewPosition;
+
+    v_normal = mat3(modelMatrix) * normal;
+    v_color = color;
+    v_fogDepth = -(worldViewPosition).z;
+    v_position = worldViewPosition.xyz;
+  }
+`
+const getFragmentShaderSource = (isLinearFog = true) => `
+  uniform vec3 lightDirection;
+  uniform vec4 fogColor;
+  uniform float fogNear;
+  uniform float fogFar;
+  uniform float fogDensity;
+
+  varying vec3 v_normal;
+  varying vec3 v_color;
+  varying float v_fogDepth;
+  varying vec3 v_position;
+
+  void main () {
+    vec3 normal = normalize(v_normal);
+    float light = dot(normal, lightDirection);
+
+    ${
+      isLinearFog
+        ? `
+        float fogAmount = smoothstep(fogNear, fogFar, v_fogDepth);
+      `
+        : `
+        #define LOG2 1.442695
+        float fogDistance = length(v_position);
+        float fogAmount = 1.0 - exp2(-fogDensity * fogDensity * fogDistance * fogDistance * LOG2);
+        fogAmount = clamp(fogAmount, 0.0, 1.0);
+      `
+    }
+
+    gl_FragColor = vec4(v_color, 1.0);
+    gl_FragColor.rgb *= light;
+    gl_FragColor = mix(gl_FragColor, fogColor, fogAmount);
+  }
+`
+
 const OPTIONS = {
-  isLinearFog: true,
   isExponentialFog: false,
   fogNear: 0,
   fogFar: 70,
@@ -24,16 +85,20 @@ const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
 const transformMatrix = mat4.create()
 const translateVec3 = vec3.create()
 
+const gltfInfo = document.getElementById('gltf-info')
+
 let oldTime = 0
 let gJson
 let gBin
 let gltfMesh
+let gltfMesh2
 
 gl.enable(gl.BLEND)
 gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 gl.enable(gl.DEPTH_TEST)
 gl.enable(gl.CULL_FACE)
 gl.depthFunc(gl.LEQUAL)
+gl.enable(gl.SCISSOR_TEST)
 
 const camera = new hwoaRangGL.PerspectiveCamera(
   (45 * Math.PI) / 180,
@@ -54,16 +119,13 @@ downloadFile('./Suzanne.gltf', 'json', loadModel)
 downloadFile('./Suzanne.bin', 'arraybuffer', loadModel)
 
 const linearFolder = gui.addFolder('linear fog')
-linearFolder.add(OPTIONS, 'isLinearFog').onChange((val) => {
-  OPTIONS.isExponentialFog = !val
-  gltfMesh.setUniform('isLinearFog', 'float', Number(val))
-})
-linearFolder
-  .add(OPTIONS, 'fogNear')
-  .min(0)
-  .max(10)
-  .step(1)
-  .onChange((val) => gltfMesh.setUniform('fogNear', 'float', val))
+linearFolder.open()
+// linearFolder
+//   .add(OPTIONS, 'fogNear')
+//   .min(0)
+//   .max(10)
+//   .step(1)
+//   .onChange((val) => gltfMesh.setUniform('fogNear', 'float', val))
 linearFolder
   .add(OPTIONS, 'fogFar')
   .min(0)
@@ -72,16 +134,22 @@ linearFolder
   .onChange((val) => gltfMesh.setUniform('fogFar', 'float', val))
 
 const exponentialFolder = gui.addFolder('exponential squared fog')
-exponentialFolder.add(OPTIONS, 'isExponentialFog').onChange((val) => {
-  OPTIONS.isLinearFog = !val
-  gltfMesh.setUniform('isLinearFog', 'float', Number(val))
-})
+exponentialFolder.open()
 exponentialFolder
   .add(OPTIONS, 'fogDensity')
   .min(0)
   .max(0.05)
   .step(0.001)
-  .onChange((val) => gltfMesh.setUniform('fogDensity', 'float', val))
+  .onChange((val) => gltfMesh2.setUniform('fogDensity', 'float', val))
+
+const sharedUniforms = {
+  time: { type: 'float', value: 0 },
+  lightDirection: { type: 'vec3', value: lightDirection },
+  fogColor: { type: 'vec4', value: FOG_COLOR },
+  fogNear: { type: 'float', value: OPTIONS.fogNear },
+  fogFar: { type: 'float', value: OPTIONS.fogFar },
+  fogDensity: { type: 'float', value: OPTIONS.fogDensity },
+}
 
 document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)
@@ -140,74 +208,20 @@ function loadModel(xhr) {
     geometry,
     instanceCount: INSTANCE_COUNT,
     uniforms: {
-      time: { type: 'float', value: 0 },
-      lightDirection: { type: 'vec3', value: lightDirection },
-      isLinearFog: { type: 'float', value: OPTIONS.isLinearFog },
-      fogColor: { type: 'vec4', value: FOG_COLOR },
-      fogNear: { type: 'float', value: OPTIONS.fogNear },
-      fogFar: { type: 'float', value: OPTIONS.fogFar },
-      fogDensity: { type: 'float', value: OPTIONS.fogDensity },
+      ...sharedUniforms,
     },
-    vertexShaderSource: `
-      uniform float time;
+    vertexShaderSource,
+    fragmentShaderSource: getFragmentShaderSource(true),
+  })
 
-      attribute vec4 position;
-      attribute vec3 normal;
-      attribute mat4 instanceModelMatrix;
-      attribute vec3 color;
-
-      varying vec3 v_normal;
-      varying vec3 v_color;
-      varying float v_fogDepth;
-      varying vec3 v_position;
-
-      void main () {
-        vec4 offsetPosition = instanceModelMatrix * position;
-        offsetPosition.y += sin(instanceModelMatrix[3][2] * 10.0 + time) * 1.0;
-
-        vec4 worldViewPosition = viewMatrix * modelMatrix * offsetPosition;
-
-        gl_Position = projectionMatrix * worldViewPosition;
-
-        v_normal = mat3(modelMatrix) * normal;
-        v_color = color;
-        v_fogDepth = -(worldViewPosition).z;
-        v_position = worldViewPosition.xyz;
-      }
-    `,
-    fragmentShaderSource: `
-      uniform vec3 lightDirection;
-      uniform vec4 fogColor;
-      uniform float fogNear;
-      uniform float fogFar;
-      uniform float fogDensity;
-      uniform bool isLinearFog;
-
-      varying vec3 v_normal;
-      varying vec3 v_color;
-      varying float v_fogDepth;
-      varying vec3 v_position;
-
-      void main () {
-        vec3 normal = normalize(v_normal);
-        float light = dot(normal, lightDirection);
-
-        float fogAmount = 0.0;
-
-        if (isLinearFog) {
-          fogAmount = smoothstep(fogNear, fogFar, v_fogDepth);
-        } else {
-          #define LOG2 1.442695
-          float fogDistance = length(v_position);
-          fogAmount = 1.0 - exp2(-fogDensity * fogDensity * fogDistance * fogDistance * LOG2);
-          fogAmount = clamp(fogAmount, 0.0, 1.0);
-        }
-        
-        gl_FragColor = vec4(v_color, 1.0);
-        gl_FragColor.rgb *= light;
-        gl_FragColor = mix(gl_FragColor, fogColor, fogAmount);
-      }
-    `,
+  gltfMesh2 = new hwoaRangGL.InstancedMesh(gl, {
+    geometry,
+    instanceCount: INSTANCE_COUNT,
+    uniforms: {
+      ...sharedUniforms,
+    },
+    vertexShaderSource,
+    fragmentShaderSource: getFragmentShaderSource(false),
   })
 
   let i = 0
@@ -226,6 +240,7 @@ function loadModel(xhr) {
         )
         mat4.translate(transformMatrix, transformMatrix, translateVec3)
         gltfMesh.setMatrixAt(i, transformMatrix)
+        gltfMesh2.setMatrixAt(i, transformMatrix)
         i++
       }
     }
@@ -241,12 +256,27 @@ function updateFrame(ts) {
 
   gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)
   gl.clearColor(...FOG_COLOR)
+  gl.scissor(0, 0, gl.drawingBufferWidth / 2, gl.drawingBufferHeight)
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
   if (gltfMesh) {
     gltfMesh.setUniform('time', 'float', ts)
     gltfMesh.setCamera(camera)
     gltfMesh.draw()
+  }
+
+  gl.scissor(
+    gl.drawingBufferWidth / 2,
+    0,
+    gl.drawingBufferWidth,
+    gl.drawingBufferHeight,
+  )
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+
+  if (gltfMesh2) {
+    gltfMesh2.setUniform('time', 'float', ts)
+    gltfMesh2.setCamera(camera)
+    gltfMesh2.draw()
   }
 
   stats.end()

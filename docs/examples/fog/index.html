@@ -8,17 +8,60 @@
 
   <style>
     * { margin: 0; padding: 0; }
-    #gltf-info {
+    #fog-overlay {
       position: fixed;
-      bottom: 24px;
-      right: 24px;
-      font-size: 14px;
-      font-family: sans-serif;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: flex;
+      justify-content: space-between;
+      pointer-events: none;
+    }
+    .panel {
+      position: relative;
+    }
+    .panel:first-of-type {
+      width: calc(50% - 1px);
+      border-right: 1px solid #000;
+    }
+    .panel:last-of-type {
+      width: 50%;
+    }
+    .text {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 20px;
+      box-sizing: border-box;
+      font-family: Helvetica, sans-serif;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.3));
+    }
+    .text h2 {
+      font-size: 16px;
+      margin-bottom: 6px;
     }
   </style>
 
 </head>
 <body>
+
+  <div id="fog-overlay">
+    <div class="panel">
+      <div class="text">
+        <h2>Linear Fog</h2>
+        <p>Fog that grows linearly denser with the distance</p>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="text">
+        <h2>Exponential Squared Fog</h2>
+        <p>Fog exponentially densening with the distance</p>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.7/dat.gui.min.js" integrity="sha512-LF8ZB1iTwi4Qvkm4pekHG4a437Y9Af5ZuwbnW4GTbAWQeR2E4KW8WF+xH8b9psevV7wIlDMx1MH9YfPqgKhA/Q==" crossorigin="anonymous"></script>
   <!-- <script src="https://greggman.github.io/webgl-lint/webgl-lint.js" crossorigin></script> -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/16/Stats.min.js" integrity="sha512-by6gRzSfA6HGshqED4Jnc6n/jJ9ojBvjbEbCvsrLzErlIiWswh1qYfYnvSzZg8SmbqVCk/v0XwlpGzJxIDPILw==" crossorigin="anonymous"></script>
