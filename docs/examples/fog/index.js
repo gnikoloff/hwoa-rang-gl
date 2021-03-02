@@ -138,7 +138,7 @@ exponentialFolder.open()
 exponentialFolder
   .add(OPTIONS, 'fogDensity')
   .min(0)
-  .max(0.05)
+  .max(0.225)
   .step(0.001)
   .onChange((val) => gltfMesh2.setUniform('fogDensity', 'float', val))
 
