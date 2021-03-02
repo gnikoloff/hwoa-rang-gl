@@ -106,10 +106,11 @@ export default class Mesh {
     return this.#scale
   }
 
-  setUniform(uniformName, uniformType, uniformValue): void {
+  setUniform(uniformName, uniformType, uniformValue): this {
     this.program.bind()
     this.program.setUniform(uniformName, uniformType, uniformValue)
     this.program.unbind()
+    return this
   }
 
   setPosition({

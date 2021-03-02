@@ -96,7 +96,7 @@ export default class InstancedMesh extends Mesh {
 
     this.#instanceExtension = getExtension(gl, 'ANGLE_instanced_arrays')
   }
-  setMatrixAt(index: number, matrix: Float32Array): void {
+  setMatrixAt(index: number, matrix: Float32Array): this {
     const itemsPerInstance = 16
     const { buffer } = this.instanceAttributes.get(INSTANCED_OFFSET_MODEL_MATRIX)
     const newArr = new Float32Array(itemsPerInstance)
@@ -113,6 +113,7 @@ export default class InstancedMesh extends Mesh {
     )
 
     this.vaoExtension.bindVertexArrayOES(null)
+    return this
   }
   draw(): this {
 
