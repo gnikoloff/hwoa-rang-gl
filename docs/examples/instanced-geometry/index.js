@@ -111,8 +111,7 @@ function updateFrame(ts) {
     mesh.setMatrixAt(i, matrix)
   }
 
-  mesh.setCamera(camera)
-  mesh.draw()
+  mesh.setCamera(camera).draw()
 
   stats.end()
 

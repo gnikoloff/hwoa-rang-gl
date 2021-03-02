@@ -448,29 +448,28 @@ function updateFrame(ts) {
   gl.clearColor(0.1, 0.1, 0.1, 1)
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-  boxMesh.setUniform('eyePosition', 'vec3', camera.position)
-  boxMesh.setCamera(camera)
-  boxMesh.setRotation(
-    {
-      y: 1,
-    },
-    ts * 0.5,
-  )
-  boxMesh.draw()
+  boxMesh
+    .setUniform('eyePosition', 'vec3', camera.position)
+    .setCamera(camera)
+    .setRotation(
+      {
+        y: 1,
+      },
+      ts * 0.5,
+    )
+    .draw()
 
-  sphereMesh.setUniform('eyePosition', 'vec3', camera.position)
-  sphereMesh.setCamera(camera)
-  sphereMesh.draw()
+  sphereMesh
+    .setUniform('eyePosition', 'vec3', camera.position)
+    .setCamera(camera)
+    .draw()
 
-  floorHelperMesh.setCamera(camera)
-  floorHelperMesh.draw()
+  floorHelperMesh.setCamera(camera).draw()
 
   if (OPTIONS.lightsDebug) {
-    lightHelperMesh.setCamera(camera)
-    lightHelperMesh.draw()
+    lightHelperMesh.setCamera(camera).draw()
 
-    lightPointerHelperMesh.setCamera(camera)
-    lightPointerHelperMesh.draw()
+    lightPointerHelperMesh.setCamera(camera).draw()
   }
 
   stats.end()

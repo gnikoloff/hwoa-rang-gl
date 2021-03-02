@@ -152,8 +152,7 @@ function updateFrame(ts) {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
   texture.bind()
-  mesh.setCamera(camera)
-  mesh.draw()
+  mesh.setCamera(camera).draw()
   texture.unbind()
 
   stats.end()

@@ -113,9 +113,10 @@ for (let i = 0; i < SHAPE_COUNT; ++i) {
   const randRotY = (Math.random() * 2 - 1) * (Math.PI * 2)
   const rotAngle = Math.random() * Math.PI
 
-  mesh.setScale({ x: scale, y: scale, z: scale })
-  mesh.setPosition({ x: randX, y: randY, z: randZ })
-  mesh.setRotation({ x: randRotX, y: randRotY }, rotAngle)
+  mesh
+    .setScale({ x: scale, y: scale, z: scale })
+    .setPosition({ x: randX, y: randY, z: randZ })
+    .setRotation({ x: randRotX, y: randRotY }, rotAngle)
 
   meshes.push(mesh)
 
@@ -145,9 +146,10 @@ for (let i = 0; i < SHAPE_COUNT; ++i) {
     `,
   })
 
-  hoverMesh.setScale({ x: scale, y: scale, z: scale })
-  hoverMesh.setPosition({ x: randX, y: randY, z: randZ })
-  hoverMesh.setRotation({ x: randRotX, y: randRotY }, rotAngle)
+  hoverMesh
+    .setScale({ x: scale, y: scale, z: scale })
+    .setPosition({ x: randX, y: randY, z: randZ })
+    .setRotation({ x: randRotX, y: randRotY }, rotAngle)
   hoverMeshes.push(hoverMesh)
 }
 
@@ -172,16 +174,14 @@ function updateFrame(ts) {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
   meshes.forEach((mesh) => {
-    mesh.setCamera(camera)
-    mesh.draw()
+    mesh.setCamera(camera).draw()
   })
 
   mousePickTarget.bind()
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
   hoverMeshes.forEach((mesh) => {
-    mesh.setCamera(camera)
-    mesh.draw()
+    mesh.setCamera(camera).draw()
   })
 
   const pixelX = (mouseX * canvas.width) / innerWidth

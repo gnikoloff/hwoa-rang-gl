@@ -260,9 +260,7 @@ function updateFrame(ts) {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
   if (gltfMesh) {
-    gltfMesh.setUniform('time', 'float', ts)
-    gltfMesh.setCamera(camera)
-    gltfMesh.draw()
+    gltfMesh.setUniform('time', 'float', ts).setCamera(camera).draw()
   }
 
   gl.scissor(
@@ -274,9 +272,7 @@ function updateFrame(ts) {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
   if (gltfMesh2) {
-    gltfMesh2.setUniform('time', 'float', ts)
-    gltfMesh2.setCamera(camera)
-    gltfMesh2.draw()
+    gltfMesh2.setUniform('time', 'float', ts).setCamera(camera).draw()
   }
 
   stats.end()

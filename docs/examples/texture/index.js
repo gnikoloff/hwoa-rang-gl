@@ -98,8 +98,7 @@ function updateFrame(ts) {
 
   if (texture) {
     texture.bind()
-    mesh.setCamera(camera)
-    mesh.draw()
+    mesh.setCamera(camera).draw()
     texture.unbind()
   }
 

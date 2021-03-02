@@ -138,8 +138,7 @@ function updateFrame(ts) {
     texture.bind()
   }
   if (gltfMesh) {
-    gltfMesh.setCamera(camera)
-    gltfMesh.draw()
+    gltfMesh.setCamera(camera).draw()
   }
 
   stats.end()

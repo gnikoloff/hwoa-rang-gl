@@ -116,8 +116,7 @@ function updateFrame(ts) {
   meshes.forEach((mesh, i) => {
     const texture = textures[i]
     texture.bind()
-    mesh.setCamera(camera)
-    mesh.draw()
+    mesh.setCamera(camera).draw()
     texture.unbind()
   })
 

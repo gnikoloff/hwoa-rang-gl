@@ -242,17 +242,16 @@ function updateFrame(ts) {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
   }
 
-  sphereMesh.setCamera(camera)
-  sphereMesh.setPosition({
-    x: Math.sin(ts) * 4,
-    y: Math.cos(ts) * 3,
-    z: -5,
-  })
-  sphereMesh.updateModelMatrix()
-  sphereMesh.draw()
+  sphereMesh
+    .setCamera(camera)
+    .setPosition({
+      x: Math.sin(ts) * 4,
+      y: Math.cos(ts) * 3,
+      z: -5,
+    })
+    .draw()
 
-  boxesMesh.setCamera(camera)
-  boxesMesh.draw()
+  boxesMesh.setCamera(camera).draw()
 
   if (!OPTS.debugMode) {
     renderTargetBlurX.unbind()
@@ -261,12 +260,13 @@ function updateFrame(ts) {
       readBuffer.bind()
       writeBuffer.bindTexture()
       const radius = BLUR_ITERATIONS - i - 1
-      planeMesh.setUniform(
-        'blurDirection',
-        'vec2',
-        i % 2 === 0 ? [radius, 0] : [0, radius],
-      )
-      planeMesh.draw()
+      planeMesh
+        .setUniform(
+          'blurDirection',
+          'vec2',
+          i % 2 === 0 ? [radius, 0] : [0, radius],
+        )
+        .draw()
       // readBuffer.unbindTexture()
 
       let t = writeBuffer

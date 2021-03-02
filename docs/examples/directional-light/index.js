@@ -86,7 +86,7 @@ vec3.normalize(lightDirection, lightDirection)
     `,
   })
   boxMesh.setPosition({
-    y: 0.5
+    y: 0.5,
   })
 }
 
@@ -138,11 +138,10 @@ image.src = '../assets/images/webgl-logo-pot.png'
   }
 
   const geometry = new hwoaRangGL.Geometry(gl)
-  geometry
-    .addAttribute('position', {
-      typedArray: vertices,
-      size: 3
-    })
+  geometry.addAttribute('position', {
+    typedArray: vertices,
+    size: 3,
+  })
   floorHelperMesh = new hwoaRangGL.Mesh(gl, {
     geometry,
     vertexShaderSource: `
@@ -155,12 +154,15 @@ image.src = '../assets/images/webgl-logo-pot.png'
       void main () {
         gl_FragColor = vec4(0.5, 0.5, 0.5, 1.0);
       }
-    `
+    `,
   })
   floorHelperMesh.drawMode = gl.LINES
-  floorHelperMesh.setRotation({
-    x: 1
-  }, Math.PI / 2)
+  floorHelperMesh.setRotation(
+    {
+      x: 1,
+    },
+    Math.PI / 2,
+  )
 }
 
 document.body.appendChild(canvas)
@@ -179,21 +181,21 @@ function updateFrame(ts) {
   gl.clearColor(0.1, 0.1, 0.1, 1)
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-  boxMesh.setUniform('lightDirection', 'vec3', lightDirection)
-  boxMesh.setCamera(camera)
-  boxMesh.setRotation(
-    {
-      y: 1,
-    },
-    ts * 0.5,
-  )
   if (texture) {
     texture.bind()
   }
-  boxMesh.draw()
+  boxMesh
+    .setUniform('lightDirection', 'vec3', lightDirection)
+    .setCamera(camera)
+    .setRotation(
+      {
+        y: 1,
+      },
+      ts * 0.5,
+    )
+    .draw()
 
-  floorHelperMesh.setCamera(camera)
-  floorHelperMesh.draw()
+  floorHelperMesh.setCamera(camera).draw()
 
   stats.end()
 

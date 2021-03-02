@@ -52,7 +52,7 @@ vec3.normalize(lightDirection, lightDirection)
 {
   const { indices, vertices, normal } = hwoaRangGL.GeometryUtils.createSphere({
     widthSegments: 20,
-    heightSegments: 20
+    heightSegments: 20,
   })
   const geometry = new hwoaRangGL.Geometry(gl)
 
@@ -75,9 +75,18 @@ vec3.normalize(lightDirection, lightDirection)
       lightDirection: { type: 'vec3', value: lightDirection },
       'PointLight.worldPosition': { type: 'vec3', value: lightWorldPosition },
       'PointLight.shininess': { type: 'float', value: OPTIONS.shininess },
-      'PointLight.lightColor': { type: 'vec3', value: normalizeColor(OPTIONS.lightColor) },
-      'PointLight.specularColor': { type: 'vec3', value: normalizeColor(OPTIONS.specularColor) },
-      'PointLight.specularFactor': { type: 'float', value: OPTIONS.specularFactor },
+      'PointLight.lightColor': {
+        type: 'vec3',
+        value: normalizeColor(OPTIONS.lightColor),
+      },
+      'PointLight.specularColor': {
+        type: 'vec3',
+        value: normalizeColor(OPTIONS.specularColor),
+      },
+      'PointLight.specularFactor': {
+        type: 'float',
+        value: OPTIONS.specularFactor,
+      },
     },
     vertexShaderSource: `
         struct PointLightInfo {
@@ -110,7 +119,7 @@ vec3.normalize(lightDirection, lightDirection)
           v_surfaceToView = eyePosition - surfaceWorldPosition;
         }
       `,
-      fragmentShaderSource: `
+    fragmentShaderSource: `
         struct PointLightInfo {
           float shininess;
           vec3 lightColor;
@@ -145,7 +154,7 @@ vec3.normalize(lightDirection, lightDirection)
           gl_FragColor.rgb *= pointLight * PointLight.lightColor + directionalLight * 0.05;
           gl_FragColor.rgb += specular * PointLight.specularColor * PointLight.specularFactor;
         }
-      `
+      `,
   })
 
   let idx = 0
@@ -167,14 +176,14 @@ vec3.normalize(lightDirection, lightDirection)
 }
 
 {
-  const { vertices, indices } = hwoaRangGL.GeometryUtils.createSphere({ radius: 0.1 })
+  const { vertices, indices } = hwoaRangGL.GeometryUtils.createSphere({
+    radius: 0.1,
+  })
   const geometry = new hwoaRangGL.Geometry(gl)
-  geometry
-    .addIndex({ typedArray: indices })
-    .addAttribute('position', {
-      typedArray: vertices,
-      size: 3
-    })
+  geometry.addIndex({ typedArray: indices }).addAttribute('position', {
+    typedArray: vertices,
+    size: 3,
+  })
   lightMesh = new hwoaRangGL.Mesh(gl, {
     geometry,
     vertexShaderSource: `
@@ -188,21 +197,39 @@ vec3.normalize(lightDirection, lightDirection)
       void main () {
         gl_FragColor = vec4(1.0);
       }
-    `
+    `,
   })
 }
 
-gui.add(OPTIONS, 'shininess').min(2).max(256).step(1).onChange(val => {
-  sphereMesh.setUniform('PointLight.shininess', 'float', val)
+gui
+  .add(OPTIONS, 'shininess')
+  .min(2)
+  .max(256)
+  .step(1)
+  .onChange((val) => {
+    sphereMesh.setUniform('PointLight.shininess', 'float', val)
+  })
+gui
+  .add(OPTIONS, 'specularFactor')
+  .min(0)
+  .max(1)
+  .step(0.05)
+  .onChange((val) => {
+    sphereMesh.setUniform('PointLight.specularFactor', 'float', val)
+  })
+gui.addColor(OPTIONS, 'lightColor').onChange((newColor) => {
+  sphereMesh.setUniform(
+    'PointLight.lightColor',
+    'vec3',
+    normalizeColor(newColor),
+  )
 })
-gui.add(OPTIONS, 'specularFactor').min(0).max(1).step(0.05).onChange(val => {
-  sphereMesh.setUniform('PointLight.specularFactor', 'float', val)
-})
-gui.addColor(OPTIONS, 'lightColor').onChange(newColor => {
-  sphereMesh.setUniform('PointLight.lightColor', 'vec3', normalizeColor(newColor))
-})
-gui.addColor(OPTIONS, 'specularColor').onChange(newColor => {
-  sphereMesh.setUniform('PointLight.specularColor', 'vec3', normalizeColor(newColor))
+gui.addColor(OPTIONS, 'specularColor').onChange((newColor) => {
+  sphereMesh.setUniform(
+    'PointLight.specularColor',
+    'vec3',
+    normalizeColor(newColor),
+  )
 })
 
 document.body.appendChild(canvas)
@@ -210,8 +237,7 @@ requestAnimationFrame(updateFrame)
 resize()
 window.addEventListener('resize', resize)
 
-
-function normalizeColor (color) {
+function normalizeColor(color) {
   return [color[0] / 255, color[1] / 255, color[2] / 255]
 }
 
@@ -228,19 +254,20 @@ function updateFrame(ts) {
 
   vec3.set(lightWorldPosition, 0, 0, Math.sin(ts * 0.8) * 8)
 
-  lightMesh.setPosition({
-    x: lightWorldPosition[0],
-    y: lightWorldPosition[1],
-    z: lightWorldPosition[2]
-  })
-  lightMesh.setCamera(camera)
-  lightMesh.draw()
+  lightMesh
+    .setPosition({
+      x: lightWorldPosition[0],
+      y: lightWorldPosition[1],
+      z: lightWorldPosition[2],
+    })
+    .setCamera(camera)
+    .draw()
 
-  sphereMesh.setUniform('PointLight.worldPosition', 'vec3', lightWorldPosition)
-  sphereMesh.setUniform('eyePosition', 'vec3', camera.position)
-
-  sphereMesh.setCamera(camera)
-  sphereMesh.draw()  
+  sphereMesh
+    .setUniform('PointLight.worldPosition', 'vec3', lightWorldPosition)
+    .setUniform('eyePosition', 'vec3', camera.position)
+    .setCamera(camera)
+    .draw()
 
   stats.end()
 

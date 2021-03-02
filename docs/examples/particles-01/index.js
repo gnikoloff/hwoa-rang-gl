@@ -95,9 +95,10 @@ function updateFrame(ts) {
 
   spacing += (spacingTarget - spacing) * (dt * 20)
 
-  mesh.setUniform('time', 'float', ts)
-  mesh.setUniform('spacing', 'float', spacing)
-  mesh.draw()
+  mesh
+    .setUniform('time', 'float', ts)
+    .setUniform('spacing', 'float', spacing)
+    .draw()
 
   stats.end()
 
