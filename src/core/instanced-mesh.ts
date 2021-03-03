@@ -37,7 +37,7 @@ export default class InstancedMesh extends Mesh {
     )
     const identityMat = mat4.create()
     const itemsPerInstance = 16
-    const bytesPerMatrix = itemsPerInstance * 4
+    const bytesPerMatrix = itemsPerInstance * Float32Array.BYTES_PER_ELEMENT
     const matrixData = new Float32Array(itemsPerInstance * instanceCount)
 
     for (let i = 0; i < instanceCount; i++) {
