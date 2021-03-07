@@ -1,13 +1,16 @@
 const litObjectVertexShader = `
-  struct PointLightInfo {
+  struct SpotLightInfo {
     float shininess;
     vec3 lightColor;
     vec3 specularColor;
     float specularFactor;
     vec3 worldPosition;
+    vec3 lightDirection;
+    float innerLimit;
+    float outerLimit;
   };
   
-  uniform PointLightInfo PointLight;
+  uniform SpotLightInfo SpotLight;
   uniform vec3 eyePosition;
 
   attribute vec4 position;
@@ -24,7 +27,7 @@ const litObjectVertexShader = `
 
     vec3 surfaceWorldPosition = (modelMatrix * position).xyz;
 
-    v_surfaceToLight = PointLight.worldPosition - surfaceWorldPosition;
+    v_surfaceToLight = SpotLight.worldPosition - surfaceWorldPosition;
     v_surfaceToView = eyePosition - surfaceWorldPosition;
     v_uv = uv;
     v_normal = mat3(modelMatrix) * normal;
@@ -32,15 +35,18 @@ const litObjectVertexShader = `
 `
 
 const litObjectFragmentShader = `
-  struct PointLightInfo {
+  struct SpotLightInfo {
     float shininess;
     vec3 lightColor;
     vec3 specularColor;
     float specularFactor;
     vec3 worldPosition;
+    vec3 lightDirection;
+    float innerLimit;
+    float outerLimit;
   };
 
-  uniform PointLightInfo PointLight;
+  uniform SpotLightInfo SpotLight;
 
   varying vec2 v_uv;
   varying vec3 v_normal;
@@ -53,16 +59,17 @@ const litObjectFragmentShader = `
     vec3 surfaceToViewDirection = normalize(v_surfaceToView);
 
     vec3 halfVector = normalize(surfaceToLightDirection + surfaceToViewDirection);
-    float pointLight = dot(normal, surfaceToLightDirection);
-    float specular = 0.0;
 
-    if (pointLight > 0.0) {
-      specular = pow(dot(normal, halfVector), PointLight.shininess);
-    }
+    float dotFromDirection = dot(surfaceToLightDirection, -SpotLight.lightDirection);
+    float limitRange = SpotLight.innerLimit - SpotLight.outerLimit;
+    float inLight = clamp((dotFromDirection - SpotLight.outerLimit) / limitRange, 0.0, 1.0);
+
+    float light = inLight * dot(normal, surfaceToLightDirection);
+    float specular = inLight * pow(dot(normal, halfVector), SpotLight.shininess);
     
     gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
-    gl_FragColor.rgb *= pointLight * PointLight.lightColor;
-    gl_FragColor.rgb += specular * PointLight.specularColor * PointLight.specularFactor;
+    gl_FragColor.rgb *= light * SpotLight.lightColor;
+    gl_FragColor.rgb += specular * SpotLight.specularColor * SpotLight.specularFactor;
   }
 `
 
@@ -80,6 +87,91 @@ const helperFragmentShader = `
   }
 `
 
+const makeLightHelperVertices = (hasArrow) => {
+  const vertices = [
+    0,
+    0,
+    MOVEMENT_LIGHT_RADIUS,
+    1,
+    1,
+    0,
+
+    1,
+    1,
+    0,
+    -1,
+    1,
+    0,
+
+    -1,
+    1,
+    0,
+    0,
+    0,
+    MOVEMENT_LIGHT_RADIUS,
+
+    0,
+    0,
+    MOVEMENT_LIGHT_RADIUS,
+    -1,
+    -1,
+    0,
+    -1,
+    -1,
+    0,
+    -1,
+    1,
+    0,
+
+    0,
+    0,
+    MOVEMENT_LIGHT_RADIUS,
+    1,
+    -1,
+    0,
+
+    1,
+    -1,
+    0,
+    1,
+    1,
+    0,
+
+    1,
+    -1,
+    0,
+    -1,
+    -1,
+    0,
+
+    0,
+    0,
+  ]
+  if (hasArrow) {
+    vertices.push(
+      MOVEMENT_LIGHT_RADIUS,
+      0,
+      0,
+      MOVEMENT_LIGHT_RADIUS * 0.75,
+      0,
+      0,
+      MOVEMENT_LIGHT_RADIUS * 0.75,
+      0.05,
+      0,
+      MOVEMENT_LIGHT_RADIUS * 0.77,
+      0,
+      0,
+      MOVEMENT_LIGHT_RADIUS * 0.75,
+      -0.05,
+      0,
+      MOVEMENT_LIGHT_RADIUS * 0.77,
+      0,
+      0,
+    )
+  }
+  return vertices
+}
+
 const gui = new dat.GUI()
 
 const MOVEMENT_LIGHT_RADIUS = 2.25
@@ -89,6 +181,8 @@ const OPTIONS = {
   specularFactor: 0.4,
   lightColor: [201, 0, 0],
   specularColor: [255, 0, 0],
+  innerLimit: 90,
+  outerLimit: 120,
   theta: 0,
   phi: 10,
   lightsDebug: true,
@@ -100,12 +194,19 @@ document.body.appendChild(stats.domElement)
 const dpr = devicePixelRatio
 const canvas = document.createElement('canvas')
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
+const spotLightMat = mat4.create()
+const target = vec3.create()
+vec3.set(target, 0, 0, 0)
+const up = vec3.create()
+vec3.set(up, 0, 1, 0)
 
+let lightDirection
 let boxMesh
 let sphereMesh
 let floorHelperMesh
 let lightHelperMesh
-let lightPointerHelperMesh
+let lightPointerHelperMeshInner
+let lightPointerHelperMeshOuter
 let oldTime = 0
 
 gl.enable(gl.BLEND)
@@ -130,19 +231,31 @@ vec3.set(lightWorldPosition, 0, 0, MOVEMENT_LIGHT_RADIUS)
 
 const litObjectSharedUniforms = {
   eyePosition: { type: 'vec3', value: camera.position },
-  'PointLight.worldPosition': { type: 'vec3', value: lightWorldPosition },
-  'PointLight.shininess': { type: 'float', value: OPTIONS.shininess },
-  'PointLight.lightColor': {
+  'SpotLight.worldPosition': { type: 'vec3', value: lightWorldPosition },
+  'SpotLight.shininess': { type: 'float', value: OPTIONS.shininess },
+  'SpotLight.lightColor': {
     type: 'vec3',
     value: normalizeColor(OPTIONS.lightColor),
   },
-  'PointLight.specularColor': {
+  'SpotLight.specularColor': {
     type: 'vec3',
     value: normalizeColor(OPTIONS.specularColor),
   },
-  'PointLight.specularFactor': {
+  'SpotLight.specularFactor': {
     type: 'float',
     value: OPTIONS.specularFactor,
+  },
+  'SpotLight.lightDirection': {
+    type: 'vec3',
+    value: [0, 0, 0],
+  },
+  'SpotLight.innerLimit': {
+    type: 'float',
+    value: Math.cos((OPTIONS.innerLimit * Math.PI) / 180),
+  },
+  'SpotLight.outerLimit': {
+    type: 'float',
+    value: Math.cos((OPTIONS.outerLimit * Math.PI) / 180),
   },
 }
 
@@ -174,7 +287,7 @@ const litObjectSharedUniforms = {
     fragmentShaderSource: litObjectFragmentShader,
   })
   boxMesh.setPosition({
-    x: -0.75,
+    x: -0.5,
     y: 0.5,
   })
 }
@@ -199,7 +312,7 @@ const litObjectSharedUniforms = {
     fragmentShaderSource: litObjectFragmentShader,
   })
   sphereMesh.setPosition({
-    x: 0.75,
+    x: 0.5,
     y: 0.5,
   })
 }
@@ -224,94 +337,18 @@ const litObjectSharedUniforms = {
   lightHelperMesh.setPosition({
     x: lightWorldPosition[0],
     y: lightWorldPosition[1] + 0.39,
-    z: lightWorldPosition[2],
+    z: lightWorldPosition[2] + MOVEMENT_LIGHT_RADIUS,
   })
 }
 
 {
-  const vertices = new Float32Array([
-    0,
-    0,
-    MOVEMENT_LIGHT_RADIUS,
-    1,
-    1,
-    0,
-
-    1,
-    1,
-    0,
-    -1,
-    1,
-    0,
-
-    -1,
-    1,
-    0,
-    0,
-    0,
-    MOVEMENT_LIGHT_RADIUS,
-
-    0,
-    0,
-    MOVEMENT_LIGHT_RADIUS,
-    -1,
-    -1,
-    0,
-    -1,
-    -1,
-    0,
-    -1,
-    1,
-    0,
-
-    0,
-    0,
-    MOVEMENT_LIGHT_RADIUS,
-    1,
-    -1,
-    0,
-
-    1,
-    -1,
-    0,
-    1,
-    1,
-    0,
-
-    1,
-    -1,
-    0,
-    -1,
-    -1,
-    0,
-
-    0,
-    0,
-    MOVEMENT_LIGHT_RADIUS,
-    0,
-    0,
-    MOVEMENT_LIGHT_RADIUS * 0.75,
-    0,
-    0,
-    MOVEMENT_LIGHT_RADIUS * 0.75,
-    0.05,
-    0,
-    MOVEMENT_LIGHT_RADIUS * 0.77,
-    0,
-    0,
-    MOVEMENT_LIGHT_RADIUS * 0.75,
-    -0.05,
-    0,
-    MOVEMENT_LIGHT_RADIUS * 0.77,
-    0,
-    0,
-  ])
+  const vertices = new Float32Array(makeLightHelperVertices(true))
   const geometry = new hwoaRangGL.Geometry(gl)
   geometry.addAttribute('position', {
     typedArray: vertices,
     size: 3,
   })
-  lightPointerHelperMesh = new hwoaRangGL.Mesh(gl, {
+  lightPointerHelperMeshInner = new hwoaRangGL.Mesh(gl, {
     geometry,
     uniforms: {
       color: { type: 'vec3', value: [0, 1, 0] },
@@ -319,10 +356,44 @@ const litObjectSharedUniforms = {
     vertexShaderSource: helperVertexShader,
     fragmentShaderSource: helperFragmentShader,
   })
-  lightPointerHelperMesh.drawMode = gl.LINES
-  lightPointerHelperMesh.setPosition({
-    y: 0.39,
+  lightPointerHelperMeshInner.drawMode = gl.LINES
+  lightPointerHelperMeshInner
+    .setPosition({
+      y: 0.39,
+      z: MOVEMENT_LIGHT_RADIUS,
+    })
+
+    .setScale({
+      x: OPTIONS.innerLimit / 180,
+      y: OPTIONS.innerLimit / 180,
+    })
+}
+
+{
+  const vertices = new Float32Array(makeLightHelperVertices(false))
+  const geometry = new hwoaRangGL.Geometry(gl)
+  geometry.addAttribute('position', {
+    typedArray: vertices,
+    size: 3,
   })
+  lightPointerHelperMeshOuter = new hwoaRangGL.Mesh(gl, {
+    geometry,
+    uniforms: {
+      color: { type: 'vec3', value: [0, 0, 1] },
+    },
+    vertexShaderSource: helperVertexShader,
+    fragmentShaderSource: helperFragmentShader,
+  })
+  lightPointerHelperMeshOuter.drawMode = gl.LINES
+  lightPointerHelperMeshOuter
+    .setPosition({
+      y: 0.39,
+      z: MOVEMENT_LIGHT_RADIUS,
+    })
+    .setScale({
+      x: OPTIONS.outerLimit / 180,
+      y: OPTIONS.outerLimit / 180,
+    })
 }
 
 // Floor helper
@@ -384,28 +455,52 @@ const litObjectSharedUniforms = {
 }
 
 gui
+  .add(OPTIONS, 'shininess')
+  .min(1)
+  .max(100)
+  .step(1)
+  .onChange((val) => {
+    boxMesh.setUniform('SpotLight.shininess', 'float', val)
+    sphereMesh.setUniform('SpotLight.shininess', 'float', val)
+  })
+gui
   .add(OPTIONS, 'theta')
   .min(0)
   .max(360)
   .step(5)
   .onChange((val) => {
-    const updatex = Math.sin((val * Math.PI) / 180) * MOVEMENT_LIGHT_RADIUS
-    const updatez = Math.cos((val * Math.PI) / 180) * MOVEMENT_LIGHT_RADIUS
+    const cameraUpdateX =
+      Math.sin((val * Math.PI) / 180) * MOVEMENT_LIGHT_RADIUS * 2
+    const cameraUpdateZ =
+      Math.cos((val * Math.PI) / 180) * MOVEMENT_LIGHT_RADIUS * 2
+    const cameraPointerUpdateX =
+      Math.sin((val * Math.PI) / 180) * MOVEMENT_LIGHT_RADIUS
+    const cameraPointerUpdateZ =
+      Math.cos((val * Math.PI) / 180) * MOVEMENT_LIGHT_RADIUS
     lightHelperMesh.setPosition({
-      x: updatex,
-      z: updatez,
+      x: cameraUpdateX,
+      z: cameraUpdateZ,
     })
-    lightPointerHelperMesh.setPosition({
-      x: updatex,
-      z: updatez - MOVEMENT_LIGHT_RADIUS,
-    })
-    vec3.set(lightWorldPosition, updatex, lightWorldPosition[1], updatez)
-    boxMesh.setUniform('PointLight.worldPosition', 'vec3', lightWorldPosition)
-    sphereMesh.setUniform(
-      'PointLight.worldPosition',
-      'vec3',
+    lightPointerHelperMeshInner
+      .setRotation({ x: 0, y: 1 }, (val * Math.PI) / 180)
+      .setPosition({
+        x: cameraPointerUpdateX,
+        z: cameraPointerUpdateZ,
+      })
+    lightPointerHelperMeshOuter
+      .setRotation({ x: 0, y: 1 }, (val * Math.PI) / 180)
+      .setPosition({
+        x: cameraPointerUpdateX,
+        z: cameraPointerUpdateZ,
+      })
+    vec3.set(
       lightWorldPosition,
+      cameraPointerUpdateX,
+      lightWorldPosition[1],
+      cameraPointerUpdateZ,
     )
+    boxMesh.setUniform('SpotLight.worldPosition', 'vec3', lightWorldPosition)
+    sphereMesh.setUniform('SpotLight.worldPosition', 'vec3', lightWorldPosition)
   })
 
 gui
@@ -414,23 +509,106 @@ gui
   .max(360)
   .step(5)
   .onChange((val) => {
-    const updatey = Math.sin((val * Math.PI) / 180) * MOVEMENT_LIGHT_RADIUS
-    const updatez = Math.cos((val * Math.PI) / 180) * MOVEMENT_LIGHT_RADIUS
-    lightHelperMesh.setPosition({ y: updatey, z: updatez })
-    lightPointerHelperMesh.setPosition({
-      y: updatey,
-      z: updatez - MOVEMENT_LIGHT_RADIUS,
+    const cameraUpdateY =
+      Math.sin((val * Math.PI) / 180) * MOVEMENT_LIGHT_RADIUS
+    const cameraUpdateZ =
+      Math.cos((val * Math.PI) / 180) * MOVEMENT_LIGHT_RADIUS
+    const cameraPointerUpdateY =
+      Math.sin((val * Math.PI) / 180) * MOVEMENT_LIGHT_RADIUS
+    const cameraPointerUpdateZ =
+      Math.cos((val * Math.PI) / 180) * MOVEMENT_LIGHT_RADIUS
+    lightHelperMesh.setPosition({
+      y: Math.sin((val * Math.PI) / 180) * MOVEMENT_LIGHT_RADIUS * 2,
+      z: Math.cos((val * Math.PI) / 180) * MOVEMENT_LIGHT_RADIUS * 2,
     })
-    vec3.set(lightWorldPosition, lightWorldPosition[0], updatey, updatez)
-    boxMesh.setUniform('PointLight.worldPosition', 'vec3', lightWorldPosition)
-    sphereMesh.setUniform(
-      'PointLight.worldPosition',
-      'vec3',
+    lightPointerHelperMeshInner
+      .setRotation({ x: 1, y: 0 }, -(val * Math.PI) / 180)
+      .setPosition({
+        y: cameraUpdateY,
+        z: cameraUpdateZ,
+      })
+    lightPointerHelperMeshOuter
+      .setRotation({ x: 1, y: 0 }, -(val * Math.PI) / 180)
+      .setPosition({
+        y: cameraPointerUpdateY,
+        z: cameraPointerUpdateZ,
+      })
+    vec3.set(
       lightWorldPosition,
+      lightWorldPosition[0],
+      cameraPointerUpdateY,
+      cameraPointerUpdateZ,
     )
+    boxMesh.setUniform('SpotLight.worldPosition', 'vec3', lightWorldPosition)
+    sphereMesh.setUniform('SpotLight.worldPosition', 'vec3', lightWorldPosition)
   })
+gui
+  .add(OPTIONS, 'specularFactor')
+  .min(0)
+  .max(1)
+  .step(0.05)
+  .onChange((val) => {
+    boxMesh.setUniform('SpotLight.specularFactor', 'float', val)
+    sphereMesh.setUniform('SpotLight.specularFactor', 'float', val)
+  })
+gui
+  .add(OPTIONS, 'innerLimit')
+  .min(0)
+  .max(180)
+  .step(1)
+  .onChange((val) => {
+    if (val > OPTIONS.outerLimit) {
+      OPTIONS.outerLimit = val + 1
+    }
+    lightPointerHelperMeshInner.setScale({ x: val / 180, y: val / 180 })
+    val *= Math.PI / 180
+    boxMesh.setUniform('SpotLight.innerLimit', 'float', Math.cos(val))
+    sphereMesh.setUniform('SpotLight.innerLimit', 'float', Math.cos(val))
+  })
+  .listen()
+gui
+  .add(OPTIONS, 'outerLimit')
+  .min(0)
+  .max(180)
+  .step(1)
+  .onChange((val) => {
+    if (val < OPTIONS.innerLimit) {
+      OPTIONS.innerLimit = val - 1
+    }
+    lightPointerHelperMeshOuter.setScale({ x: val / 180, y: val / 180 })
+    val *= Math.PI / 180
+    boxMesh.setUniform('SpotLight.outerLimit', 'float', Math.cos(val))
+    sphereMesh.setUniform('SpotLight.outerLimit', 'float', Math.cos(val))
+  })
+  .listen()
+
+gui.addColor(OPTIONS, 'lightColor').onChange((newColor) => {
+  boxMesh.setUniform('SpotLight.lightColor', 'vec3', normalizeColor(newColor))
+  sphereMesh.setUniform(
+    'SpotLight.lightColor',
+    'vec3',
+    normalizeColor(newColor),
+  )
+})
+gui.addColor(OPTIONS, 'specularColor').onChange((newColor) => {
+  sphereMesh.setUniform(
+    'SpotLight.specularColor',
+    'vec3',
+    normalizeColor(newColor),
+  )
+  boxMesh.setUniform(
+    'SpotLight.specularColor',
+    'vec3',
+    normalizeColor(newColor),
+  )
+})
 
 gui.add(OPTIONS, 'lightsDebug')
+
+const position = vec3.create()
+vec3.set(position, ...sphereMesh.position)
+mat4.lookAt(spotLightMat, position, target, up)
+lightDirection = [-spotLightMat[8], -spotLightMat[9], -spotLightMat[10]]
 
 document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)
@@ -450,6 +628,7 @@ function updateFrame(ts) {
 
   boxMesh
     .setUniform('eyePosition', 'vec3', camera.position)
+    // .setUniform('SpotLight.lightDirection', 'vec3', lightDirection)
     .setCamera(camera)
     .setRotation(
       {
@@ -461,6 +640,7 @@ function updateFrame(ts) {
 
   sphereMesh
     .setUniform('eyePosition', 'vec3', camera.position)
+    // .setUniform('SpotLight.lightDirection', 'vec3', lightDirection)
     .setCamera(camera)
     .draw()
 
@@ -469,7 +649,8 @@ function updateFrame(ts) {
   if (OPTIONS.lightsDebug) {
     lightHelperMesh.setCamera(camera).draw()
 
-    lightPointerHelperMesh.setCamera(camera).draw()
+    lightPointerHelperMeshInner.setCamera(camera).draw()
+    lightPointerHelperMeshOuter.setCamera(camera).draw()
   }
 
   stats.end()
