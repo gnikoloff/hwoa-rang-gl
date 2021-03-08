@@ -23,6 +23,8 @@ export default class Texture {
       wrapS = gl.CLAMP_TO_EDGE,
       wrapT = gl.CLAMP_TO_EDGE,
       anisotropy = 0,
+      minFilter = gl.LINEAR,
+      magFilter = gl.LINEAR
     },
   ) {
     this.#gl = gl
@@ -36,7 +38,21 @@ export default class Texture {
     }
 
     if (image) {
-      gl.texImage2D(gl.TEXTURE_2D, 0, internalFormat, format, type, image)
+      if (image instanceof HTMLVideoElement || image instanceof HTMLImageElement || image instanceof HTMLCanvasElement) {
+        gl.texImage2D(gl.TEXTURE_2D, 0, internalFormat, format, type, image)
+      } else {
+        gl.texImage2D(
+          gl.TEXTURE_2D,
+          0,                // mip level
+          internalFormat,
+          width,
+          height,
+          0,                // border
+          format,
+          type,
+          image
+        )
+      }
 
       if (isPowerOf2(image.width) && isPowerOf2(image.height) && useMipmaps) {
         gl.generateMipmap(gl.TEXTURE_2D)
@@ -45,10 +61,10 @@ export default class Texture {
           gl.TEXTURE_MIN_FILTER,
           gl.LINEAR_MIPMAP_LINEAR,
         )
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, magFilter)
       } else {
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, minFilter)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, magFilter)
       }
     } else if (width && height) {
       gl.texImage2D(
@@ -62,8 +78,8 @@ export default class Texture {
         type,
         null,
       )
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, minFilter)
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, magFilter)
     }
 
     if (anisotropy) {
