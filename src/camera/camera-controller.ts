@@ -366,6 +366,8 @@ export default class CameraController {
     let dY: number
     let dDis: number
 
+    event.preventDefault()
+
     switch (event.touches.length) {
       case 1:
         if (this.state !== 'rotate') return

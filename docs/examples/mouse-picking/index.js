@@ -35,7 +35,6 @@ const fieldOfViewRadians = (45 * Math.PI) / 180
 const near = 0.1
 const far = 100
 const frustumProjectionMatrix = mat4.create()
-const pixelData = new Uint8Array(4)
 
 let mouseX = -1
 let mouseY = -1
@@ -54,7 +53,7 @@ const camera = new hwoaRangGL.PerspectiveCamera(
 )
 camera.position = [0, 0, 40]
 camera.lookAt([0, 0, 0])
-new hwoaRangGL.CameraController(camera)
+new hwoaRangGL.CameraController(camera, canvas)
 
 const mousePickTarget = new hwoaRangGL.RenderTarget(gl, {
   width: innerWidth,
@@ -163,8 +162,9 @@ resize()
 window.addEventListener('resize', resize)
 
 function onMouseMove(e) {
-  mouseX = e.pageX
-  mouseY = e.pageY
+  const rect = canvas.getBoundingClientRect()
+  mouseX = e.clientX - rect.left
+  mouseY = e.clientY - rect.top
 }
 
 function updateFrame(ts) {
@@ -223,7 +223,7 @@ function updateFrame(ts) {
 
   // const pixelX = (mouseX * canvas.width) / innerWidth
   // const pixelY = canvas.height - (mouseY * canvas.height) / innerHeight - 1
-
+  const pixelData = new Uint8Array(4)
   gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixelData)
 
   const id =

@@ -24,7 +24,7 @@ const camera = new hwoaRangGL.PerspectiveCamera(
 camera.position = [0, 0, 40]
 camera.lookAt([0, 0, 0])
 
-new hwoaRangGL.CameraController(camera)
+new hwoaRangGL.CameraController(camera, canvas)
 
 const { indices, vertices, uv } = hwoaRangGL.GeometryUtils.createPlane({
   width: 16,

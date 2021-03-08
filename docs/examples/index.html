@@ -8,7 +8,19 @@
   
 
   <style>
+
+    :root {
+      --app-height: 100%;
+    }
+
     * { box-sizing: border-box; }
+
+    html,
+    body {
+      overflow: hidden;
+      width: 100vw;
+      height: var(--app-height);
+    }
 
     body {
       line-height: 1.5rem;
@@ -55,15 +67,59 @@
     }
 
     .app-aside {
+      position: fixed;
+      top: 0;
+      left: 0;
       overflow: auto;
       width: 300px;
       height: 100vh;
       padding: 24px 18px;
+      background: white;
+      z-index: 1;
+      transition: transform 0.15s ease-in-out;
+      transform: translateX(-100%);
+    }
+    .app-aside.visible {
+      transform: translateX(0);
+    }
+
+    #toggle-mobile-nav {
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: white;
+      border: none;
+      z-index: 1;
+      box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #toggle-mobile-nav svg {
+      width: 20px;
+    }
+    #toggle-mobile-nav:focus { outline: 0; }
+
+    @media (min-width: 720px) {
+      /* .app-aside {
+        transform: translateX(-100%);
+      } */
     }
 
     .app-main {
-      width: calc(100vw - 300px);
-      height: 100vh;
+      touch-action: none;
+      overflow: hidden;
+      width: 100vw;
+      height: var(--app-height);
+    }
+
+    @media (min-width: 720px) {
+      .app-main {
+        width: calc(100vw - 300px);
+      }
     }
 
     .iframe {
@@ -105,9 +161,11 @@
 
     let viewerIframe
     let sourceLinkBtn
+    let mobileNavToggleBtn
     let appNav
+    let appAside
 
-    function setIframeSrc () {
+    function onHashChange () {
       
       if (viewerIframe) {
         if (location.hash) {
@@ -121,6 +179,9 @@
           location.hash = exampleName
           sourceLinkBtn.setAttribute('href', `https://github.com/gnikoloff/hwoa-rang-gl/tree/main/docs/examples/${exampleName}/index.js`)
         }
+        if (appAside.classList.contains('visible')) {
+          appAside.classList.remove('visible')
+        }
       }
     }
 
@@ -131,18 +192,32 @@
       }
     }
 
-    function onDOMLoad () {
-      viewerIframe = document.getElementById('preview-iframe')
-      appNav = document.getElementById('app-nav')
-      sourceLinkBtn = document.getElementById('source-link')
-
-      setIframeSrc()
-
-      appNav.addEventListener('click', onNavClick)
+    function toggleMobileNav () {
+      appAside.classList.toggle('visible')
     }
 
-    window.onhashchange = setIframeSrc
+    function onDOMLoad () {
+      viewerIframe = document.getElementById('preview-iframe')
+      appAside = document.getElementsByClassName('app-aside')[0]
+      appNav = document.getElementById('app-nav')
+      sourceLinkBtn = document.getElementById('source-link')
+      mobileNavToggleBtn = document.getElementById('toggle-mobile-nav')
+
+      onHashChange()
+
+      appNav.addEventListener('click', onNavClick)
+      mobileNavToggleBtn.addEventListener('click', toggleMobileNav)
+    }
+
+    function onResize () {
+      const doc = document.documentElement
+      doc.style.setProperty('--app-height', `${window.innerHeight}px`)
+    }
+
+    window.onhashchange = onHashChange
     document.addEventListener('DOMContentLoaded', onDOMLoad)
+    window.addEventListener('resize', onResize)
+    onResize()
 
   </script>
   
@@ -210,6 +285,13 @@
               data-title="Environment Map"
             >
               Environment Map
+            </a>
+          </li>
+          <li>
+            <a
+              data-title="Planar Perspective Projection"
+              href="#planar-perspective-projection">
+              Planar Perspective Projection
             </a>
           </li>
         </ul>
@@ -314,6 +396,19 @@
         class="iframe"
         id="preview-iframe"
       ></iframe>
+
+      <button id="toggle-mobile-nav">
+        <svg
+          width="32px"
+          height="32px"
+          style="enable-background:new 0 0 32 32;"
+          version="1.1"
+          viewBox="0 0 32 32"
+        >
+          <path
+            d="M4,10h24c1.104,0,2-0.896,2-2s-0.896-2-2-2H4C2.896,6,2,6.896,2,8S2.896,10,4,10z M28,14H4c-1.104,0-2,0.896-2,2  s0.896,2,2,2h24c1.104,0,2-0.896,2-2S29.104,14,28,14z M28,22H4c-1.104,0-2,0.896-2,2s0.896,2,2,2h24c1.104,0,2-0.896,2-2  S29.104,22,28,22z"/>
+        </svg>
+      </button>
       <a
         id="source-link"
         class="example-source-link"

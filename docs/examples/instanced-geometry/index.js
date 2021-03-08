@@ -73,6 +73,11 @@ document.body.addEventListener('mousemove', (e) => {
   mouseX = (e.pageX / innerWidth) * 8 - 4
   mouseY = (1 - e.pageY / innerHeight) * 10 - 5
 })
+document.body.addEventListener('touchmove', (e) => {
+  e.preventDefault()
+  mouseX = (e.changedTouches[0].pageX / innerWidth) * 8 - 4
+  mouseY = (1 - e.changedTouches[0].pageY / innerHeight) * 10 - 5
+})
 document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)
 resize()

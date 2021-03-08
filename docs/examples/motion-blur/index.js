@@ -45,7 +45,7 @@ const camera = new hwoaRangGL.PerspectiveCamera(
 camera.position = [0, 0, 10]
 camera.lookAt([0, 0, 0])
 
-new hwoaRangGL.CameraController(camera)
+new hwoaRangGL.CameraController(camera, canvas)
 
 const { indices, vertices, uv } = hwoaRangGL.GeometryUtils.createBox()
 const boxGeometry = new hwoaRangGL.Geometry(gl)
@@ -133,6 +133,11 @@ const resultMesh = new hwoaRangGL.Mesh(gl, {
 document.body.addEventListener('mousemove', (e) => {
   mousePosTarget.x = (e.pageX / innerWidth) * 2 - 1
   mousePosTarget.y = 2 - (e.pageY / innerHeight) * 2 - 1
+})
+document.body.addEventListener('mousemove', (e) => {
+  e.preventDefault()
+  mousePosTarget.x = (e.changedTouches[0].pageX / innerWidth) * 2 - 1
+  mousePosTarget.y = 2 - (e.changedTouches[0].pageY / innerHeight) * 2 - 1
 })
 document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)

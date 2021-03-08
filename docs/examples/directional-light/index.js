@@ -25,7 +25,7 @@ const camera = new hwoaRangGL.PerspectiveCamera(
 camera.position = [4, 3, 3]
 camera.lookAt([0, 0, 0])
 
-new hwoaRangGL.CameraController(camera)
+new hwoaRangGL.CameraController(camera, canvas)
 
 const lightDirection = vec3.create()
 vec3.set(lightDirection, 1, 1, 1)

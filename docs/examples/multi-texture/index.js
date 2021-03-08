@@ -33,7 +33,7 @@ const camera = new hwoaRangGL.PerspectiveCamera(
 camera.position = [20, 20, 20]
 camera.lookAt([0, 0, 0])
 
-new hwoaRangGL.CameraController(camera)
+new hwoaRangGL.CameraController(camera, canvas)
 
 const sidesData = hwoaRangGL.GeometryUtils.createBox({
   width: 10,

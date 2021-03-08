@@ -32,7 +32,7 @@ const lightDirection = vec3.create()
 vec3.set(lightDirection, 1, 1, 1)
 vec3.normalize(lightDirection, lightDirection)
 
-new hwoaRangGL.CameraController(camera)
+new hwoaRangGL.CameraController(camera, canvas)
 
 downloadFile('./Suzanne.gltf', 'json', loadModel)
 downloadFile('./Suzanne.bin', 'arraybuffer', loadModel)

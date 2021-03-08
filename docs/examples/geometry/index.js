@@ -1,3 +1,5 @@
+const MOBILE_VIEWPORT = 600
+
 const regularVertexShader = `
 
   attribute vec4 position;
@@ -46,7 +48,7 @@ const camera = new hwoaRangGL.PerspectiveCamera(
 camera.position = [0, 0, 10]
 camera.lookAt([0, 0, 0])
 
-new hwoaRangGL.CameraController(camera)
+new hwoaRangGL.CameraController(camera, canvas)
 
 /* --------- Box Geometry --------- */
 {
@@ -68,7 +70,11 @@ new hwoaRangGL.CameraController(camera)
     vertexShaderSource: regularVertexShader,
     fragmentShaderSource: regularFragmentShader,
   })
-  boxMesh.setPosition({ x: -3 })
+  if (innerWidth < MOBILE_VIEWPORT) {
+    boxMesh.setPosition({ y: -2 })
+  } else {
+    boxMesh.setPosition({ x: -2 })
+  }
 }
 
 /* --------- Line Geometry --------- */
@@ -102,7 +108,11 @@ new hwoaRangGL.CameraController(camera)
   })
   lineMesh.drawMode = gl.LINE_LOOP
 
-  lineMesh.setPosition({ x: -1 })
+  if (innerWidth < MOBILE_VIEWPORT) {
+    lineMesh.setPosition({ y: -0.75 })
+  } else {
+    lineMesh.setPosition({ x: -0.75 })
+  }
 }
 
 /* --------- Sphere Geometry --------- */
@@ -127,7 +137,11 @@ new hwoaRangGL.CameraController(camera)
     vertexShaderSource: regularVertexShader,
     fragmentShaderSource: regularFragmentShader,
   })
-  sphereMesh.setPosition({ x: 1 })
+  if (innerWidth < MOBILE_VIEWPORT) {
+    sphereMesh.setPosition({ y: 0.75 })
+  } else {
+    sphereMesh.setPosition({ x: 0.75 })
+  }
 }
 
 /* --------- Plane Geometry --------- */
@@ -149,7 +163,11 @@ new hwoaRangGL.CameraController(camera)
     vertexShaderSource: regularVertexShader,
     fragmentShaderSource: regularFragmentShader,
   })
-  planeMesh.setPosition({ x: 3 })
+  if (innerWidth < MOBILE_VIEWPORT) {
+    planeMesh.setPosition({ y: 2 })
+  } else {
+    planeMesh.setPosition({ x: 2 })
+  }
 }
 
 document.body.appendChild(canvas)

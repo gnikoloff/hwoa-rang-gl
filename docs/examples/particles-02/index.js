@@ -32,7 +32,7 @@ setInterval(() => {
   tweenTarget = tweenTarget === 0 ? 1 : 0
 }, 5000)
 
-new hwoaRangGL.CameraController(camera)
+new hwoaRangGL.CameraController(camera, canvas)
 
 {
   let vertices = generateTextVertices('hwoa-rang-gl')
@@ -152,7 +152,7 @@ window.addEventListener('resize', resize)
 
 function updateFrame(ts) {
   ts /= 1000
-  const dt = ts - oldTime
+  const dt = Math.min(ts - oldTime, 1)
   oldTime = ts
 
   stats.begin()

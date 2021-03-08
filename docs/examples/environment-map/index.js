@@ -22,7 +22,7 @@ const camera = new hwoaRangGL.PerspectiveCamera(
 camera.position = [0, 0, 10]
 camera.lookAt([0, 0, 0])
 
-new hwoaRangGL.CameraController(camera)
+new hwoaRangGL.CameraController(camera, canvas)
 
 const facesInfo = [
   {
