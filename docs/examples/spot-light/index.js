@@ -204,7 +204,7 @@ let lightDirection
 let boxMesh
 let sphereMesh
 let floorHelperMesh
-let lightHelperMesh
+// let lightHelperMesh
 let lightPointerHelperMeshInner
 let lightPointerHelperMeshOuter
 let oldTime = 0
@@ -287,7 +287,7 @@ const litObjectSharedUniforms = {
     fragmentShaderSource: litObjectFragmentShader,
   })
   boxMesh.setPosition({
-    x: -0.5,
+    x: -0.65,
     y: 0.5,
   })
 }
@@ -312,7 +312,7 @@ const litObjectSharedUniforms = {
     fragmentShaderSource: litObjectFragmentShader,
   })
   sphereMesh.setPosition({
-    x: 0.5,
+    x: 0.65,
     y: 0.5,
   })
 }
@@ -326,19 +326,19 @@ const litObjectSharedUniforms = {
     typedArray: vertices,
     size: 3,
   })
-  lightHelperMesh = new hwoaRangGL.Mesh(gl, {
-    geometry,
-    uniforms: {
-      color: { type: 'vec3', value: [1, 1, 1] },
-    },
-    vertexShaderSource: helperVertexShader,
-    fragmentShaderSource: helperFragmentShader,
-  })
-  lightHelperMesh.setPosition({
-    x: lightWorldPosition[0],
-    y: lightWorldPosition[1] + 0.39,
-    z: lightWorldPosition[2] + MOVEMENT_LIGHT_RADIUS,
-  })
+  // lightHelperMesh = new hwoaRangGL.Mesh(gl, {
+  //   geometry,
+  //   uniforms: {
+  //     color: { type: 'vec3', value: [1, 1, 1] },
+  //   },
+  //   vertexShaderSource: helperVertexShader,
+  //   fragmentShaderSource: helperFragmentShader,
+  // })
+  // lightHelperMesh.setPosition({
+  //   x: lightWorldPosition[0],
+  //   y: lightWorldPosition[1] + 0.39,
+  //   z: lightWorldPosition[2] + MOVEMENT_LIGHT_RADIUS,
+  // })
 }
 
 {
@@ -477,10 +477,10 @@ gui
       Math.sin((val * Math.PI) / 180) * MOVEMENT_LIGHT_RADIUS
     const cameraPointerUpdateZ =
       Math.cos((val * Math.PI) / 180) * MOVEMENT_LIGHT_RADIUS
-    lightHelperMesh.setPosition({
-      x: cameraUpdateX,
-      z: cameraUpdateZ,
-    })
+    // lightHelperMesh.setPosition({
+    //   x: cameraUpdateX,
+    //   z: cameraUpdateZ,
+    // })
     lightPointerHelperMeshInner
       .setRotation({ x: 0, y: 1 }, (val * Math.PI) / 180)
       .setPosition({
@@ -517,10 +517,10 @@ gui
       Math.sin((val * Math.PI) / 180) * MOVEMENT_LIGHT_RADIUS
     const cameraPointerUpdateZ =
       Math.cos((val * Math.PI) / 180) * MOVEMENT_LIGHT_RADIUS
-    lightHelperMesh.setPosition({
-      y: Math.sin((val * Math.PI) / 180) * MOVEMENT_LIGHT_RADIUS * 2,
-      z: Math.cos((val * Math.PI) / 180) * MOVEMENT_LIGHT_RADIUS * 2,
-    })
+    // lightHelperMesh.setPosition({
+    //   y: Math.sin((val * Math.PI) / 180) * MOVEMENT_LIGHT_RADIUS * 2,
+    //   z: Math.cos((val * Math.PI) / 180) * MOVEMENT_LIGHT_RADIUS * 2,
+    // })
     lightPointerHelperMeshInner
       .setRotation({ x: 1, y: 0 }, -(val * Math.PI) / 180)
       .setPosition({
@@ -606,7 +606,7 @@ gui.addColor(OPTIONS, 'specularColor').onChange((newColor) => {
 gui.add(OPTIONS, 'lightsDebug')
 
 const position = vec3.create()
-vec3.set(position, ...sphereMesh.position)
+vec3.set(position, ...lightPointerHelperMeshOuter.position)
 mat4.lookAt(spotLightMat, position, target, up)
 lightDirection = [-spotLightMat[8], -spotLightMat[9], -spotLightMat[10]]
 
@@ -647,7 +647,7 @@ function updateFrame(ts) {
   floorHelperMesh.setCamera(camera).draw()
 
   if (OPTIONS.lightsDebug) {
-    lightHelperMesh.setCamera(camera).draw()
+    // lightHelperMesh.setCamera(camera).draw()
 
     lightPointerHelperMeshInner.setCamera(camera).draw()
     lightPointerHelperMeshOuter.setCamera(camera).draw()
