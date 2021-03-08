@@ -31,7 +31,10 @@ document.body.appendChild(stats.domElement)
 const dpr = devicePixelRatio
 const canvas = document.createElement('canvas')
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
-
+const fieldOfViewRadians = (45 * Math.PI) / 180
+const near = 0.1
+const far = 100
+const frustumProjectionMatrix = mat4.create()
 const pixelData = new Uint8Array(4)
 
 let mouseX = -1
@@ -44,10 +47,10 @@ gl.enable(gl.DEPTH_TEST)
 gl.depthFunc(gl.LEQUAL)
 
 const camera = new hwoaRangGL.PerspectiveCamera(
-  (45 * Math.PI) / 180,
+  fieldOfViewRadians,
   innerWidth / innerHeight,
-  0.1,
-  100,
+  near,
+  far,
 )
 camera.position = [0, 0, 40]
 camera.lookAt([0, 0, 0])
@@ -173,21 +176,55 @@ function updateFrame(ts) {
   gl.clearColor(0.9, 0.9, 0.9, 1)
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
+  const aspect = innerWidth / innerHeight
+  const top = Math.tan(fieldOfViewRadians * 0.5) * near
+  const bottom = -top
+  const left = aspect * bottom
+  const right = aspect * top
+  const width = Math.abs(right - left)
+  const height = Math.abs(top - bottom)
+
+  const pixelX = (mouseX * gl.canvas.width) / gl.canvas.clientWidth
+  const pixelY =
+    gl.canvas.height - (mouseY * gl.canvas.height) / gl.canvas.clientHeight - 1
+
+  const subLeft = left + (pixelX * width) / gl.canvas.width
+  const subBottom = bottom + (pixelY * height) / gl.canvas.height
+  const subWidth = 1 / gl.canvas.width
+  const subHeight = 1 / gl.canvas.height
+
+  // make a frustum for that 1 pixel
+  mat4.frustum(
+    frustumProjectionMatrix,
+    subLeft,
+    subLeft + subWidth,
+    subBottom,
+    subBottom + subHeight,
+    near,
+    far,
+  )
+
   meshes.forEach((mesh) => {
     mesh.setCamera(camera).draw()
   })
 
   mousePickTarget.bind()
+
+  gl.viewport(0, 0, 1, 1)
+
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
   hoverMeshes.forEach((mesh) => {
-    mesh.setCamera(camera).draw()
+    mesh
+      .setCamera(camera)
+      .setUniform('projectionMatrix', 'matrix4fv', frustumProjectionMatrix)
+      .draw()
   })
 
-  const pixelX = (mouseX * canvas.width) / innerWidth
-  const pixelY = canvas.height - (mouseY * canvas.height) / innerHeight - 1
+  // const pixelX = (mouseX * canvas.width) / innerWidth
+  // const pixelY = canvas.height - (mouseY * canvas.height) / innerHeight - 1
 
-  gl.readPixels(pixelX, pixelY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixelData)
+  gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixelData)
 
   const id =
     pixelData[0] +
