@@ -89,6 +89,7 @@ export default class Program {
         this.#gl.uniform1i(uniformLocation, uniformValue)
         break
       default:
+        console.error(`Unrecognised uniform type: ${uniformType}`)
         return
     }
     return this
