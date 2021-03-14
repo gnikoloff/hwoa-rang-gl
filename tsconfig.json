@@ -11,6 +11,7 @@
     "lib": ["ES2016", "ES2017", "DOM"],
     "noImplicitAny": false,
     "declaration": true,
+    "moduleResolution": "node"
   },
   "include": [
     "src"
