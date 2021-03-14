@@ -6,7 +6,7 @@ class DampedAction {
   private value = 0.0
   private damping: number
   constructor() {
-    this.damping = 0.85
+    this.damping = 0.5
   }
 
   addForce(force: number) {
@@ -86,6 +86,7 @@ export default class CameraController {
   private _panStart = { x: 0, y: 0 }
   private _panDelta = { x: 0, y: 0 }
   private _panEnd = { x: 0, y: 0 }
+  private _paused = false
   constructor(camera, domElement = document.body) {
     if (!camera) {
       console.error('camera is undefined')
@@ -201,9 +202,17 @@ export default class CameraController {
   startTick(): void {
     this.loopId = requestAnimationFrame(this.tick)
   }
+  pause (): void {
+    this._paused = true
+  }
+  start (): void {
+    this._paused = false
+  }
   tick(): void {
-    this.updateDampedAction()
-    this.updateCamera()
+    if (!this._paused) {
+      this.updateDampedAction()
+      this.updateCamera()
+    }
     this.loopId = requestAnimationFrame(this.tick)
   }
   updateDampedAction(): void {
