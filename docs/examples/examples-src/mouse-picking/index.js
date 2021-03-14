@@ -229,7 +229,7 @@ function updateFrame(ts) {
   hoverMeshes.forEach((mesh) => {
     mesh
       .setCamera(camera)
-      .setUniform('projectionMatrix', 'matrix4fv', frustumProjectionMatrix)
+      .setUniform('projectionMatrix', 'mat4', frustumProjectionMatrix)
       .draw()
   })
 

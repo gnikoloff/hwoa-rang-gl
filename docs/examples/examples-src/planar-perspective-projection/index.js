@@ -231,13 +231,13 @@ const updateTexMatrix = ({
   mat4.lookAt(textureWorldMatrix, projectionPos, projectionTarget, UP_VECTOR)
   mat4.scale(textureWorldMatrix, textureWorldMatrix, projectionScaleVec)
   // mat4.invert(textureWorldMatrix, textureWorldMatrix)
-  sphereMesh.setUniform('textureMatrix', 'matrix4fv', textureWorldMatrix)
-  planeMesh.setUniform('textureMatrix', 'matrix4fv', textureWorldMatrix)
+  sphereMesh.setUniform('textureMatrix', 'mat4', textureWorldMatrix)
+  planeMesh.setUniform('textureMatrix', 'mat4', textureWorldMatrix)
 
   vec3.set(cubeScaleVec, 1, 1, 100)
   cubeMesh
     .setCamera(camera)
-    .setUniform('modelMatrix', 'matrix4fv', textureWorldMatrix)
+    .setUniform('modelMatrix', 'mat4', textureWorldMatrix)
 }
 
 gui.add(OPTIONS, 'posX').min(-20).max(20).step(1).onChange(updateTexMatrix)
@@ -282,7 +282,7 @@ const checkeredTexture = new Texture(gl, {
 const sharedUniforms = {
   texture: { type: 'int', value: 0 },
   projectedTexture: { type: 'int', value: 1 },
-  textureMatrix: { type: 'matrix4fv', value: textureWorldMatrix },
+  textureMatrix: { type: 'mat4', value: textureWorldMatrix },
 }
 
 /* ---- Sphere mesh ---- */

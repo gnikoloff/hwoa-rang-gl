@@ -92,7 +92,7 @@ export default class Mesh {
     }
     this.program.setUniform(
       MODEL_MATRIX_UNIFORM_NAME,
-      'matrix4fv',
+      'mat4',
       this.modelMatrix,
     )
     this.program.unbind()
@@ -176,7 +176,7 @@ export default class Mesh {
     this.program.bind()
     this.program.setUniform(
       MODEL_MATRIX_UNIFORM_NAME,
-      'matrix4fv',
+      'mat4',
       this.modelMatrix,
     )
     this.program.unbind()
@@ -187,12 +187,12 @@ export default class Mesh {
     this.program.bind()
     this.program.setUniform(
       PROJECTION_MATRIX_UNIFORM_NAME,
-      'matrix4fv',
+      'mat4',
       camera.projectionMatrix,
     )
     this.program.setUniform(
       VIEW_MATRIX_UNIFORM_NAME,
-      'matrix4fv',
+      'mat4',
       camera.viewMatrix,
     )
     this.program.unbind()

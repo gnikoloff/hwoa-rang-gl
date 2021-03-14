@@ -11,7 +11,7 @@ export const UNIFORM_TYPE_FLOAT = 'float'
 export const UNIFORM_TYPE_VEC2 = 'vec2'
 export const UNIFORM_TYPE_VEC3 = 'vec3'
 export const UNIFORM_TYPE_VEC4 = 'vec4'
-export const UNIFORM_TYPE_MATRIX4X4 = 'matrix4fv'
+export const UNIFORM_TYPE_MATRIX4X4 = 'mat4'
 
 export const POINTS = 0x0000
 export const LINES = 0x0001
