@@ -31,27 +31,28 @@ examplesDefinitions.forEach((groupDefinition) => {
 })
 
 function onHashChange() {
-  if (viewerIframe) {
-    if (location.hash) {
-      const exampleName = location.hash.substring(1)
-      viewerIframe.setAttribute('src', `${exampleName}/index.html`)
-      viewerIframe.setAttribute('title', currentExampleTitle)
+  if (location.hash) {
+    const exampleName = location.hash.substring(1)
 
-      sourceLinkBtn.setAttribute(
-        'href',
-        `https://github.com/gnikoloff/hwoa-rang-gl/tree/main/docs/examples/${exampleName}/index.js`,
-      )
-    } else {
-      const exampleName = 'particles-01'
-      location.hash = exampleName
-      sourceLinkBtn.setAttribute(
-        'href',
-        `https://github.com/gnikoloff/hwoa-rang-gl/tree/main/docs/examples/${exampleName}/index.js`,
-      )
-    }
-    if (appAside.classList.contains('visible')) {
-      appAside.classList.remove('visible')
-    }
+    document.title = `hwoa-rang-gl | ${exampleName}`
+
+    viewerIframe.setAttribute('src', `${exampleName}/index.html`)
+    viewerIframe.setAttribute('title', currentExampleTitle)
+
+    sourceLinkBtn.setAttribute(
+      'href',
+      `https://github.com/gnikoloff/hwoa-rang-gl/tree/main/docs/examples/${exampleName}/index.js`,
+    )
+  } else {
+    const exampleName = 'particles-01'
+    location.hash = exampleName
+    sourceLinkBtn.setAttribute(
+      'href',
+      `https://github.com/gnikoloff/hwoa-rang-gl/tree/main/docs/examples/${exampleName}/index.js`,
+    )
+  }
+  if (appAside.classList.contains('visible')) {
+    appAside.classList.remove('visible')
   }
 }
 
