@@ -4,16 +4,35 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Particles 01</title>
-
+  <title>GPGPU Particles</title>
   <style>
     * { margin: 0; padding: 0; }
+    #error-log {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      font-family: monospace;
+    }
+    #info-log {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      padding: 4px 14px;
+      background: rgba(255, 255, 255, 0.82);
+      color: #111;
+      font-family: monospace;
+    }
   </style>
-
 </head>
 <body>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/16/Stats.min.js" integrity="sha512-by6gRzSfA6HGshqED4Jnc6n/jJ9ojBvjbEbCvsrLzErlIiWswh1qYfYnvSzZg8SmbqVCk/v0XwlpGzJxIDPILw==" crossorigin="anonymous"></script>
-  <script src="../library/index.js"></script>
+  <div id="info-log"></div>
+  <div id="error-log"></div>
   <script src="index.js"></script>
 </body>
 </html>

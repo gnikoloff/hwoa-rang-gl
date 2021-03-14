@@ -18,23 +18,27 @@ export default class Texture {
       format = gl.RGB,
       internalFormat = format,
       type = gl.UNSIGNED_BYTE,
-      isFlip = true,
+      isFlip = false,
       useMipmaps = false,
       wrapS = gl.CLAMP_TO_EDGE,
       wrapT = gl.CLAMP_TO_EDGE,
       anisotropy = 0,
       minFilter = gl.LINEAR,
-      magFilter = gl.LINEAR
+      magFilter = gl.LINEAR,
+      unpackAlignment = 1
     },
   ) {
     this.#gl = gl
-
     this.texture = gl.createTexture()
 
     gl.bindTexture(gl.TEXTURE_2D, this.texture)
 
     if (isFlip) {
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
+    }
+
+    if (unpackAlignment) {
+      gl.pixelStorei(gl.UNPACK_ALIGNMENT, unpackAlignment)
     }
 
     if (image) {
@@ -53,15 +57,8 @@ export default class Texture {
           image
         )
       }
-
       if (isPowerOf2(image.width) && isPowerOf2(image.height) && useMipmaps) {
         gl.generateMipmap(gl.TEXTURE_2D)
-        gl.texParameteri(
-          gl.TEXTURE_2D,
-          gl.TEXTURE_MIN_FILTER,
-          gl.LINEAR_MIPMAP_LINEAR,
-        )
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, magFilter)
       } else {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, minFilter)
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, magFilter)
@@ -78,8 +75,12 @@ export default class Texture {
         type,
         null,
       )
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, minFilter)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, magFilter)
+      if (isPowerOf2(width) && isPowerOf2(height) && useMipmaps) {
+        gl.generateMipmap(gl.TEXTURE_2D)
+      } else {
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, minFilter)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, magFilter)
+      }
     }
 
     if (anisotropy) {
