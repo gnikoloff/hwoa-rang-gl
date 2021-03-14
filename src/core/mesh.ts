@@ -96,6 +96,7 @@ export default class Mesh {
       this.modelMatrix,
     )
     this.program.unbind()
+    return this
   }
 
   get position(): [number, number, number] {

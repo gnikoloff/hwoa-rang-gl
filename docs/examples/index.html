@@ -104,9 +104,10 @@
     #toggle-mobile-nav:focus { outline: 0; }
 
     @media (min-width: 720px) {
-      /* .app-aside {
-        transform: translateX(-100%);
-      } */
+      .app-aside {
+        position: static;
+        transform: translateX(0);
+      }
     }
 
     .app-main {
@@ -156,70 +157,7 @@
   </style>
 
 
-  <script>
-    let currentExampleTitle = 'Particles 01'
-
-    let viewerIframe
-    let sourceLinkBtn
-    let mobileNavToggleBtn
-    let appNav
-    let appAside
-
-    function onHashChange () {
-      
-      if (viewerIframe) {
-        if (location.hash) {
-          const exampleName = location.hash.substring(1)
-          viewerIframe.setAttribute('src', `${exampleName}/index.html`)
-          viewerIframe.setAttribute('title', currentExampleTitle)
-          
-          sourceLinkBtn.setAttribute('href', `https://github.com/gnikoloff/hwoa-rang-gl/tree/main/docs/examples/${exampleName}/index.js`)
-        } else {
-          const exampleName = 'particles-01'
-          location.hash = exampleName
-          sourceLinkBtn.setAttribute('href', `https://github.com/gnikoloff/hwoa-rang-gl/tree/main/docs/examples/${exampleName}/index.js`)
-        }
-        if (appAside.classList.contains('visible')) {
-          appAside.classList.remove('visible')
-        }
-      }
-    }
-
-
-    function onNavClick (e) {
-      if (e.target.nodeName === 'A') {
-        currentExampleTitle = e.target.dataset.title
-      }
-    }
-
-    function toggleMobileNav () {
-      appAside.classList.toggle('visible')
-    }
-
-    function onDOMLoad () {
-      viewerIframe = document.getElementById('preview-iframe')
-      appAside = document.getElementsByClassName('app-aside')[0]
-      appNav = document.getElementById('app-nav')
-      sourceLinkBtn = document.getElementById('source-link')
-      mobileNavToggleBtn = document.getElementById('toggle-mobile-nav')
-
-      onHashChange()
-
-      appNav.addEventListener('click', onNavClick)
-      mobileNavToggleBtn.addEventListener('click', toggleMobileNav)
-    }
-
-    function onResize () {
-      const doc = document.documentElement
-      doc.style.setProperty('--app-height', `${window.innerHeight}px`)
-    }
-
-    window.onhashchange = onHashChange
-    document.addEventListener('DOMContentLoaded', onDOMLoad)
-    window.addEventListener('resize', onResize)
-    onResize()
-
-  </script>
+  
   
 </head>
 <body>
@@ -229,7 +167,7 @@
       <h2>minimal webgl library</h2>
       <h4>By <a href="https://github.com/gnikoloff" target="_blank">Georgi Nikolov</a></h4>
       <nav id="app-nav">
-        <h3>Particles</h3>
+        <!-- <h3>Particles</h3>
         <ul>
           <li>
             <a
@@ -388,7 +326,7 @@
             </a>
           </li>
         </ul>
-        
+         -->
       </nav>
     </aside>
     <main class="app-main">
@@ -434,5 +372,8 @@
       </a>
     </main>
   </div>
+
+  <script src="index.js"></script>
+
 </body>
 </html>
