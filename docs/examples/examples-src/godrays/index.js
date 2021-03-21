@@ -14,8 +14,8 @@ import {
 const COUNT_SIDE = 12
 const BOXES_COUNT = COUNT_SIDE * COUNT_SIDE
 const BLUR_ITERATIONS = 24
-const BACKGROUND_COLOR = [0.1, 0.1, 0.1, 1.9]
-const SCALE_DOWN_POSTFX = 10
+const BACKGROUND_COLOR = [0.02, 0.02, 0.02, 1]
+const SCALE_DOWN_POSTFX = 7
 
 const OPTS = {
   debugMode: false,
@@ -36,11 +36,11 @@ let boxesMesh
 let sphereMesh
 let planeMesh
 
-gl.enable(gl.BLEND)
-gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
-gl.enable(gl.DEPTH_TEST)
+// gl.enable(gl.BLEND)
+// gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
+// gl.enable(gl.DEPTH_TEST)
 // gl.enable(gl.CULL_FACE)
-gl.depthFunc(gl.LEQUAL)
+// gl.depthFunc(gl.LEQUAL)
 
 const camera = new PerspectiveCamera(
   (45 * Math.PI) / 180,
@@ -100,7 +100,9 @@ const renderTargetBlurY = new RenderTarget(gl, {
         if (debugMode) {
           gl_FragColor = vec4(v_uv.x, 0.1, v_uv.y, 1.0);
         } else {
-          gl_FragColor = vec4(0.1, 0.1, 0.1, 1.0);
+          gl_FragColor = vec4(${BACKGROUND_COLOR.map(
+            (color) => `${color}`,
+          ).join(', ')});
         }
       }
     `,
@@ -190,7 +192,7 @@ planeMesh = new Mesh(gl, {
       vec2 resolution = vec2(${innerWidth}.0, ${innerHeight}.0);
       vec4 maskColor = texture2D(mask, v_uv);
       gl_FragColor = mix(
-        blur9(diffuse, v_uv, resolution, blurDirection),
+        blur9(diffuse, v_uv, resolution, blurDirection) * 1.09,
         vec4(0.1, 0.1, 0.1, 1.0),
         maskColor.r
       );
@@ -272,7 +274,7 @@ function updateFrame(ts) {
     for (let i = 0; i < BLUR_ITERATIONS; i++) {
       readBuffer.bind()
       writeBuffer.bindTexture()
-      const radius = BLUR_ITERATIONS - i - 1
+      const radius = BLUR_ITERATIONS - i * 3 - 1
       planeMesh
         .setUniform(
           'blurDirection',
