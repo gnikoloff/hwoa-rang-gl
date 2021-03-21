@@ -20,11 +20,13 @@ const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
 
 const gltfInfo = document.getElementById('gltf-info')
 
+const texture = new Texture(gl)
+texture.bind().fromSize(1, 1).unbind()
+
 let oldTime = 0
 let gJson
 let gBin
 let gltfMesh
-let texture
 
 gl.enable(gl.BLEND)
 gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
@@ -127,11 +129,7 @@ function loadModel(xhr) {
 
   const image = new Image()
   image.onload = () => {
-    texture = new Texture(gl, {
-      image,
-      width: image.naturalWidth,
-      height: image.naturalHeight,
-    })
+    texture.fromImage(image)
   }
   image.src = '/assets/textures/Suzanne_BaseColor.png'
 }

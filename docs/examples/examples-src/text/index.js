@@ -83,12 +83,11 @@ gl.enable(gl.BLEND)
 gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 
 const texture = new Texture(gl, {
-  image: texCanvas,
-  isFlip: true,
   format: gl.RGBA,
-  width: texCanvas.width,
-  height: texCanvas.height,
+  internalFormat: gl.RGBA,
 })
+texture.bind().setIsFlip().fromImage(texCanvas)
+
 const camera = new PerspectiveCamera(
   (45 * Math.PI) / 180,
   innerWidth / innerHeight,

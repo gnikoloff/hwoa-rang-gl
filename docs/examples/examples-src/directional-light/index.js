@@ -102,14 +102,17 @@ vec3.normalize(lightDirection, lightDirection)
   })
 }
 
+texture = new Texture(gl)
+texture.bind().setIsFlip().fromSize(1, 1).unbind()
+
 const image = new Image()
 image.onload = () => {
-  texture = new Texture(gl, {
-    image,
-    isFlip: true,
-    width: image.naturalWidth,
-    height: image.naturalHeight,
-  })
+  texture
+    .bind()
+    .fromImage(image)
+    .generateMipmap()
+    .setMinFilter(gl.LINEAR_MIPMAP_NEAREST)
+    .setMagFilter(gl.LINEAR_MIPMAP_NEAREST)
 }
 image.src = '/assets/textures/webgl-logo.png'
 

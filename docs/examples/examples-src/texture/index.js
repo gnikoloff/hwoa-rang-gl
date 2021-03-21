@@ -1,4 +1,5 @@
 import Stats from 'stats-js'
+import * as dat from 'dat.gui'
 
 import {
   PerspectiveCamera,
@@ -7,7 +8,11 @@ import {
   GeometryUtils,
   Mesh,
   Texture,
+  getExtension,
 } from '../../../../dist/esm'
+
+const gui = new dat.GUI()
+gui.width = 420
 
 const stats = new Stats()
 document.body.appendChild(stats.domElement)
@@ -16,9 +21,13 @@ const dpr = devicePixelRatio
 const canvas = document.createElement('canvas')
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
 
-let oldTime = 0
+const OPTIONS = {
+  minFilter: 'LINEAR',
+  magFilter: 'LINEAR',
+  // anisotropy: 0,
+}
 
-let texture
+let oldTime = 0
 
 gl.enable(gl.BLEND)
 gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
@@ -30,14 +39,14 @@ const camera = new PerspectiveCamera(
   0.1,
   100,
 )
-camera.position = [0, 0, 40]
+camera.position = [0, 0, 26]
 camera.lookAt([0, 0, 0])
 
 new CameraController(camera, canvas)
 
 const { indices, vertices, uv } = GeometryUtils.createPlane({
   width: 16,
-  height: 16 * 1.4828125,
+  height: 16,
 })
 const geometry = new Geometry(gl)
 geometry
@@ -78,21 +87,51 @@ const mesh = new Mesh(gl, {
   `,
 })
 
+const texture = new Texture(gl)
+texture.bind().setIsFlip()
+
 const image = new Image()
 image.onload = () => {
-  texture = new Texture(gl, {
-    image,
-    isFlip: true,
-    width: image.naturalWidth,
-    height: image.naturalHeight,
-  })
+  texture.fromImage(image).generateMipmap().setAnisotropy(1)
 }
-image.src = '/assets/textures/zhang-kaiyv-G7oFLe-OW74-unsplash.jpeg'
+image.src = '/assets/textures/zhang-kaiyv-mh2o8DuHaMM-unsplash.png'
 
 document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)
 resize()
 window.addEventListener('resize', resize)
+
+gui
+  .add(OPTIONS, 'minFilter', [
+    'NEAREST',
+    'LINEAR',
+    'NEAREST_MIPMAP_NEAREST',
+    'NEAREST_MIPMAP_LINEAR',
+    'LINEAR_MIPMAP_NEAREST',
+    'LINEAR_MIPMAP_LINEAR',
+  ])
+  .onChange((val) => {
+    texture.setMinFilter(gl[val])
+  })
+gui.add(OPTIONS, 'magFilter', ['NEAREST', 'LINEAR']).onChange((val) => {
+  texture.setMinFilter(gl[val])
+})
+
+const anisotropyExtension =
+  getExtension(gl, 'EXT_texture_filter_anisotropic') ||
+  getExtension(gl, 'MOZ_EXT_texture_filter_anisotropic') ||
+  getExtension(gl, 'WEBKIT_EXT_texture_filter_anisotropic')
+const maxAnisotropySupported = gl.getParameter(
+  anisotropyExtension.MAX_TEXTURE_MAX_ANISOTROPY_EXT,
+)
+
+gui
+  .add(OPTIONS, 'anisotropy')
+  .min(0)
+  .max(maxAnisotropySupported)
+  .onChange((val) => {
+    texture.setAnisotropy(val)
+  })
 
 function updateFrame(ts) {
   ts /= 1000
@@ -105,11 +144,7 @@ function updateFrame(ts) {
   gl.clearColor(0.9, 0.9, 0.9, 1)
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-  if (texture) {
-    texture.bind()
-    mesh.setCamera(camera).draw()
-    texture.unbind()
-  }
+  mesh.setCamera(camera).draw()
 
   stats.end()
 

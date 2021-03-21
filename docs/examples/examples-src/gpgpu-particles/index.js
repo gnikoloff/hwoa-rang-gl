@@ -80,6 +80,7 @@ const canvas = document.createElement('canvas')
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
 const errorLogWrapper = document.getElementById('error-log')
 const infoLogWrapper = document.getElementById('info-log')
+// const webglLint = getExtension(gl, 'GMAN_debug_helper')
 
 checkExtensionsSupport()
 
@@ -109,48 +110,90 @@ const velocities = new Float32Array(
 )
 
 const velicityTexture = new Texture(gl, {
-  image: velocities,
-  width: particleTexWidth,
-  height: particleTexHeight,
   format: gl.RGBA,
   internalFormat: gl.RGBA,
-  minFilter: gl.NEAREST,
-  magFilter: gl.NEAREST,
   type: gl.FLOAT,
 })
-const positionTex1 = new Texture(gl, {
-  image: positions,
-  width: particleTexWidth,
-  height: particleTexHeight,
-  format: gl.RGBA,
-  internalFormat: gl.RGBA,
-  minFilter: gl.NEAREST,
-  magFilter: gl.NEAREST,
-  type: gl.FLOAT,
-})
-const positionTex2 = new Texture(gl, {
-  image: null,
-  width: particleTexWidth,
-  height: particleTexHeight,
-  format: gl.RGBA,
-  internalFormat: gl.RGBA,
-  minFilter: gl.NEAREST,
-  magFilter: gl.NEAREST,
-  type: gl.FLOAT,
-})
+// webglLint.tagObject(velicityTexture.getTexture(), 'velocity textiure')
+velicityTexture
+  .bind()
+  .fromData(velocities, particleTexWidth, particleTexHeight)
+  .unbind()
 
-const positionsFB1 = createFramebuffer(gl, positionTex1.texture)
-const positionsFB2 = createFramebuffer(gl, positionTex2.texture)
+// const velicityTexture = new Texture(gl, {
+//   image: velocities,
+//   width: particleTexWidth,
+//   height: particleTexHeight,
+//   format: gl.RGBA,
+//   internalFormat: gl.RGBA,
+//   minFilter: gl.NEAREST,
+//   magFilter: gl.NEAREST,
+//   type: gl.FLOAT,
+// })
+// const positionTex1 = new Texture(gl, {
+//   image: positions,
+//   width: particleTexWidth,
+//   height: particleTexHeight,
+//   format: gl.RGBA,
+//   internalFormat: gl.RGBA,
+//   minFilter: gl.NEAREST,
+//   magFilter: gl.NEAREST,
+//   type: gl.FLOAT,
+// })
+// const positionTex2 = new Texture(gl, {
+//   image: null,
+//   width: particleTexWidth,
+//   height: particleTexHeight,
+//   format: gl.RGBA,
+//   internalFormat: gl.RGBA,
+//   minFilter: gl.NEAREST,
+//   magFilter: gl.NEAREST,
+//   type: gl.FLOAT,
+// })
+
+const positionTex1 = new Texture(gl, {
+  format: gl.RGBA,
+  internalFormat: gl.RGBA,
+  type: gl.FLOAT,
+})
+// webglLint.tagObject(positionTex1.getTexture(), 'position 1')
+positionTex1
+  .bind()
+  .fromData(positions, particleTexWidth, particleTexHeight)
+  .unbind()
+
+const positionTex2 = new Texture(gl, {
+  format: gl.RGBA,
+  internalFormat: gl.RGBA,
+  type: gl.FLOAT,
+})
+// webglLint.tagObject(positionTex2.getTexture(), 'position 2')
+positionTex2.bind().fromSize(particleTexWidth, particleTexHeight).unbind()
+
+// const positionTex1 = new Texture(gl, {
+//   image: positions,
+//   width: particleTexWidth,
+//   height: particleTexHeight,
+//   format: gl.RGBA,
+//   internalFormat: gl.RGBA,
+//   minFilter: gl.NEAREST,
+//   magFilter: gl.NEAREST,
+//   type: gl.FLOAT,
+// })
+
+const positionsFB1 = createFramebuffer(gl, positionTex1.getTexture())
+const positionsFB2 = createFramebuffer(gl, positionTex2.getTexture())
 
 let oldTime = 0
 let oldPositionsInfo = {
   fb: positionsFB1,
-  tex: positionTex1.texture,
+  tex: positionTex1.getTexture(),
 }
 let newPositionsInfo = {
   fb: positionsFB2,
-  tex: positionTex2.texture,
+  tex: positionTex2.getTexture(),
 }
+
 let updatePositionsMesh
 let drawMesh
 let oldMouseX = innerWidth / 2
@@ -244,7 +287,7 @@ function updateFrame(ts) {
   gl.activeTexture(gl.TEXTURE0)
   gl.bindTexture(gl.TEXTURE_2D, oldPositionsInfo.tex)
   gl.activeTexture(gl.TEXTURE0 + 1)
-  gl.bindTexture(gl.TEXTURE_2D, velicityTexture.texture)
+  gl.bindTexture(gl.TEXTURE_2D, velicityTexture.getTexture())
 
   updatePositionsMesh.setUniform('deltaTime', 'float', dt).draw()
 
