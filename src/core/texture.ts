@@ -22,6 +22,8 @@ export default class Texture {
       internalFormat = format,
       type = gl.UNSIGNED_BYTE,
       unpackAlignment = 1,
+      wrapS = gl.CLAMP_TO_EDGE,
+      wrapT = gl.CLAMP_TO_EDGE,
       minFilter = gl.NEAREST,
       magFilter = gl.NEAREST,
     } = {},
@@ -37,7 +39,7 @@ export default class Texture {
       .setPixelStore(gl.UNPACK_ALIGNMENT, unpackAlignment)
       .setMinFilter(minFilter)
       .setMagFilter(magFilter)
-      .setWrap()
+      .setWrap(wrapS, wrapT)
       .unbind()
 
     this.#anisotropyExtension =
@@ -162,9 +164,12 @@ export default class Texture {
     return this
   }
 
-  setWrap(wrap = this.#gl.CLAMP_TO_EDGE): this {
-    this.#gl.texParameteri(this.#gl.TEXTURE_2D, this.#gl.TEXTURE_WRAP_S, wrap)
-    this.#gl.texParameteri(this.#gl.TEXTURE_2D, this.#gl.TEXTURE_WRAP_T, wrap)
+  setWrap(
+    wrapS = this.#gl.CLAMP_TO_EDGE,
+    wrapT = this.#gl.CLAMP_TO_EDGE,
+  ): this {
+    this.#gl.texParameteri(this.#gl.TEXTURE_2D, this.#gl.TEXTURE_WRAP_S, wrapS)
+    this.#gl.texParameteri(this.#gl.TEXTURE_2D, this.#gl.TEXTURE_WRAP_T, wrapT)
     return this
   }
 

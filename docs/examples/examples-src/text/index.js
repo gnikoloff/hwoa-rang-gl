@@ -85,6 +85,8 @@ gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 const texture = new Texture(gl, {
   format: gl.RGBA,
   internalFormat: gl.RGBA,
+  minFilter: gl.LINEAR,
+  magFilter: gl.LINEAR,
 })
 texture.bind().setIsFlip().fromImage(texCanvas)
 

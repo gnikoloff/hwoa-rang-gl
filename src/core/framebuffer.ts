@@ -2,14 +2,15 @@ import type { RenderTargetInterface } from '../ts-types'
 
 import Texture from './texture'
 
-export default class RenderTarget {
-  #gl
-  #buffer
-  #depthBuffer
-  #textures = []
+export default class Framebuffer {
+  #gl: WebGLRenderingContext
+  #buffer: WebGLFramebuffer
+  #depthBuffer: WebGLRenderbuffer
 
-  public width
-  public height
+  #width: number
+  #height: number
+
+  texture: Texture
 
   constructor(
     gl: WebGLRenderingContext,
@@ -25,26 +26,24 @@ export default class RenderTarget {
     }: RenderTargetInterface,
   ) {
     this.#gl = gl
-    this.width = width
-    this.height = height
+    this.#width = width
+    this.#height = height
 
-    const tex = new Texture(gl, {
-      width,
-      height,
-      wrapS,
-      wrapT,
+    this.texture = new Texture(gl, {
       format,
       internalFormat,
+      wrapS,
+      wrapT,
     })
 
-    this.#textures.push(tex)
+    this.texture.bind().fromSize(width, height).unbind()
 
     this.#buffer = gl.createFramebuffer()
 
     gl.bindFramebuffer(target, this.#buffer)
 
     const level = 0
-    const texture = tex.texture
+    const texture = this.texture.getTexture()
     gl.framebufferTexture2D(
       target,
       gl.COLOR_ATTACHMENT0,
@@ -59,8 +58,8 @@ export default class RenderTarget {
       this.#gl.renderbufferStorage(
         this.#gl.RENDERBUFFER,
         this.#gl.DEPTH_COMPONENT16,
-        width,
-        height,
+        this.#width,
+        this.#height,
       )
       this.#gl.framebufferRenderbuffer(
         target,
@@ -80,12 +79,14 @@ export default class RenderTarget {
     this.#gl.bindFramebuffer(this.#gl.FRAMEBUFFER, null)
     return this
   }
-  bindTexture(): this {
-    this.#textures[0].bind()
-    return this
+  /**
+   * @description reset texture
+   */
+  reset() {
+    this.texture.bind().fromSize(this.#width, this.#height)
   }
-  unbindTexture(): this {
-    this.#textures[0].unbind()
-    return this
+  delete() {
+    this.texture.delete()
+    this.#gl.deleteFramebuffer(this.#buffer)
   }
 }

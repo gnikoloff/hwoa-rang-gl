@@ -8,17 +8,19 @@ import {
   GeometryUtils,
   Mesh,
   InstancedMesh,
-  RenderTarget,
+  Framebuffer,
 } from '../../../../dist/esm'
 
 const COUNT_SIDE = 12
 const BOXES_COUNT = COUNT_SIDE * COUNT_SIDE
 const BLUR_ITERATIONS = 24
 const BACKGROUND_COLOR = [0.02, 0.02, 0.02, 1]
-const SCALE_DOWN_POSTFX = 7
+const SCALE_DOWN_POSTFX = 4
 
 const OPTS = {
   debugMode: false,
+  spread: 3,
+  factor: 1.1,
 }
 
 const gui = new dat.GUI()
@@ -51,11 +53,11 @@ const camera = new PerspectiveCamera(
 camera.position = [0, 0, 10]
 camera.lookAt([0, 0, 0])
 
-const renderTargetBlurX = new RenderTarget(gl, {
+const renderTargetBlurX = new Framebuffer(gl, {
   width: innerWidth / SCALE_DOWN_POSTFX,
   height: innerHeight / SCALE_DOWN_POSTFX,
 })
-const renderTargetBlurY = new RenderTarget(gl, {
+const renderTargetBlurY = new Framebuffer(gl, {
   width: innerWidth / SCALE_DOWN_POSTFX,
   height: innerHeight / SCALE_DOWN_POSTFX,
 })
@@ -156,6 +158,7 @@ planeMesh = new Mesh(gl, {
     diffuse: { type: 'int', value: 0 },
     mask: { type: 'int', value: 1 },
     blurDirection: { type: 'vec2', value: [0, 1] },
+    factor: { type: 'float', value: OPTS.factor },
   },
   vertexShaderSource: `
     attribute vec4 position;
@@ -173,6 +176,7 @@ planeMesh = new Mesh(gl, {
     uniform sampler2D diffuse;
     uniform sampler2D mask;
     uniform vec2 blurDirection;
+    uniform float factor;
 
     varying vec2 v_uv;
 
@@ -192,7 +196,7 @@ planeMesh = new Mesh(gl, {
       vec2 resolution = vec2(${innerWidth}.0, ${innerHeight}.0);
       vec4 maskColor = texture2D(mask, v_uv);
       gl_FragColor = mix(
-        blur9(diffuse, v_uv, resolution, blurDirection) * 1.09,
+        blur9(diffuse, v_uv, resolution, blurDirection) * factor,
         vec4(0.1, 0.1, 0.1, 1.0),
         maskColor.r
       );
@@ -225,6 +229,15 @@ for (let i = 0; i < BOXES_COUNT; i++) {
 gui.add(OPTS, 'debugMode').onChange((val) => {
   boxesMesh.setUniform('debugMode', 'float', val)
 })
+gui
+  .add(OPTS, 'factor')
+  .min(1)
+  .max(1.15)
+  .step(0.01)
+  .onChange((val) => {
+    planeMesh.setUniform('factor', 'float', val)
+  })
+gui.add(OPTS, 'spread').min(1).max(5).step(0.5)
 
 document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)
@@ -273,8 +286,8 @@ function updateFrame(ts) {
 
     for (let i = 0; i < BLUR_ITERATIONS; i++) {
       readBuffer.bind()
-      writeBuffer.bindTexture()
-      const radius = BLUR_ITERATIONS - i * 3 - 1
+      writeBuffer.texture.bind()
+      const radius = BLUR_ITERATIONS - i * OPTS.spread - 1
       planeMesh
         .setUniform(
           'blurDirection',
@@ -295,7 +308,7 @@ function updateFrame(ts) {
     gl.clearColor(...BACKGROUND_COLOR)
     // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-    readBuffer.bindTexture()
+    readBuffer.texture.bind()
 
     planeMesh.draw()
   }
