@@ -119,7 +119,7 @@ function loadModel(xhr) {
         float light = dot(normal, lightDirection);
         
         gl_FragColor = texture2D(diffuse, v_uv);
-        gl_FragColor.rgb += normal * 0.5;
+        gl_FragColor.rgb += (normal);
         gl_FragColor.rgb *= light;
       }
     `,
