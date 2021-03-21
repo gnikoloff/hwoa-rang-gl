@@ -1,5 +1,7 @@
 import Stats from 'stats-js'
 
+import { vec3, vec4, mat4 } from 'gl-matrix'
+
 import {
   PerspectiveCamera,
   Geometry,
