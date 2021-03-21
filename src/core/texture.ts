@@ -62,9 +62,9 @@ export default class Texture {
     return this
   }
 
-  fromImage(image): this {
-    this.#width = image.width
-    this.#height = image.height
+  fromImage(image, width = image.width, height = image.height): this {
+    this.#width = width
+    this.#height = height
 
     this.#gl.texImage2D(
       this.#gl.TEXTURE_2D,
