@@ -111,8 +111,8 @@ image.onload = () => {
     .bind()
     .fromImage(image)
     .generateMipmap()
-    .setMinFilter(gl.LINEAR_MIPMAP_NEAREST)
-    .setMagFilter(gl.LINEAR_MIPMAP_NEAREST)
+    .setMinFilter(gl.LINEAR_MIPMAP_LINEAR)
+    .setMagFilter(gl.LINEAR)
 }
 image.src = '/assets/textures/webgl-logo.png'
 

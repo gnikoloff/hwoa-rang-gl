@@ -11,6 +11,8 @@ import {
 
 import GLTF from './GLTFLoader'
 
+const MOBILE_VIEWPORT = 420
+
 const INSTANCE_COUNT_X = 4
 const INSTANCE_COUNT_Y = 4
 const INSTANCE_COUNT_Z = 8
@@ -269,19 +271,32 @@ function updateFrame(ts) {
 
   gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)
   gl.clearColor(...FOG_COLOR)
-  gl.scissor(0, 0, gl.drawingBufferWidth / 2, gl.drawingBufferHeight)
+  if (innerWidth < MOBILE_VIEWPORT) {
+    gl.scissor(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight / 2)
+  } else {
+    gl.scissor(0, 0, gl.drawingBufferWidth / 2, gl.drawingBufferHeight)
+  }
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
   if (gltfMesh) {
     gltfMesh.setUniform('time', 'float', ts).setCamera(camera).draw()
   }
 
-  gl.scissor(
-    gl.drawingBufferWidth / 2,
-    0,
-    gl.drawingBufferWidth,
-    gl.drawingBufferHeight,
-  )
+  if (innerWidth < MOBILE_VIEWPORT) {
+    gl.scissor(
+      0,
+      gl.drawingBufferHeight / 2,
+      gl.drawingBufferWidth,
+      gl.drawingBufferHeight / 2,
+    )
+  } else {
+    gl.scissor(
+      gl.drawingBufferWidth / 2,
+      0,
+      gl.drawingBufferWidth,
+      gl.drawingBufferHeight,
+    )
+  }
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
   if (gltfMesh2) {

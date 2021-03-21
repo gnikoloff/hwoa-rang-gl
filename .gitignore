@@ -1,4 +1,4 @@
 node_modules
 dist
-docs/docs
-docs/examples/dist
+# docs/docs
+# docs/examples/dist

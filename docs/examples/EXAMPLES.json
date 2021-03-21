@@ -90,12 +90,16 @@
       {
         "label": "Particles",
         "id": "gpgpu-particles"
+      },
+      {
+        "label": "Fluid",
+        "id": "gpgpu-fluid"
       }
     ]
   },
   {
-    "label": "Particles",
-    "group": "particles",
+    "label": "Extra",
+    "group": "extra",
     "children": [
       {
         "label": "Mouse Picking",
