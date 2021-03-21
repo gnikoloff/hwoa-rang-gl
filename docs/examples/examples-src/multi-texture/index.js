@@ -99,13 +99,13 @@ for (let i = 0; i < sidesData.length; i++) {
   })
   meshes.push(mesh)
 
-  textures.push(
-    new Texture(gl, {
-      image: createNumCanvas(i),
-      width: 512,
-      height: 512,
-    }),
-  )
+  const tex = new Texture(gl, {
+    minFilter: gl.LINEAR,
+    magFilter: gl.LINEAR,
+  })
+  tex.bind().setIsFlip().fromImage(createNumCanvas(i)).unbind()
+
+  textures.push(tex)
 }
 
 document.body.appendChild(canvas)
