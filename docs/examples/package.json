@@ -7,7 +7,7 @@
     "serve": "http-serve dist",
     "watch": "rollup -c -w",
     "start:dev": "run-p serve watch",
-    "start": "rollup-c"
+    "start": "rollup -c"
   },
   "author": "",
   "license": "ISC",

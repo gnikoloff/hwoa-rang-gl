@@ -7,9 +7,11 @@
   "scripts": {
     "watch": "rollup -c -w",
     "build": "rollup -c",
-    "watch:examples": "rollup -c -w --environment EXAMPLES",
-    "serve:examples": "http-serve docs/examples",
-    "start:examples:dev": "run-p watch:examples serve:examples",
+    "serve:examples": "cd docs/examples && npm run serve",
+    "watch:examples": "cd docs/examples && npm run watch",
+    "build:examples": "cd docs/examples && npm run start",
+    "start:examples:dev": "run-p watch watch:examples serve:examples",
+    "start:examples": "run-s build build:examples serve:examples",
     "start:docs": "typedoc --out docs/docs src/",
     "serve:docs": "http-serve docs/docs -p 8081"
   },
