@@ -7,7 +7,7 @@ import {
   Geometry,
   GeometryUtils,
   Mesh,
-  RenderTarget,
+  Framebuffer,
 } from '../../../../dist/esm'
 
 const SHAPE_COUNT = 50
@@ -67,7 +67,7 @@ camera.position = [0, 0, 40]
 camera.lookAt([0, 0, 0])
 new CameraController(camera, canvas)
 
-const mousePickTarget = new RenderTarget(gl, {
+const mousePickTarget = new Framebuffer(gl, {
   width: innerWidth,
   height: innerHeight,
 })

@@ -6,7 +6,7 @@ import {
   Geometry,
   GeometryUtils,
   Mesh,
-  RenderTarget,
+  Framebuffer,
 } from '../../../../dist/esm'
 
 const fullscreenQuadVertShader = `
@@ -31,11 +31,11 @@ const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
 const mousePos = { x: 0, y: 0 }
 const mousePosTarget = { ...mousePos }
 
-let prevRenderTarget = new RenderTarget(gl, {
+let prevRenderTarget = new Framebuffer(gl, {
   width: innerWidth,
   height: innerHeight,
 })
-let currentRenderTarget = new RenderTarget(gl, {
+let currentRenderTarget = new Framebuffer(gl, {
   width: innerWidth,
   height: innerHeight,
 })
@@ -142,14 +142,18 @@ const resultMesh = new Mesh(gl, {
 })
 
 document.body.addEventListener('mousemove', (e) => {
-  mousePosTarget.x = (e.pageX / innerWidth) * 2 - 1
-  mousePosTarget.y = 2 - (e.pageY / innerHeight) * 2 - 1
+  let pointerX = e.pageX
+  if (!pointerX) {
+    pointerX = e.changedTouches[0].pageX
+  }
+  let pointerY = e.pageY
+  if (!pointerY) {
+    pointerY = e.changedTouches[0].pageY
+  }
+  mousePosTarget.x = (pointerX / innerWidth) * 2 - 1
+  mousePosTarget.y = 2 - (pointerY / innerHeight) * 2 - 1
 })
-document.body.addEventListener('mousemove', (e) => {
-  e.preventDefault()
-  mousePosTarget.x = (e.changedTouches[0].pageX / innerWidth) * 2 - 1
-  mousePosTarget.y = 2 - (e.changedTouches[0].pageY / innerHeight) * 2 - 1
-})
+
 document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)
 resize()
@@ -181,7 +185,7 @@ function updateFrame(ts) {
     currentRenderTarget.bind()
     // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-    prevRenderTarget.bindTexture()
+    prevRenderTarget.texture.bind()
     fadeMesh.draw()
 
     boxMesh.setCamera(camera).draw()
@@ -193,7 +197,7 @@ function updateFrame(ts) {
   gl.clearColor(0.9, 0.9, 0.9, 1)
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-  currentRenderTarget.bindTexture()
+  currentRenderTarget.texture.bind()
   resultMesh.draw()
 
   const temp = prevRenderTarget

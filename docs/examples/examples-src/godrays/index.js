@@ -40,9 +40,9 @@ let planeMesh
 
 // gl.enable(gl.BLEND)
 // gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
-// gl.enable(gl.DEPTH_TEST)
-// gl.enable(gl.CULL_FACE)
-// gl.depthFunc(gl.LEQUAL)
+gl.enable(gl.DEPTH_TEST)
+gl.enable(gl.CULL_FACE)
+gl.depthFunc(gl.LEQUAL)
 
 const camera = new PerspectiveCamera(
   (45 * Math.PI) / 180,
