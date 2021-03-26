@@ -1,14 +1,11 @@
-import type { RenderTargetInterface } from '../ts-types';
-import Texture from './texture';
-export default class Framebuffer {
+import type { FramebufferInterface } from '../types';
+import { Texture } from './texture';
+export declare class Framebuffer {
     #private;
     texture: Texture;
-    constructor(gl: WebGLRenderingContext, { width, height, target, wrapS, wrapT, format, internalFormat, depth, }: RenderTargetInterface);
+    constructor(gl: WebGLRenderingContext, { width, height, target, wrapS, wrapT, minFilter, magFilter, format, internalFormat, type, depth, }?: FramebufferInterface);
     bind(): this;
     unbind(): this;
-    /**
-     * @description reset texture
-     */
-    reset(): void;
+    reset(): this;
     delete(): void;
 }

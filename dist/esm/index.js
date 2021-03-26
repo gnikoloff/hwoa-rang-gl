@@ -49,7 +49,7 @@ const STATIC_DRAW = 0x88e4;
 /**
  * Create and compile WebGLShader
  * @param {(WebGL1RenderingContext|WebGL2RenderingContext)} gl
- * @param {number} shaderType
+ * @param {GLenum} shaderType
  * @param {string} shaderSource
  * @returns {WebGLShader}
  */
@@ -81,12 +81,12 @@ function createProgram(gl, vertexShaderSource, fragmentShaderSource) {
     gl.attachShader(program, vertexShader);
     gl.attachShader(program, fragmentShader);
     gl.linkProgram(program);
+    // It is safe to detach and delete shaders once a program is linked
+    gl.detachShader(program, vertexShader);
+    gl.deleteShader(vertexShader);
+    gl.detachShader(program, fragmentShader);
+    gl.deleteShader(fragmentShader);
     if (gl.getProgramParameter(program, gl.LINK_STATUS)) {
-        // It is safe to detach and delete shaders once a program is linked
-        gl.detachShader(program, vertexShader);
-        gl.deleteShader(vertexShader);
-        gl.detachShader(program, fragmentShader);
-        gl.deleteShader(fragmentShader);
         return program;
     }
     console.error(gl.getProgramInfoLog(program));
@@ -96,7 +96,7 @@ function createProgram(gl, vertexShaderSource, fragmentShaderSource) {
  * Create a ARRAY_BUFFER buffer
  * @param {(WebGL1RenderingContext|WebGL2RenderingContext)} gl
  * @param {ArrayBuffer} data - Typed array types that will be copied into the data store
- * @param {number} [usage=STATIC_DRAW] - A GLenum specifying the intended usage pattern of the data store for optimization purposes
+ * @param {GLenum} [usage = gl.STATIC_DRAW] - A GLenum specifying the intended usage pattern of the data store for optimization purposes
  * @returns {WebGLBuffer}
  */
 function createBuffer(gl, data, usage = STATIC_DRAW) {
@@ -109,15 +109,14 @@ function createBuffer(gl, data, usage = STATIC_DRAW) {
  * Create a ELEMENT_ARRAY_BUFFER buffer
  * @param {(WebGL1RenderingContext|WebGL2RenderingContext)} gl
  * @param {ArrayBuffer} data - Typed array types that will be copied into the data store
- * @param {number} [usage=STATIC_DRAW] - A GLenum specifying the intended usage pattern of the data store for optimization purposes
+ * @param {GLenum} [usage=STATIC_DRAW] - A GLenum specifying the intended usage pattern of the data store for optimization purposes
  * @returns {WebGLBuffer}
  */
-function createIndexBuffer(gl, indices, usage = STATIC_DRAW) {
+function createIndexBuffer(gl, indices, usage = gl.STATIC_DRAW) {
     const buffer = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, usage);
-    const count = indices.length;
-    return { count, buffer };
+    return buffer;
 }
 const cachedExtensions = new Map();
 /**
@@ -134,34 +133,49 @@ function getExtension(gl, extensionName) {
     return extension;
 }
 
-const vertexShaderSourceWebGL2Head = `
-  uniform mat4 projectionMatrix;
-  uniform mat4 viewMatrix;
-  uniform mat4 modelMatrix;
+const vertexShaderSourceHead = `
+  uniform mat4 ${MODEL_MATRIX_UNIFORM_NAME};
+  uniform mat4 ${VIEW_MATRIX_UNIFORM_NAME};
+  uniform mat4 ${PROJECTION_MATRIX_UNIFORM_NAME};
 `;
 
-const fragmentShaderSourceWebGL2Head = `
+const fragmentShaderSourceHead = `
   precision highp float;
 `;
 
 var _gl, _program, _attribLocations, _uniformLocations;
+/**
+ * Program class for compiling GLSL shaders and linking them in a WebGLProgram and managing its state
+ *
+ * @public
+ */
 class Program {
-    constructor(gl, { vertexShaderSource: inputVertexShaderSource, fragmentShaderSource: inputFragmentShaderSource, }) {
+    constructor(gl, params) {
         _gl.set(this, void 0);
         _program.set(this, void 0);
         _attribLocations.set(this, new Map());
         _uniformLocations.set(this, new Map());
         __classPrivateFieldSet(this, _gl, gl);
-        const vertexShaderSource = `${vertexShaderSourceWebGL2Head}
+        const { vertexShaderSource: inputVertexShaderSource, fragmentShaderSource: inputFragmentShaderSource, } = params;
+        const vertexShaderSource = `
+      ${vertexShaderSourceHead}
       ${inputVertexShaderSource}
     `;
-        const fragmentShaderSource = `${fragmentShaderSourceWebGL2Head}
+        const fragmentShaderSource = `
+      ${fragmentShaderSourceHead}
       ${inputFragmentShaderSource}
     `;
         __classPrivateFieldSet(this, _program, createProgram(gl, vertexShaderSource, fragmentShaderSource));
         __classPrivateFieldSet(this, _attribLocations, new Map());
         __classPrivateFieldSet(this, _uniformLocations, new Map());
     }
+    /**
+     * Set uniform value. Query the uniform location if necessary and cache it in-memory for future use
+     * @param {string} uniformName
+     * @param {UniformType} uniformType
+     * @param uniformValue
+     * @returns {this}
+     */
     setUniform(uniformName, uniformType, uniformValue) {
         let uniformLocation;
         if (__classPrivateFieldGet(this, _uniformLocations).has(uniformName)) {
@@ -196,6 +210,11 @@ class Program {
         }
         return this;
     }
+    /**
+     * Get the location for an attribute
+     * @param {string} attribName
+     * @returns {number} attribLocation
+     */
     getAttribLocation(attribName) {
         if (__classPrivateFieldGet(this, _attribLocations).has(attribName)) {
             return __classPrivateFieldGet(this, _attribLocations).get(attribName);
@@ -207,18 +226,39 @@ class Program {
         __classPrivateFieldGet(this, _attribLocations).set(attribName, attribLocation);
         return attribLocation;
     }
+    /**
+     * Binds the program for use
+     * @returns {this}
+     */
     bind() {
         __classPrivateFieldGet(this, _gl).useProgram(__classPrivateFieldGet(this, _program));
         return this;
     }
+    /**
+     * Uninds the program for use
+     * @returns {this}
+     */
     unbind() {
         __classPrivateFieldGet(this, _gl).useProgram(null);
         return this;
+    }
+    /**
+     * Deletes the program
+     */
+    delete() {
+        __classPrivateFieldGet(this, _gl).deleteProgram(__classPrivateFieldGet(this, _program));
     }
 }
 _gl = new WeakMap(), _program = new WeakMap(), _attribLocations = new WeakMap(), _uniformLocations = new WeakMap();
 
 var _gl$1;
+/**
+ * Geometry class to hold buffers and attributes for a mesh.
+ * Accepts the data that makes up your model - indices, vertices, uvs, normals, etc.
+ * The only required attribute & buffer to render is "position"
+ *
+ * @public
+ */
 class Geometry {
     constructor(gl) {
         _gl$1.set(this, void 0);
@@ -226,16 +266,26 @@ class Geometry {
         this.vertexCount = 0;
         __classPrivateFieldSet(this, _gl$1, gl);
     }
-    addIndex({ typedArray }) {
-        const { count, buffer } = createIndexBuffer(__classPrivateFieldGet(this, _gl$1), typedArray);
-        this.vertexCount = count;
-        this.attributes.set(INDEX_ATTRIB_NAME, {
-            typedArray,
-            buffer,
-        });
+    /**
+     * @description Set data into element array buffer
+     * @param {WebGLElementBufferInterface} params
+     * @returns {this}
+     */
+    addIndex(params) {
+        const { typedArray } = params;
+        const buffer = createIndexBuffer(__classPrivateFieldGet(this, _gl$1), typedArray);
+        this.vertexCount = typedArray.length;
+        this.attributes.set(INDEX_ATTRIB_NAME, { typedArray, buffer });
         return this;
     }
-    addAttribute(key, { typedArray, size = 1, type = __classPrivateFieldGet(this, _gl$1).FLOAT, normalized = false, stride = 0, offset = 0, instancedDivisor, }) {
+    /**
+     * @description Add attribute as array buffer
+     * @param {string} key - Name of attribute. Must match attribute name in your GLSL program
+     * @param {WebGLArrayBufferInterface} params
+     * @returns {this}
+     */
+    addAttribute(key, params) {
+        const { typedArray, size = 1, type = __classPrivateFieldGet(this, _gl$1).FLOAT, normalized = false, stride = 0, offset = 0, instancedDivisor, } = params;
         const buffer = createBuffer(__classPrivateFieldGet(this, _gl$1), typedArray);
         if (key === POSITION_ATTRIB_NAME && !this.vertexCount) {
             this.vertexCount = typedArray.length / size;
@@ -252,6 +302,9 @@ class Geometry {
         });
         return this;
     }
+    /**
+     * @description Delete all buffers associated with this geometry
+     */
     delete() {
         this.attributes.forEach(({ buffer }) => {
             __classPrivateFieldGet(this, _gl$1).deleteBuffer(buffer);
@@ -761,13 +814,13 @@ function cross(out, a, b) {
 }());
 
 var _position, _positionVec3, _scale, _scaleVec3, _rotationAxis, _rotationAxisVec3, _rotationAngle, _gl$2, _geometry;
+/**
+ * Mesh class for holding the geometry, program and shaders for an object.
+ *
+ * @public
+ */
 class Mesh {
-    /**
-     *
-     * @param gl
-     * @param param1
-     */
-    constructor(gl, { geometry, uniforms = {}, vertexShaderSource, fragmentShaderSource, }) {
+    constructor(gl, params) {
         _position.set(this, [0, 0, 0]);
         _positionVec3.set(this, create$1());
         _scale.set(this, [1, 1, 1]);
@@ -779,14 +832,19 @@ class Mesh {
         _geometry.set(this, void 0);
         this.modelMatrixNeedsUpdate = false;
         this.modelMatrix = create();
+        /**
+         * DrawMode
+         * @default gl.TRIANGLES
+         */
         this.drawMode = TRIANGLES;
+        const { geometry, uniforms = {}, vertexShaderSource, fragmentShaderSource, } = params;
         __classPrivateFieldSet(this, _gl$2, gl);
         __classPrivateFieldSet(this, _geometry, geometry);
         this.program = new Program(gl, { vertexShaderSource, fragmentShaderSource });
         this.vaoExtension = getExtension(gl, 'OES_vertex_array_object');
         this.vao = this.vaoExtension.createVertexArrayOES();
-        set(__classPrivateFieldGet(this, _scaleVec3), ...__classPrivateFieldGet(this, _scale));
         this.hasIndices = geometry.attributes.has(INDEX_ATTRIB_NAME);
+        set(__classPrivateFieldGet(this, _scaleVec3), __classPrivateFieldGet(this, _scale)[0], __classPrivateFieldGet(this, _scale)[1], __classPrivateFieldGet(this, _scale)[2]);
         this.vaoExtension.bindVertexArrayOES(this.vao);
         geometry.attributes.forEach(({ size, type, normalized, stride, offset, buffer }, key) => {
             if (key === INDEX_ATTRIB_NAME) {
@@ -806,7 +864,7 @@ class Mesh {
         for (const [key, uniform] of Object.entries(uniforms)) {
             this.program.setUniform(key, uniform['type'], uniform['value']);
         }
-        this.program.setUniform(MODEL_MATRIX_UNIFORM_NAME, 'mat4', this.modelMatrix);
+        this.program.setUniform(MODEL_MATRIX_UNIFORM_NAME, UNIFORM_TYPE_MATRIX4X4, this.modelMatrix);
         this.program.unbind();
         return this;
     }
@@ -816,48 +874,83 @@ class Mesh {
     get scale() {
         return __classPrivateFieldGet(this, _scale);
     }
+    /**
+     * Set uniform value. Query the uniform location if necessary and cache it in-memory for future use
+     * @param {string} uniformName
+     * @param {UniformType} uniformType
+     * @param uniformValue
+     * @returns {this}
+     */
     setUniform(uniformName, uniformType, uniformValue) {
         this.program.bind();
         this.program.setUniform(uniformName, uniformType, uniformValue);
         this.program.unbind();
         return this;
     }
-    setPosition({ x = __classPrivateFieldGet(this, _position)[0], y = __classPrivateFieldGet(this, _position)[1], z = __classPrivateFieldGet(this, _position)[2], }) {
+    /**
+     * Sets position
+     * @returns {this}
+     */
+    setPosition(position) {
+        const { x = __classPrivateFieldGet(this, _position)[0], y = __classPrivateFieldGet(this, _position)[1], z = __classPrivateFieldGet(this, _position)[2], } = position;
         __classPrivateFieldSet(this, _position, [x, y, z]);
         set(__classPrivateFieldGet(this, _positionVec3), x, y, z);
         this.modelMatrixNeedsUpdate = true;
         return this;
     }
-    setScale({ x = __classPrivateFieldGet(this, _scale)[0], y = __classPrivateFieldGet(this, _scale)[1], z = __classPrivateFieldGet(this, _scale)[2], }) {
+    /**
+     * Sets scale
+     * @returns {this}
+     */
+    setScale(scale) {
+        const { x = __classPrivateFieldGet(this, _scale)[0], y = __classPrivateFieldGet(this, _scale)[1], z = __classPrivateFieldGet(this, _scale)[2] } = scale;
         __classPrivateFieldSet(this, _scale, [x, y, z]);
         set(__classPrivateFieldGet(this, _scaleVec3), x, y, z);
         this.modelMatrixNeedsUpdate = true;
         return this;
     }
-    setRotation({ x = __classPrivateFieldGet(this, _rotationAxis)[0], y = __classPrivateFieldGet(this, _rotationAxis)[1], z = __classPrivateFieldGet(this, _rotationAxis)[2], }, rotationAngle) {
+    /**
+     * Sets rotation
+     * @returns {this}
+     */
+    setRotation(rotation, rotationAngle) {
+        const { x = __classPrivateFieldGet(this, _rotationAxis)[0], y = __classPrivateFieldGet(this, _rotationAxis)[1], z = __classPrivateFieldGet(this, _rotationAxis)[2], } = rotation;
         __classPrivateFieldSet(this, _rotationAxis, [x, y, z]);
         set(__classPrivateFieldGet(this, _rotationAxisVec3), x, y, z);
         __classPrivateFieldSet(this, _rotationAngle, rotationAngle);
         this.modelMatrixNeedsUpdate = true;
         return this;
     }
+    /**
+     * Update model matrix with scale, rotation and translation
+     * @returns {this}
+     */
     updateModelMatrix() {
         identity(this.modelMatrix);
         translate(this.modelMatrix, this.modelMatrix, __classPrivateFieldGet(this, _positionVec3));
         rotate(this.modelMatrix, this.modelMatrix, __classPrivateFieldGet(this, _rotationAngle), __classPrivateFieldGet(this, _rotationAxisVec3));
         scale(this.modelMatrix, this.modelMatrix, __classPrivateFieldGet(this, _scaleVec3));
         this.program.bind();
-        this.program.setUniform(MODEL_MATRIX_UNIFORM_NAME, 'mat4', this.modelMatrix);
+        this.program.setUniform(MODEL_MATRIX_UNIFORM_NAME, UNIFORM_TYPE_MATRIX4X4, this.modelMatrix);
         this.program.unbind();
         return this;
     }
+    /**
+     * Assign camera projection matrix and view matrix to model uniforms
+     * @param {PerspectiveCamera} camera
+     * @returns {this}
+     */
     setCamera(camera) {
         this.program.bind();
-        this.program.setUniform(PROJECTION_MATRIX_UNIFORM_NAME, 'mat4', camera.projectionMatrix);
-        this.program.setUniform(VIEW_MATRIX_UNIFORM_NAME, 'mat4', camera.viewMatrix);
+        this.program.setUniform(PROJECTION_MATRIX_UNIFORM_NAME, UNIFORM_TYPE_MATRIX4X4, camera.projectionMatrix);
+        this.program.setUniform(VIEW_MATRIX_UNIFORM_NAME, UNIFORM_TYPE_MATRIX4X4, camera.viewMatrix);
         this.program.unbind();
         return this;
     }
+    /**
+     * Renders the mesh
+     * @returns {this}
+     */
     draw() {
         if (this.modelMatrixNeedsUpdate) {
             this.updateModelMatrix();
@@ -875,17 +968,25 @@ class Mesh {
         this.program.unbind();
         return this;
     }
+    /**
+     * Deletes the geometry, program and VAO extension associated with the Mesh
+     */
+    delete() {
+        __classPrivateFieldGet(this, _geometry).delete();
+        this.program.delete();
+        this.vaoExtension.deleteVertexArrayOES(this.vao);
+    }
 }
 _position = new WeakMap(), _positionVec3 = new WeakMap(), _scale = new WeakMap(), _scaleVec3 = new WeakMap(), _rotationAxis = new WeakMap(), _rotationAxisVec3 = new WeakMap(), _rotationAngle = new WeakMap(), _gl$2 = new WeakMap(), _geometry = new WeakMap();
 
-var _geometry$1, _gl$3, _instanceExtension;
+var _geometry$1, _gl$3, _instanceAttributes, _instanceExtension;
 class InstancedMesh extends Mesh {
     constructor(gl, { geometry, uniforms, instanceCount = 1, vertexShaderSource, fragmentShaderSource, }) {
         super(gl, { geometry, uniforms, vertexShaderSource, fragmentShaderSource });
         _geometry$1.set(this, void 0);
         _gl$3.set(this, void 0);
+        _instanceAttributes.set(this, new Map());
         _instanceExtension.set(this, void 0);
-        this.instanceAttributes = new Map();
         __classPrivateFieldSet(this, _gl$3, gl);
         __classPrivateFieldSet(this, _geometry$1, geometry);
         __classPrivateFieldSet(this, _instanceExtension, getExtension(gl, 'ANGLE_instanced_arrays'));
@@ -922,7 +1023,7 @@ class InstancedMesh extends Mesh {
             __classPrivateFieldGet(this, _instanceExtension).vertexAttribDivisorANGLE(location, 1);
         }
         this.vaoExtension.bindVertexArrayOES(null);
-        this.instanceAttributes.set(INSTANCED_OFFSET_MODEL_MATRIX, {
+        __classPrivateFieldGet(this, _instanceAttributes).set(INSTANCED_OFFSET_MODEL_MATRIX, {
             location: instanceMatrixLocation,
             typedArray: matrixData,
             buffer: matrixBuffer,
@@ -932,15 +1033,22 @@ class InstancedMesh extends Mesh {
         });
         __classPrivateFieldSet(this, _instanceExtension, getExtension(gl, 'ANGLE_instanced_arrays'));
     }
+    /**
+     * @param {number} index - Instance index on which to apply the matrix
+     * @param {Float32Array|Float64Array} matrix - Matrix to control the instance scale, rotation and translation
+     */
     setMatrixAt(index, matrix) {
         const itemsPerInstance = 16;
-        const { buffer } = this.instanceAttributes.get(INSTANCED_OFFSET_MODEL_MATRIX);
+        const { buffer } = __classPrivateFieldGet(this, _instanceAttributes).get(INSTANCED_OFFSET_MODEL_MATRIX);
         this.vaoExtension.bindVertexArrayOES(this.vao);
         __classPrivateFieldGet(this, _gl$3).bindBuffer(__classPrivateFieldGet(this, _gl$3).ARRAY_BUFFER, buffer);
         __classPrivateFieldGet(this, _gl$3).bufferSubData(__classPrivateFieldGet(this, _gl$3).ARRAY_BUFFER, index * itemsPerInstance * Float32Array.BYTES_PER_ELEMENT, matrix);
         this.vaoExtension.bindVertexArrayOES(null);
         return this;
     }
+    /**
+     * Draws the instanced mesh
+     */
     draw() {
         if (this.modelMatrixNeedsUpdate) {
             this.updateModelMatrix();
@@ -959,10 +1067,28 @@ class InstancedMesh extends Mesh {
         return this;
     }
 }
-_geometry$1 = new WeakMap(), _gl$3 = new WeakMap(), _instanceExtension = new WeakMap();
+_geometry$1 = new WeakMap(), _gl$3 = new WeakMap(), _instanceAttributes = new WeakMap(), _instanceExtension = new WeakMap();
+
+/**
+ * Clamp number to a given range
+ * @param {num}
+ * @param {min}
+ * @param {max}
+ * @returns {number}
+ */
+const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+/**
+ * Check if number is power of 2
+ * @param {number} value
+ * @returns {number}
+ */
+const isPowerOf2 = (value) => (value & (value - 1)) === 0;
 
 var _gl$4, _texture, _width, _height, _format, _internalFormat, _type, _anisotropyExtension;
-const isPowerOf2 = (value) => (value & (value - 1)) === 0;
+/**
+ * Texture class used to store image, video, canvas and data as typed arrays
+ * @public
+ */
 class Texture {
     constructor(gl, { format = gl.RGB, internalFormat = format, type = gl.UNSIGNED_BYTE, unpackAlignment = 1, wrapS = gl.CLAMP_TO_EDGE, wrapT = gl.CLAMP_TO_EDGE, minFilter = gl.NEAREST, magFilter = gl.NEAREST, } = {}) {
         _gl$4.set(this, void 0);
@@ -988,23 +1114,45 @@ class Texture {
             getExtension(gl, 'MOZ_EXT_texture_filter_anisotropic') ||
             getExtension(gl, 'WEBKIT_EXT_texture_filter_anisotropic'));
     }
+    /**
+     * @returns {WebGLTexture}
+     */
     getTexture() {
         return __classPrivateFieldGet(this, _texture);
     }
+    /**
+     * Binds the texture to gl.TEXTURE_2D
+     * @returns {this}
+     */
     bind() {
         __classPrivateFieldGet(this, _gl$4).bindTexture(__classPrivateFieldGet(this, _gl$4).TEXTURE_2D, __classPrivateFieldGet(this, _texture));
         return this;
     }
+    /**
+     * Unbinds the texture
+     * @returns {this}
+     */
     unbind() {
         __classPrivateFieldGet(this, _gl$4).bindTexture(__classPrivateFieldGet(this, _gl$4).TEXTURE_2D, null);
         return this;
     }
+    /**
+     * @param {HTMLImageElement|HTMLCanvasElement|HTMLVideoElement} image
+     * @param {number} [width]
+     * @param {number} [height
+     * @returns {this}
+     */
     fromImage(image, width = image.width, height = image.height) {
         __classPrivateFieldSet(this, _width, width);
         __classPrivateFieldSet(this, _height, height);
         __classPrivateFieldGet(this, _gl$4).texImage2D(__classPrivateFieldGet(this, _gl$4).TEXTURE_2D, 0, __classPrivateFieldGet(this, _internalFormat), __classPrivateFieldGet(this, _format), __classPrivateFieldGet(this, _type), image);
         return this;
     }
+    /**
+     * @param {number} width
+     * @param {number} height
+     * @returns {this}
+     */
     fromSize(width, height) {
         if (!width || !height) {
             console.warn('Incomplete dimensions for creating empty texture');
@@ -1014,6 +1162,12 @@ class Texture {
         __classPrivateFieldGet(this, _gl$4).texImage2D(__classPrivateFieldGet(this, _gl$4).TEXTURE_2D, 0, __classPrivateFieldGet(this, _internalFormat), __classPrivateFieldGet(this, _width), __classPrivateFieldGet(this, _height), 0, __classPrivateFieldGet(this, _format), __classPrivateFieldGet(this, _type), null);
         return this;
     }
+    /**
+     * @param dataArray
+     * @param {number} [width]
+     * @param {number} [height]
+     * @returns {this}
+     */
     fromData(dataArray, width, height) {
         if (!width || !height) {
             console.warn('Incomplete dimensions for creating texture from data array');
@@ -1023,38 +1177,73 @@ class Texture {
         __classPrivateFieldGet(this, _gl$4).texImage2D(__classPrivateFieldGet(this, _gl$4).TEXTURE_2D, 0, __classPrivateFieldGet(this, _internalFormat), __classPrivateFieldGet(this, _width), __classPrivateFieldGet(this, _height), 0, __classPrivateFieldGet(this, _format), __classPrivateFieldGet(this, _type), dataArray);
         return this;
     }
+    /**
+     * @returns {this}
+     */
     generateMipmap() {
         __classPrivateFieldGet(this, _gl$4).generateMipmap(__classPrivateFieldGet(this, _gl$4).TEXTURE_2D);
         return this;
     }
+    /**
+     * @param {GLEnum} [format = gl.RGB]
+     * @param {GLEnum} [internalFormat = gl.RGB]
+     * @param {GLenum} [type = gl.UNSIGNED_BYTE]
+     * @returns {this}
+     */
     setFormat(format = __classPrivateFieldGet(this, _gl$4).RGB, internalFormat = __classPrivateFieldGet(this, _gl$4).RGB, type = __classPrivateFieldGet(this, _gl$4).UNSIGNED_BYTE) {
         __classPrivateFieldSet(this, _format, format);
         __classPrivateFieldSet(this, _internalFormat, internalFormat);
         __classPrivateFieldSet(this, _type, type);
         return this;
     }
+    /**
+     * @returns {this}
+     */
     setIsFlip() {
         this.setPixelStore(__classPrivateFieldGet(this, _gl$4).UNPACK_FLIP_Y_WEBGL, true);
         return this;
     }
+    /**
+     * @param {GLenum} name
+     * @param params
+     * @returns {this}
+     */
     setPixelStore(name, params) {
         __classPrivateFieldGet(this, _gl$4).pixelStorei(name, params);
         return this;
     }
+    /**
+     * @param {GLenum} [filter = gl.LINEAR]
+     * @returns {this}
+     */
     setMinFilter(filter = __classPrivateFieldGet(this, _gl$4).LINEAR) {
-        console.log(filter === __classPrivateFieldGet(this, _gl$4).NEAREST);
         __classPrivateFieldGet(this, _gl$4).texParameteri(__classPrivateFieldGet(this, _gl$4).TEXTURE_2D, __classPrivateFieldGet(this, _gl$4).TEXTURE_MIN_FILTER, filter);
         return this;
     }
+    /**
+     * @param {GLenum} [filter = gl.LINEAR]
+     * @returns {this}
+     */
     setMagFilter(filter = __classPrivateFieldGet(this, _gl$4).LINEAR) {
         __classPrivateFieldGet(this, _gl$4).texParameteri(__classPrivateFieldGet(this, _gl$4).TEXTURE_2D, __classPrivateFieldGet(this, _gl$4).TEXTURE_MAG_FILTER, filter);
         return this;
     }
+    /**
+     *
+     * @param {GLenum} [wrapS = gl.CLAMP_TO_EDGE]
+     * @param {GLenum} [wrapT = gl.CLAMP_TO_EDGE]
+     * @returns {this}
+     */
     setWrap(wrapS = __classPrivateFieldGet(this, _gl$4).CLAMP_TO_EDGE, wrapT = __classPrivateFieldGet(this, _gl$4).CLAMP_TO_EDGE) {
         __classPrivateFieldGet(this, _gl$4).texParameteri(__classPrivateFieldGet(this, _gl$4).TEXTURE_2D, __classPrivateFieldGet(this, _gl$4).TEXTURE_WRAP_S, wrapS);
         __classPrivateFieldGet(this, _gl$4).texParameteri(__classPrivateFieldGet(this, _gl$4).TEXTURE_2D, __classPrivateFieldGet(this, _gl$4).TEXTURE_WRAP_T, wrapT);
         return this;
     }
+    /**
+     *
+     * @param {number} anisotropyLevel
+     * @returns {this}
+     */
     setAnisotropy(anisotropyLevel) {
         if (!anisotropyLevel) {
             return;
@@ -1070,7 +1259,6 @@ class Texture {
     }
     delete() {
         __classPrivateFieldGet(this, _gl$4).deleteTexture(__classPrivateFieldGet(this, _texture));
-        return this;
     }
 }
 _gl$4 = new WeakMap(), _texture = new WeakMap(), _width = new WeakMap(), _height = new WeakMap(), _format = new WeakMap(), _internalFormat = new WeakMap(), _type = new WeakMap(), _anisotropyExtension = new WeakMap();
@@ -1078,7 +1266,7 @@ Texture.isPowerOf2 = (width, height) => isPowerOf2(width) && isPowerOf2(height);
 
 var _gl$5, _buffer, _depthBuffer, _width$1, _height$1;
 class Framebuffer {
-    constructor(gl, { width = gl.canvas.width, height = gl.canvas.height, target = gl.FRAMEBUFFER, wrapS = gl.CLAMP_TO_EDGE, wrapT = gl.CLAMP_TO_EDGE, format = gl.RGBA, internalFormat = format, depth = true, }) {
+    constructor(gl, { width = gl.canvas.width, height = gl.canvas.height, target = gl.FRAMEBUFFER, wrapS = gl.CLAMP_TO_EDGE, wrapT = gl.CLAMP_TO_EDGE, minFilter = gl.NEAREST, magFilter = gl.NEAREST, format = gl.RGBA, internalFormat = format, type = gl.UNSIGNED_BYTE, depth = true, } = {}) {
         _gl$5.set(this, void 0);
         _buffer.set(this, void 0);
         _depthBuffer.set(this, void 0);
@@ -1088,10 +1276,13 @@ class Framebuffer {
         __classPrivateFieldSet(this, _width$1, width);
         __classPrivateFieldSet(this, _height$1, height);
         this.texture = new Texture(gl, {
+            type,
             format,
             internalFormat,
             wrapS,
             wrapT,
+            minFilter,
+            magFilter,
         });
         this.texture.bind().fromSize(width, height).unbind();
         __classPrivateFieldSet(this, _buffer, gl.createFramebuffer());
@@ -1115,11 +1306,12 @@ class Framebuffer {
         __classPrivateFieldGet(this, _gl$5).bindFramebuffer(__classPrivateFieldGet(this, _gl$5).FRAMEBUFFER, null);
         return this;
     }
-    /**
-     * @description reset texture
-     */
     reset() {
-        this.texture.bind().fromSize(__classPrivateFieldGet(this, _width$1), __classPrivateFieldGet(this, _height$1));
+        this.texture
+            .bind()
+            .fromSize(__classPrivateFieldGet(this, _width$1), __classPrivateFieldGet(this, _height$1))
+            .unbind();
+        return this;
     }
     delete() {
         this.texture.delete();
@@ -1127,8 +1319,6 @@ class Framebuffer {
     }
 }
 _gl$5 = new WeakMap(), _buffer = new WeakMap(), _depthBuffer = new WeakMap(), _width$1 = new WeakMap(), _height$1 = new WeakMap();
-
-const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
 class DampedAction {
     constructor() {
@@ -1563,571 +1753,312 @@ class PerspectiveCamera {
 }
 PerspectiveCamera.UP_VECTOR = [0, 1, 0];
 
-function buildPlane(
-  vertices,
-  normal,
-  uv,
-  indices,
-  width,
-  height,
-  depth,
-  wSegs,
-  hSegs,
-  u = 0,
-  v = 1,
-  w = 2,
-  uDir = 1,
-  vDir = -1,
-  i = 0,
-  ii = 0,
-) {
-  const io = i;
-  const segW = width / wSegs;
-  const segH = height / hSegs;
-
-  for (let iy = 0; iy <= hSegs; iy++) {
-    let y = iy * segH - height / 2;
-    for (let ix = 0; ix <= wSegs; ix++, i++) {
-      let x = ix * segW - width / 2;
-
-      vertices[i * 3 + u] = x * uDir;
-      vertices[i * 3 + v] = y * vDir;
-      vertices[i * 3 + w] = depth / 2;
-
-      normal[i * 3 + u] = 0;
-      normal[i * 3 + v] = 0;
-      normal[i * 3 + w] = depth >= 0 ? 1 : -1;
-
-      uv[i * 2] = ix / wSegs;
-      uv[i * 2 + 1] = 1 - iy / hSegs;
-
-      if (iy === hSegs || ix === wSegs) continue
-      let a = io + ix + iy * (wSegs + 1);
-      let b = io + ix + (iy + 1) * (wSegs + 1);
-      let c = io + ix + (iy + 1) * (wSegs + 1) + 1;
-      let d = io + ix + iy * (wSegs + 1) + 1;
-
-      indices[ii * 6] = a;
-      indices[ii * 6 + 1] = b;
-      indices[ii * 6 + 2] = d;
-      indices[ii * 6 + 3] = b;
-      indices[ii * 6 + 4] = c;
-      indices[ii * 6 + 5] = d;
-      ii++;
+/**
+ * @private
+ */
+function buildPlane(vertices, normal, uv, indices, width, height, depth, wSegs, hSegs, u = 0, v = 1, w = 2, uDir = 1, vDir = -1, i = 0, ii = 0) {
+    const io = i;
+    const segW = width / wSegs;
+    const segH = height / hSegs;
+    for (let iy = 0; iy <= hSegs; iy++) {
+        let y = iy * segH - height / 2;
+        for (let ix = 0; ix <= wSegs; ix++, i++) {
+            let x = ix * segW - width / 2;
+            vertices[i * 3 + u] = x * uDir;
+            vertices[i * 3 + v] = y * vDir;
+            vertices[i * 3 + w] = depth / 2;
+            normal[i * 3 + u] = 0;
+            normal[i * 3 + v] = 0;
+            normal[i * 3 + w] = depth >= 0 ? 1 : -1;
+            uv[i * 2] = ix / wSegs;
+            uv[i * 2 + 1] = 1 - iy / hSegs;
+            if (iy === hSegs || ix === wSegs)
+                continue;
+            let a = io + ix + iy * (wSegs + 1);
+            let b = io + ix + (iy + 1) * (wSegs + 1);
+            let c = io + ix + (iy + 1) * (wSegs + 1) + 1;
+            let d = io + ix + iy * (wSegs + 1) + 1;
+            indices[ii * 6] = a;
+            indices[ii * 6 + 1] = b;
+            indices[ii * 6 + 2] = d;
+            indices[ii * 6 + 3] = b;
+            indices[ii * 6 + 4] = c;
+            indices[ii * 6 + 5] = d;
+            ii++;
+        }
     }
-  }
 }
-
-function createPlane({
-  width = 1,
-  height = 1,
-  widthSegments = 1,
-  heightSegments = 1,
-  attributes = {},
-} = {}) {
-  const wSegs = widthSegments;
-  const hSegs = heightSegments;
-
-  // Determine length of arrays
-  const num = (wSegs + 1) * (hSegs + 1);
-  const numIndices = wSegs * hSegs * 6;
-
-  // Generate empty arrays once
-  const position = new Float32Array(num * 3);
-  const normal = new Float32Array(num * 3);
-  const uv = new Float32Array(num * 2);
-  const index =
-    num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices);
-
-  buildPlane(position, normal, uv, index, width, height, 0, wSegs, hSegs);
-  return {
-    vertices: position,
-    normal,
-    uv,
-    indices: index,
-  }
-}
-
-function createBox({
-  width = 1,
-  height = 1,
-  depth = 1,
-  widthSegments = 1,
-  heightSegments = 1,
-  depthSegments = 1,
-  separateFaces = false,
-} = {}) {
-  const wSegs = widthSegments;
-  const hSegs = heightSegments;
-  const dSegs = depthSegments;
-
-  const num =
-    (wSegs + 1) * (hSegs + 1) * 2 +
-    (wSegs + 1) * (dSegs + 1) * 2 +
-    (hSegs + 1) * (dSegs + 1) * 2;
-  const numIndices =
-    (wSegs * hSegs * 2 + wSegs * dSegs * 2 + hSegs * dSegs * 2) * 6;
-
-  const vertices = new Float32Array(num * 3);
-  const normal = new Float32Array(num * 3);
-  const uv = new Float32Array(num * 2);
-  const indices =
-    num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices);
-
-  const sidesData = [];
-
-  let i = 0;
-  let ii = 0;
-
-  {
-    // RIGHT
-    if (separateFaces) {
-      const num = (dSegs + 1) * (hSegs + 1);
-      const numIndices = dSegs * hSegs * 6;
-      const vertices = new Float32Array(num * 3);
-      const normal = new Float32Array(num * 3);
-      const uv = new Float32Array(num * 2);
-      const indices =
-        num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices);
-      buildPlane(
-        vertices,
-        normal,
-        uv,
-        indices,
-        depth,
-        height,
-        width,
-        dSegs,
-        hSegs,
-        2,
-        1,
-        0,
-        -1,
-        -1,
-        i,
-        ii,
-      );
-      sidesData.push({
-        orientation: 'right',
-        vertices,
-        normal,
-        uv,
-        indices,
-      });
-    } else {
-      buildPlane(
-        vertices,
-        normal,
-        uv,
-        indices,
-        depth,
-        height,
-        width,
-        dSegs,
-        hSegs,
-        2,
-        1,
-        0,
-        -1,
-        -1,
-        i,
-        ii,
-      );
-    }
-  }
-  {
-    // LEFT
-    if (separateFaces) {
-      const num = (dSegs + 1) * (hSegs + 1);
-      const numIndices = dSegs * hSegs * 6;
-      const vertices = new Float32Array(num * 3);
-      const normal = new Float32Array(num * 3);
-      const uv = new Float32Array(num * 2);
-      const indices =
-        num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices);
-      buildPlane(
-        vertices,
-        normal,
-        uv,
-        indices,
-        depth,
-        height,
-        -width,
-        dSegs,
-        hSegs,
-        2,
-        1,
-        0,
-        1,
-        -1,
-        i,
-        ii,
-      );
-      sidesData.push({
-        orientation: 'left',
-        vertices,
-        normal,
-        uv,
-        indices,
-      });
-    } else {
-      buildPlane(
-        vertices,
-        normal,
-        uv,
-        indices,
-        depth,
-        height,
-        -width,
-        dSegs,
-        hSegs,
-        2,
-        1,
-        0,
-        1,
-        -1,
-        (i += (dSegs + 1) * (hSegs + 1)),
-        (ii += dSegs * hSegs),
-      );
-    }
-  }
-  {
-    // TOP
-    if (separateFaces) {
-      const num = (dSegs + 1) * (hSegs + 1);
-      const numIndices = dSegs * hSegs * 6;
-      const vertices = new Float32Array(num * 3);
-      const normal = new Float32Array(num * 3);
-      const uv = new Float32Array(num * 2);
-      const indices =
-        num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices);
-      buildPlane(
-        vertices,
-        normal,
-        uv,
-        indices,
-        width,
-        depth,
-        height,
-        dSegs,
-        hSegs,
-        0,
-        2,
-        1,
-        1,
-        1,
-        i,
-        ii,
-      );
-      sidesData.push({
-        orientation: 'top',
-        vertices,
-        normal,
-        uv,
-        indices,
-      });
-    } else {
-      buildPlane(
-        vertices,
-        normal,
-        uv,
-        indices,
-        width,
-        depth,
-        height,
-        dSegs,
-        hSegs,
-        0,
-        2,
-        1,
-        1,
-        1,
-        (i += (dSegs + 1) * (hSegs + 1)),
-        (ii += dSegs * hSegs),
-      );
-    }
-  }
-  {
-    // BOTTOM
-    if (separateFaces) {
-      const num = (dSegs + 1) * (hSegs + 1);
-      const numIndices = dSegs * hSegs * 6;
-      const vertices = new Float32Array(num * 3);
-      const normal = new Float32Array(num * 3);
-      const uv = new Float32Array(num * 2);
-      const indices =
-        num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices);
-      buildPlane(
-        vertices,
-        normal,
-        uv,
-        indices,
-        width,
-        depth,
-        -height,
-        dSegs,
-        hSegs,
-        0,
-        2,
-        1,
-        1,
-        -1,
-        i,
-        ii,
-      );
-      sidesData.push({
-        orientation: 'bottom',
-        vertices,
-        normal,
-        uv,
-        indices,
-      });
-    } else {
-      buildPlane(
-        vertices,
-        normal,
-        uv,
-        indices,
-        width,
-        depth,
-        -height,
-        dSegs,
-        hSegs,
-        0,
-        2,
-        1,
-        1,
-        -1,
-        (i += (wSegs + 1) * (dSegs + 1)),
-        (ii += wSegs * dSegs),
-      );
-    }
-  }
-  {
-    // BACK
-    if (separateFaces) {
-      const num = (wSegs + 1) * (dSegs + 1);
-      const numIndices = wSegs * dSegs * 6;
-      const vertices = new Float32Array(num * 3);
-      const normal = new Float32Array(num * 3);
-      const uv = new Float32Array(num * 2);
-      const indices =
-        num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices);
-      buildPlane(
-        vertices,
-        normal,
-        uv,
-        indices,
-        width,
-        height,
-        -depth,
-        wSegs,
-        hSegs,
-        0,
-        1,
-        2,
-        -1,
-        -1,
-        i,
-        ii,
-      );
-      sidesData.push({
-        orientation: 'back',
-        vertices,
-        normal,
-        uv,
-        indices,
-      });
-    } else {
-      buildPlane(
-        vertices,
-        normal,
-        uv,
-        indices,
-        width,
-        height,
-        -depth,
-        wSegs,
-        hSegs,
-        0,
-        1,
-        2,
-        -1,
-        -1,
-        (i += (wSegs + 1) * (dSegs + 1)),
-        (ii += wSegs * dSegs),
-      );
-    }
-  }
-  {
-    // FRONT
-    if (separateFaces) {
-      const num = (wSegs + 1) * (hSegs + 1);
-      const numIndices = wSegs * hSegs * 6;
-      const vertices = new Float32Array(num * 3);
-      const normal = new Float32Array(num * 3);
-      const uv = new Float32Array(num * 2);
-      const indices =
-        num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices);
-      buildPlane(
-        vertices,
-        normal,
-        uv,
-        indices,
-        width,
-        height,
-        depth,
-        wSegs,
-        hSegs,
-        0,
-        1,
-        2,
-        1,
-        -1,
-        i,
-        ii,
-      );
-      sidesData.push({
-        orientation: 'front',
-        vertices,
-        normal,
-        uv,
-        indices,
-      });
-    } else {
-      buildPlane(
-        vertices,
-        normal,
-        uv,
-        indices,
-        width,
-        height,
-        depth,
-        wSegs,
-        hSegs,
-        0,
-        1,
-        2,
-        1,
-        -1,
-        (i += (wSegs + 1) * (hSegs + 1)),
-        (ii += wSegs * hSegs),
-      );
-    }
-  }
-
-  if (separateFaces) {
-    return sidesData
-  } else {
+/**
+ * Generates geometry data for a quad
+ * @param {PlaneInterface} params
+ * @returns {{ vertices, normal, uv, indices }}
+ */
+function createPlane(params = {}) {
+    const { width = 1, height = 1, widthSegments = 1, heightSegments = 1, } = params;
+    const wSegs = widthSegments;
+    const hSegs = heightSegments;
+    // Determine length of arrays
+    const num = (wSegs + 1) * (hSegs + 1);
+    const numIndices = wSegs * hSegs * 6;
+    // Generate empty arrays once
+    const position = new Float32Array(num * 3);
+    const normal = new Float32Array(num * 3);
+    const uv = new Float32Array(num * 2);
+    const index = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices);
+    buildPlane(position, normal, uv, index, width, height, 0, wSegs, hSegs);
     return {
-      vertices,
-      normal,
-      uv,
-      indices,
-    }
-  }
+        vertices: position,
+        normal,
+        uv,
+        indices: index,
+    };
 }
-
+function createBox(params = {}) {
+    const { width = 1, height = 1, depth = 1, widthSegments = 1, heightSegments = 1, depthSegments = 1, separateFaces = false, } = params;
+    const wSegs = widthSegments;
+    const hSegs = heightSegments;
+    const dSegs = depthSegments;
+    const num = (wSegs + 1) * (hSegs + 1) * 2 +
+        (wSegs + 1) * (dSegs + 1) * 2 +
+        (hSegs + 1) * (dSegs + 1) * 2;
+    const numIndices = (wSegs * hSegs * 2 + wSegs * dSegs * 2 + hSegs * dSegs * 2) * 6;
+    const vertices = new Float32Array(num * 3);
+    const normal = new Float32Array(num * 3);
+    const uv = new Float32Array(num * 2);
+    const indices = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices);
+    const sidesData = [];
+    let i = 0;
+    let ii = 0;
+    {
+        // RIGHT
+        if (separateFaces) {
+            const num = (dSegs + 1) * (hSegs + 1);
+            const numIndices = dSegs * hSegs * 6;
+            const vertices = new Float32Array(num * 3);
+            const normal = new Float32Array(num * 3);
+            const uv = new Float32Array(num * 2);
+            const indices = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices);
+            buildPlane(vertices, normal, uv, indices, depth, height, width, dSegs, hSegs, 2, 1, 0, -1, -1, i, ii);
+            sidesData.push({
+                orientation: 'right',
+                vertices,
+                normal,
+                uv,
+                indices,
+            });
+        }
+        else {
+            buildPlane(vertices, normal, uv, indices, depth, height, width, dSegs, hSegs, 2, 1, 0, -1, -1, i, ii);
+        }
+    }
+    {
+        // LEFT
+        if (separateFaces) {
+            const num = (dSegs + 1) * (hSegs + 1);
+            const numIndices = dSegs * hSegs * 6;
+            const vertices = new Float32Array(num * 3);
+            const normal = new Float32Array(num * 3);
+            const uv = new Float32Array(num * 2);
+            const indices = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices);
+            buildPlane(vertices, normal, uv, indices, depth, height, -width, dSegs, hSegs, 2, 1, 0, 1, -1, i, ii);
+            sidesData.push({
+                orientation: 'left',
+                vertices,
+                normal,
+                uv,
+                indices,
+            });
+        }
+        else {
+            buildPlane(vertices, normal, uv, indices, depth, height, -width, dSegs, hSegs, 2, 1, 0, 1, -1, (i += (dSegs + 1) * (hSegs + 1)), (ii += dSegs * hSegs));
+        }
+    }
+    {
+        // TOP
+        if (separateFaces) {
+            const num = (dSegs + 1) * (hSegs + 1);
+            const numIndices = dSegs * hSegs * 6;
+            const vertices = new Float32Array(num * 3);
+            const normal = new Float32Array(num * 3);
+            const uv = new Float32Array(num * 2);
+            const indices = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices);
+            buildPlane(vertices, normal, uv, indices, width, depth, height, dSegs, hSegs, 0, 2, 1, 1, 1, i, ii);
+            sidesData.push({
+                orientation: 'top',
+                vertices,
+                normal,
+                uv,
+                indices,
+            });
+        }
+        else {
+            buildPlane(vertices, normal, uv, indices, width, depth, height, dSegs, hSegs, 0, 2, 1, 1, 1, (i += (dSegs + 1) * (hSegs + 1)), (ii += dSegs * hSegs));
+        }
+    }
+    {
+        // BOTTOM
+        if (separateFaces) {
+            const num = (dSegs + 1) * (hSegs + 1);
+            const numIndices = dSegs * hSegs * 6;
+            const vertices = new Float32Array(num * 3);
+            const normal = new Float32Array(num * 3);
+            const uv = new Float32Array(num * 2);
+            const indices = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices);
+            buildPlane(vertices, normal, uv, indices, width, depth, -height, dSegs, hSegs, 0, 2, 1, 1, -1, i, ii);
+            sidesData.push({
+                orientation: 'bottom',
+                vertices,
+                normal,
+                uv,
+                indices,
+            });
+        }
+        else {
+            buildPlane(vertices, normal, uv, indices, width, depth, -height, dSegs, hSegs, 0, 2, 1, 1, -1, (i += (wSegs + 1) * (dSegs + 1)), (ii += wSegs * dSegs));
+        }
+    }
+    {
+        // BACK
+        if (separateFaces) {
+            const num = (wSegs + 1) * (dSegs + 1);
+            const numIndices = wSegs * dSegs * 6;
+            const vertices = new Float32Array(num * 3);
+            const normal = new Float32Array(num * 3);
+            const uv = new Float32Array(num * 2);
+            const indices = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices);
+            buildPlane(vertices, normal, uv, indices, width, height, -depth, wSegs, hSegs, 0, 1, 2, -1, -1, i, ii);
+            sidesData.push({
+                orientation: 'back',
+                vertices,
+                normal,
+                uv,
+                indices,
+            });
+        }
+        else {
+            buildPlane(vertices, normal, uv, indices, width, height, -depth, wSegs, hSegs, 0, 1, 2, -1, -1, (i += (wSegs + 1) * (dSegs + 1)), (ii += wSegs * dSegs));
+        }
+    }
+    {
+        // FRONT
+        if (separateFaces) {
+            const num = (wSegs + 1) * (hSegs + 1);
+            const numIndices = wSegs * hSegs * 6;
+            const vertices = new Float32Array(num * 3);
+            const normal = new Float32Array(num * 3);
+            const uv = new Float32Array(num * 2);
+            const indices = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices);
+            buildPlane(vertices, normal, uv, indices, width, height, depth, wSegs, hSegs, 0, 1, 2, 1, -1, i, ii);
+            sidesData.push({
+                orientation: 'front',
+                vertices,
+                normal,
+                uv,
+                indices,
+            });
+        }
+        else {
+            buildPlane(vertices, normal, uv, indices, width, height, depth, wSegs, hSegs, 0, 1, 2, 1, -1, (i += (wSegs + 1) * (hSegs + 1)), (ii += wSegs * hSegs));
+        }
+    }
+    if (separateFaces) {
+        return sidesData;
+    }
+    else {
+        return {
+            vertices,
+            normal,
+            uv,
+            indices,
+        };
+    }
+}
+/**
+ * Generates geometry data for a fullscreen quad in normalized coordinates
+ * @param {SphereInterface} params
+ * @returns {{ vertices, uv }}
+ */
 function createFullscreenQuad() {
-  return {
-    vertices: new Float32Array([1, 1, -1, 1, -1, -1, -1, -1, 1, -1, 1, 1]),
-    uv: new Float32Array([1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1]),
-  }
+    return {
+        vertices: new Float32Array([1, 1, -1, 1, -1, -1, -1, -1, 1, -1, 1, 1]),
+        uv: new Float32Array([1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1]),
+    };
 }
-
-function createSphere({
-  radius = 0.5,
-  widthSegments = 16,
-  heightSegments = Math.ceil(widthSegments * 0.5),
-  phiStart = 0,
-  phiLength = Math.PI * 2,
-  thetaStart = 0,
-  thetaLength = Math.PI,
-} = {}) {
-  const wSegs = widthSegments;
-  const hSegs = heightSegments;
-  const pStart = phiStart;
-  const pLength = phiLength;
-  const tStart = thetaStart;
-  const tLength = thetaLength;
-
-  const num = (wSegs + 1) * (hSegs + 1);
-  const numIndices = wSegs * hSegs * 6;
-
-  const position = new Float32Array(num * 3);
-  const normal = new Float32Array(num * 3);
-  const uv = new Float32Array(num * 2);
-  const index =
-    num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices);
-
-  let i = 0;
-  let iv = 0;
-  let ii = 0;
-  let te = tStart + tLength;
-  const grid = [];
-
-  let n = create$1();
-
-  for (let iy = 0; iy <= hSegs; iy++) {
-    let vRow = [];
-    let v = iy / hSegs;
-    for (let ix = 0; ix <= wSegs; ix++, i++) {
-      let u = ix / wSegs;
-      let x =
-        -radius *
-        Math.cos(pStart + u * pLength) *
-        Math.sin(tStart + v * tLength);
-      let y = radius * Math.cos(tStart + v * tLength);
-      let z =
-        radius * Math.sin(pStart + u * pLength) * Math.sin(tStart + v * tLength);
-
-      position[i * 3] = x;
-      position[i * 3 + 1] = y;
-      position[i * 3 + 2] = z;
-
-      set(n, x, y, z);
-      normalize(n, n);
-
-      normal[i * 3] = n[0];
-      normal[i * 3 + 1] = n[1];
-      normal[i * 3 + 2] = n[2];
-
-      uv[i * 2] = u;
-      uv[i * 2 + 1] = 1 - v;
-
-      vRow.push(iv++);
+/**
+ * Generates geometry data for a sphere
+ * @param {SphereInterface} params
+ * @returns {{ vertices, normal, uv, indices }}
+ */
+function createSphere(params = {}) {
+    const { radius = 0.5, widthSegments = 16, heightSegments = Math.ceil(widthSegments * 0.5), phiStart = 0, phiLength = Math.PI * 2, thetaStart = 0, thetaLength = Math.PI, } = params;
+    const wSegs = widthSegments;
+    const hSegs = heightSegments;
+    const pStart = phiStart;
+    const pLength = phiLength;
+    const tStart = thetaStart;
+    const tLength = thetaLength;
+    const num = (wSegs + 1) * (hSegs + 1);
+    const numIndices = wSegs * hSegs * 6;
+    const position = new Float32Array(num * 3);
+    const normal = new Float32Array(num * 3);
+    const uv = new Float32Array(num * 2);
+    const index = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices);
+    let i = 0;
+    let iv = 0;
+    let ii = 0;
+    let te = tStart + tLength;
+    const grid = [];
+    let n = create$1();
+    for (let iy = 0; iy <= hSegs; iy++) {
+        let vRow = [];
+        let v = iy / hSegs;
+        for (let ix = 0; ix <= wSegs; ix++, i++) {
+            let u = ix / wSegs;
+            let x = -radius *
+                Math.cos(pStart + u * pLength) *
+                Math.sin(tStart + v * tLength);
+            let y = radius * Math.cos(tStart + v * tLength);
+            let z = radius * Math.sin(pStart + u * pLength) * Math.sin(tStart + v * tLength);
+            position[i * 3] = x;
+            position[i * 3 + 1] = y;
+            position[i * 3 + 2] = z;
+            set(n, x, y, z);
+            normalize(n, n);
+            normal[i * 3] = n[0];
+            normal[i * 3 + 1] = n[1];
+            normal[i * 3 + 2] = n[2];
+            uv[i * 2] = u;
+            uv[i * 2 + 1] = 1 - v;
+            vRow.push(iv++);
+        }
+        grid.push(vRow);
     }
-
-    grid.push(vRow);
-  }
-
-  for (let iy = 0; iy < hSegs; iy++) {
-    for (let ix = 0; ix < wSegs; ix++) {
-      let a = grid[iy][ix + 1];
-      let b = grid[iy][ix];
-      let c = grid[iy + 1][ix];
-      let d = grid[iy + 1][ix + 1];
-
-      if (iy !== 0 || tStart > 0) {
-        index[ii * 3] = a;
-        index[ii * 3 + 1] = b;
-        index[ii * 3 + 2] = d;
-        ii++;
-      }
-      if (iy !== hSegs - 1 || te < Math.PI) {
-        index[ii * 3] = b;
-        index[ii * 3 + 1] = c;
-        index[ii * 3 + 2] = d;
-        ii++;
-      }
+    for (let iy = 0; iy < hSegs; iy++) {
+        for (let ix = 0; ix < wSegs; ix++) {
+            let a = grid[iy][ix + 1];
+            let b = grid[iy][ix];
+            let c = grid[iy + 1][ix];
+            let d = grid[iy + 1][ix + 1];
+            if (iy !== 0 || tStart > 0) {
+                index[ii * 3] = a;
+                index[ii * 3 + 1] = b;
+                index[ii * 3 + 2] = d;
+                ii++;
+            }
+            if (iy !== hSegs - 1 || te < Math.PI) {
+                index[ii * 3] = b;
+                index[ii * 3 + 1] = c;
+                index[ii * 3 + 2] = d;
+                ii++;
+            }
+        }
     }
-  }
-  return {
-    vertices: position,
-    normal,
-    uv,
-    indices: index,
-  }
+    return {
+        vertices: position,
+        normal,
+        uv,
+        indices: index,
+    };
 }
 
 var index = /*#__PURE__*/Object.freeze({

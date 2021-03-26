@@ -1,29 +1,89 @@
-export default class Texture {
+import { TextureInterface } from '../types';
+/**
+ * Texture class used to store image, video, canvas and data as typed arrays
+ * @public
+ */
+export declare class Texture {
     #private;
-    static isPowerOf2: (width: any, height: any) => boolean;
-    constructor(gl: WebGLRenderingContext, { format, internalFormat, type, unpackAlignment, wrapS, wrapT, minFilter, magFilter, }?: {
-        format?: number;
-        internalFormat?: any;
-        type?: number;
-        unpackAlignment?: number;
-        wrapS?: number;
-        wrapT?: number;
-        minFilter?: number;
-        magFilter?: number;
-    });
+    static isPowerOf2: (width: number, height: number) => boolean;
+    constructor(gl: WebGLRenderingContext, { format, internalFormat, type, unpackAlignment, wrapS, wrapT, minFilter, magFilter, }?: TextureInterface);
+    /**
+     * @returns {WebGLTexture}
+     */
     getTexture(): WebGLTexture;
+    /**
+     * Binds the texture to gl.TEXTURE_2D
+     * @returns {this}
+     */
     bind(): this;
+    /**
+     * Unbinds the texture
+     * @returns {this}
+     */
     unbind(): this;
+    /**
+     * @param {HTMLImageElement|HTMLCanvasElement|HTMLVideoElement} image
+     * @param {number} [width]
+     * @param {number} [height
+     * @returns {this}
+     */
     fromImage(image: any, width?: any, height?: any): this;
+    /**
+     * @param {number} width
+     * @param {number} height
+     * @returns {this}
+     */
     fromSize(width: any, height: any): this;
+    /**
+     * @param dataArray
+     * @param {number} [width]
+     * @param {number} [height]
+     * @returns {this}
+     */
     fromData(dataArray: any, width: any, height: any): this;
+    /**
+     * @returns {this}
+     */
     generateMipmap(): this;
+    /**
+     * @param {GLEnum} [format = gl.RGB]
+     * @param {GLEnum} [internalFormat = gl.RGB]
+     * @param {GLenum} [type = gl.UNSIGNED_BYTE]
+     * @returns {this}
+     */
     setFormat(format?: number, internalFormat?: number, type?: number): this;
+    /**
+     * @returns {this}
+     */
     setIsFlip(): this;
+    /**
+     * @param {GLenum} name
+     * @param params
+     * @returns {this}
+     */
     setPixelStore(name: any, params: any): this;
+    /**
+     * @param {GLenum} [filter = gl.LINEAR]
+     * @returns {this}
+     */
     setMinFilter(filter?: number): this;
+    /**
+     * @param {GLenum} [filter = gl.LINEAR]
+     * @returns {this}
+     */
     setMagFilter(filter?: number): this;
+    /**
+     *
+     * @param {GLenum} [wrapS = gl.CLAMP_TO_EDGE]
+     * @param {GLenum} [wrapT = gl.CLAMP_TO_EDGE]
+     * @returns {this}
+     */
     setWrap(wrapS?: number, wrapT?: number): this;
+    /**
+     *
+     * @param {number} anisotropyLevel
+     * @returns {this}
+     */
     setAnisotropy(anisotropyLevel: any): this;
-    delete(): this;
+    delete(): void;
 }

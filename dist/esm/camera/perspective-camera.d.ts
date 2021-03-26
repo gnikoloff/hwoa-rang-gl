@@ -1,6 +1,6 @@
-import { mat4 } from 'gl-matrix';
+import { ReadonlyVec3, mat4 } from 'gl-matrix';
 export default class PerspectiveCamera {
-    static UP_VECTOR: [number, number, number];
+    static UP_VECTOR: ReadonlyVec3;
     position: [number, number, number];
     lookAtPosition: [number, number, number];
     projectionMatrix: mat4;
@@ -10,7 +10,7 @@ export default class PerspectiveCamera {
     aspect: number;
     near: number;
     far: number;
-    constructor(fieldOfView: any, aspect: any, near: any, far: any);
+    constructor(fieldOfView: number, aspect: number, near: number, far: number);
     updateViewMatrix(): this;
     updateProjectionMatrix(): this;
     lookAt(target: [number, number, number]): this;

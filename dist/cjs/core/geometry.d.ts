@@ -1,19 +1,31 @@
-export default class Geometry {
+import { WebGLElementBufferInterface, WebGLArrayBufferInterface } from '../types';
+/**
+ * Geometry class to hold buffers and attributes for a mesh.
+ * Accepts the data that makes up your model - indices, vertices, uvs, normals, etc.
+ * The only required attribute & buffer to render is "position"
+ *
+ * @public
+ */
+export declare class Geometry {
     #private;
     attributes: Map<any, any>;
     vertexCount: number;
     constructor(gl: WebGLRenderingContext);
-    addIndex({ typedArray }: {
-        typedArray: Uint32Array | Uint16Array;
-    }): this;
-    addAttribute(key: string, { typedArray, size, type, normalized, stride, offset, instancedDivisor, }: {
-        typedArray: Float32Array | Float64Array;
-        size?: number;
-        type?: number;
-        normalized?: boolean;
-        stride?: number;
-        offset?: number;
-        instancedDivisor: number | null;
-    }): this;
+    /**
+     * @description Set data into element array buffer
+     * @param {WebGLElementBufferInterface} params
+     * @returns {this}
+     */
+    addIndex(params: WebGLElementBufferInterface): this;
+    /**
+     * @description Add attribute as array buffer
+     * @param {string} key - Name of attribute. Must match attribute name in your GLSL program
+     * @param {WebGLArrayBufferInterface} params
+     * @returns {this}
+     */
+    addAttribute(key: string, params: WebGLArrayBufferInterface): this;
+    /**
+     * @description Delete all buffers associated with this geometry
+     */
     delete(): void;
 }
