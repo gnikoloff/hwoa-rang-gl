@@ -55,10 +55,10 @@
 					<a href="../modules.html">hwoa-rang-gl</a>
 				</li>
 				<li>
-					<a href="../modules/ts_types.html">ts-types</a>
+					<a href="../modules/types.html">types</a>
 				</li>
 				<li>
-					<a href="ts_types.meshinterface.html">MeshInterface</a>
+					<a href="types.meshinterface.html">MeshInterface</a>
 				</li>
 			</ul>
 			<h1>Interface MeshInterface</h1>
@@ -73,6 +73,11 @@
 				<ul class="tsd-hierarchy">
 					<li>
 						<span class="target">MeshInterface</span>
+						<ul class="tsd-hierarchy">
+							<li>
+								<a href="types.instancedmeshinterface.html" class="tsd-signature-type" data-tsd-kind="Interface">InstancedMeshInterface</a>
+							</li>
+						</ul>
 					</li>
 				</ul>
 			</section>
@@ -83,11 +88,10 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="ts_types.meshinterface.html#fragmentshadersource" class="tsd-kind-icon">fragment<wbr>Shader<wbr>Source</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="ts_types.meshinterface.html#geometry" class="tsd-kind-icon">geometry</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="ts_types.meshinterface.html#instancecount" class="tsd-kind-icon">instance<wbr>Count</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="ts_types.meshinterface.html#uniforms" class="tsd-kind-icon">uniforms</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="ts_types.meshinterface.html#vertexshadersource" class="tsd-kind-icon">vertex<wbr>Shader<wbr>Source</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="types.meshinterface.html#fragmentshadersource" class="tsd-kind-icon">fragment<wbr>Shader<wbr>Source</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="types.meshinterface.html#geometry" class="tsd-kind-icon">geometry</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="types.meshinterface.html#uniforms" class="tsd-kind-icon">uniforms</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="types.meshinterface.html#vertexshadersource" class="tsd-kind-icon">vertex<wbr>Shader<wbr>Source</a></li>
 							</ul>
 						</section>
 					</div>
@@ -101,39 +105,49 @@
 					<div class="tsd-signature tsd-kind-icon">fragment<wbr>Shader<wbr>Source<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/43c8d65/src/ts-types.ts#L16">ts-types.ts:16</a></li>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/3b36800/src/types.ts#L39">types.ts:39</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Fragment shader program as string</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="geometry" class="tsd-anchor"></a>
 					<h3>geometry</h3>
-					<div class="tsd-signature tsd-kind-icon">geometry<span class="tsd-signature-symbol">:</span> <a href="../classes/core_geometry.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></div>
+					<div class="tsd-signature tsd-kind-icon">geometry<span class="tsd-signature-symbol">:</span> <a href="../classes/core_geometry.geometry.html" class="tsd-signature-type" data-tsd-kind="Class">Geometry</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/43c8d65/src/ts-types.ts#L12">ts-types.ts:12</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="instancecount" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> instance<wbr>Count</h3>
-					<div class="tsd-signature tsd-kind-icon">instance<wbr>Count<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/43c8d65/src/ts-types.ts#L14">ts-types.ts:14</a></li>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/3b36800/src/types.ts#L21">types.ts:21</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="uniforms" class="tsd-anchor"></a>
-					<h3>uniforms</h3>
-					<div class="tsd-signature tsd-kind-icon">uniforms<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> uniforms</h3>
+					<div class="tsd-signature tsd-kind-icon">uniforms<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/43c8d65/src/ts-types.ts#L13">ts-types.ts:13</a></li>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/3b36800/src/types.ts#L31">types.ts:31</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Uniforms as object list</p>
+						</div>
+						<dl class="tsd-comment-tags">
+							<dt>example</dt>
+							<dd><pre><code><span style="color: #000000">{ type: </span><span style="color: #A31515">&#039;int&#039;</span><span style="color: #000000">, value: </span><span style="color: #098658">1</span><span style="color: #000000"> }</span>
+<span style="color: #000000">{ type: </span><span style="color: #A31515">&#039;vec4&#039;</span><span style="color: #000000">, value: [</span><span style="color: #098658">0</span><span style="color: #000000">, </span><span style="color: #098658">1</span><span style="color: #000000">, </span><span style="color: #098658">2</span><span style="color: #000000">, </span><span style="color: #098658">3</span><span style="color: #000000">] }</span>
+</code></pre>
+							</dd>
+							<dt>defaultvalue</dt>
+							<dd><p>{}</p>
+							</dd>
+						</dl>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="vertexshadersource" class="tsd-anchor"></a>
@@ -141,9 +155,14 @@
 					<div class="tsd-signature tsd-kind-icon">vertex<wbr>Shader<wbr>Source<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/43c8d65/src/ts-types.ts#L15">ts-types.ts:15</a></li>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/3b36800/src/types.ts#L35">types.ts:35</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Vertex shader program as string</p>
+						</div>
+					</div>
 				</section>
 			</section>
 		</div>
@@ -163,6 +182,9 @@
 						<a href="../modules/camera_perspective_camera.html">camera/perspective-<wbr>camera</a>
 					</li>
 					<li class=" tsd-kind-module">
+						<a href="../modules/core_framebuffer.html">core/framebuffer</a>
+					</li>
+					<li class=" tsd-kind-module">
 						<a href="../modules/core_geometry.html">core/geometry</a>
 					</li>
 					<li class=" tsd-kind-module">
@@ -175,9 +197,6 @@
 						<a href="../modules/core_program.html">core/program</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="../modules/core_render_target.html">core/render-<wbr>target</a>
-					</li>
-					<li class=" tsd-kind-module">
 						<a href="../modules/core_texture.html">core/texture</a>
 					</li>
 					<li class=" tsd-kind-module">
@@ -187,7 +206,7 @@
 						<a href="../modules/index.html">index</a>
 					</li>
 					<li class="current tsd-kind-module">
-						<a href="../modules/ts_types.html">ts-<wbr>types</a>
+						<a href="../modules/types.html">types</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="../modules/utils_gl_constants.html">utils/gl-<wbr>constants</a>
@@ -205,44 +224,59 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="types.boxinterface.html" class="tsd-kind-icon">Box<wbr>Interface</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="types.framebufferinterface.html" class="tsd-kind-icon">Framebuffer<wbr>Interface</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="types.instancedmeshinterface.html" class="tsd-kind-icon">Instanced<wbr>Mesh<wbr>Interface</a>
+					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface tsd-parent-kind-module">
-						<a href="ts_types.meshinterface.html" class="tsd-kind-icon">Mesh<wbr>Interface</a>
+						<a href="types.meshinterface.html" class="tsd-kind-icon">Mesh<wbr>Interface</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="ts_types.meshinterface.html#fragmentshadersource" class="tsd-kind-icon">fragment<wbr>Shader<wbr>Source</a>
+								<a href="types.meshinterface.html#fragmentshadersource" class="tsd-kind-icon">fragment<wbr>Shader<wbr>Source</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="ts_types.meshinterface.html#geometry" class="tsd-kind-icon">geometry</a>
+								<a href="types.meshinterface.html#geometry" class="tsd-kind-icon">geometry</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="ts_types.meshinterface.html#instancecount" class="tsd-kind-icon">instance<wbr>Count</a>
+								<a href="types.meshinterface.html#uniforms" class="tsd-kind-icon">uniforms</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="ts_types.meshinterface.html#uniforms" class="tsd-kind-icon">uniforms</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="ts_types.meshinterface.html#vertexshadersource" class="tsd-kind-icon">vertex<wbr>Shader<wbr>Source</a>
+								<a href="types.meshinterface.html#vertexshadersource" class="tsd-kind-icon">vertex<wbr>Shader<wbr>Source</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="ts_types.oes_vertex_array_objectinterface.html" class="tsd-kind-icon">OES_<wbr>vertex_<wbr>array_<wbr>object<wbr>Interface</a>
+						<a href="types.oes_vertex_array_objectinterface.html" class="tsd-kind-icon">OES_<wbr>vertex_<wbr>array_<wbr>object<wbr>Interface</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="ts_types.programinterface.html" class="tsd-kind-icon">Program<wbr>Interface</a>
+						<a href="types.planeinterface.html" class="tsd-kind-icon">Plane<wbr>Interface</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="ts_types.rendertargetinterface.html" class="tsd-kind-icon">Render<wbr>Target<wbr>Interface</a>
+						<a href="types.programinterface.html" class="tsd-kind-icon">Program<wbr>Interface</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="types.sphereinterface.html" class="tsd-kind-icon">Sphere<wbr>Interface</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="types.textureinterface.html" class="tsd-kind-icon">Texture<wbr>Interface</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="types.webglarraybufferinterface.html" class="tsd-kind-icon">WebGLArray<wbr>Buffer<wbr>Interface</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="types.webglelementbufferinterface.html" class="tsd-kind-icon">WebGLElement<wbr>Buffer<wbr>Interface</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
-						<a href="../modules/ts_types.html#uniformtype" class="tsd-kind-icon">Uniform<wbr>Type</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
-						<a href="../modules/ts_types.html#webglvao" class="tsd-kind-icon">WebGLVAO</a>
+						<a href="../modules/types.html#uniformtype" class="tsd-kind-icon">Uniform<wbr>Type</a>
 					</li>
 				</ul>
 			</nav>

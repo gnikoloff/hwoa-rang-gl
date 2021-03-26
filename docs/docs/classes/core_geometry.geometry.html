@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>default | hwoa-rang-gl</title>
+	<title>Geometry | hwoa-rang-gl</title>
 	<meta name="description" content="Documentation for hwoa-rang-gl">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -55,24 +55,33 @@
 					<a href="../modules.html">hwoa-rang-gl</a>
 				</li>
 				<li>
-					<a href="../modules/core_texture.html">core/texture</a>
+					<a href="../modules/core_geometry.html">core/geometry</a>
 				</li>
 				<li>
-					<a href="core_texture.default.html">default</a>
+					<a href="core_geometry.geometry.html">Geometry</a>
 				</li>
 			</ul>
-			<h1>Class default</h1>
+			<h1>Class Geometry</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Geometry class to hold buffers and attributes for a mesh.
+							Accepts the data that makes up your model - indices, vertices, uvs, normals, etc.
+						The only required attribute &amp; buffer to render is &quot;position&quot;</p>
+					</div>
+				</div>
+			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">default</span>
+						<span class="target">Geometry</span>
 					</li>
 				</ul>
 			</section>
@@ -83,21 +92,23 @@
 						<section class="tsd-index-section ">
 							<h3>Constructors</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="core_texture.default.html#constructor" class="tsd-kind-icon">constructor</a></li>
+								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="core_geometry.geometry.html#constructor" class="tsd-kind-icon">constructor</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="core_texture.default.html#_gl" class="tsd-kind-icon">#gl</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="core_texture.default.html#texture" class="tsd-kind-icon">texture</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="core_geometry.geometry.html#_gl" class="tsd-kind-icon">#gl</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="core_geometry.geometry.html#attributes" class="tsd-kind-icon">attributes</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="core_geometry.geometry.html#vertexcount" class="tsd-kind-icon">vertex<wbr>Count</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="core_texture.default.html#bind" class="tsd-kind-icon">bind</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="core_texture.default.html#unbind" class="tsd-kind-icon">unbind</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="core_geometry.geometry.html#addattribute" class="tsd-kind-icon">add<wbr>Attribute</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="core_geometry.geometry.html#addindex" class="tsd-kind-icon">add<wbr>Index</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="core_geometry.geometry.html#delete" class="tsd-kind-icon">delete</a></li>
 							</ul>
 						</section>
 					</div>
@@ -109,13 +120,13 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new default<span class="tsd-signature-symbol">(</span>gl<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WebGLRenderingContext</span>, __namedParameters<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Object</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="core_texture.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Geometry<span class="tsd-signature-symbol">(</span>gl<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WebGLRenderingContext</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="core_geometry.geometry.html" class="tsd-signature-type" data-tsd-kind="Class">Geometry</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/43c8d65/src/core/texture.ts#L10">core/texture.ts:10</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/3b36800/src/core/geometry.ts#L21">core/geometry.ts:21</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -123,11 +134,8 @@
 								<li>
 									<h5>gl: <span class="tsd-signature-type">WebGLRenderingContext</span></h5>
 								</li>
-								<li>
-									<h5>__namedParameters: <span class="tsd-signature-type">Object</span></h5>
-								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="core_texture.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="core_geometry.geometry.html" class="tsd-signature-type" data-tsd-kind="Class">Geometry</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -140,17 +148,27 @@
 					<div class="tsd-signature tsd-kind-icon">#gl<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">WebGLRenderingContext</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/43c8d65/src/core/texture.ts#L8">core/texture.ts:8</a></li>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/3b36800/src/core/geometry.ts#L18">core/geometry.ts:18</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
-					<a name="texture" class="tsd-anchor"></a>
-					<h3>texture</h3>
-					<div class="tsd-signature tsd-kind-icon">texture<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">WebGLTexture</span></div>
+					<a name="attributes" class="tsd-anchor"></a>
+					<h3>attributes</h3>
+					<div class="tsd-signature tsd-kind-icon">attributes<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Map</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/43c8d65/src/core/texture.ts#L10">core/texture.ts:10</a></li>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/3b36800/src/core/geometry.ts#L20">core/geometry.ts:20</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="vertexcount" class="tsd-anchor"></a>
+					<h3>vertex<wbr>Count</h3>
+					<div class="tsd-signature tsd-kind-icon">vertex<wbr>Count<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 0</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/3b36800/src/core/geometry.ts#L21">core/geometry.ts:21</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -158,36 +176,92 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Methods</h2>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="bind" class="tsd-anchor"></a>
-					<h3>bind</h3>
+					<a name="addattribute" class="tsd-anchor"></a>
+					<h3>add<wbr>Attribute</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">bind<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="core_texture.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></li>
+						<li class="tsd-signature tsd-kind-icon">add<wbr>Attribute<span class="tsd-signature-symbol">(</span>key<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, params<span class="tsd-signature-symbol">: </span><a href="../interfaces/types.webglarraybufferinterface.html" class="tsd-signature-type" data-tsd-kind="Interface">WebGLArrayBufferInterface</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="core_geometry.geometry.html" class="tsd-signature-type" data-tsd-kind="Class">Geometry</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/43c8d65/src/core/texture.ts#L84">core/texture.ts:84</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/3b36800/src/core/geometry.ts#L46">core/geometry.ts:46</a></li>
 								</ul>
 							</aside>
-							<h4 class="tsd-returns-title">Returns <a href="core_texture.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></h4>
+							<div class="tsd-comment tsd-typography">
+								<dl class="tsd-comment-tags">
+									<dt>description</dt>
+									<dd><p>Add attribute as array buffer</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>key: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Name of attribute. Must match attribute name in your GLSL program</p>
+									</div>
+								</li>
+								<li>
+									<h5>params: <a href="../interfaces/types.webglarraybufferinterface.html" class="tsd-signature-type" data-tsd-kind="Interface">WebGLArrayBufferInterface</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="core_geometry.geometry.html" class="tsd-signature-type" data-tsd-kind="Class">Geometry</a></h4>
 						</li>
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="unbind" class="tsd-anchor"></a>
-					<h3>unbind</h3>
+					<a name="addindex" class="tsd-anchor"></a>
+					<h3>add<wbr>Index</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">unbind<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="core_texture.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></li>
+						<li class="tsd-signature tsd-kind-icon">add<wbr>Index<span class="tsd-signature-symbol">(</span>params<span class="tsd-signature-symbol">: </span><a href="../interfaces/types.webglelementbufferinterface.html" class="tsd-signature-type" data-tsd-kind="Interface">WebGLElementBufferInterface</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="core_geometry.geometry.html" class="tsd-signature-type" data-tsd-kind="Class">Geometry</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/43c8d65/src/core/texture.ts#L89">core/texture.ts:89</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/3b36800/src/core/geometry.ts#L32">core/geometry.ts:32</a></li>
 								</ul>
 							</aside>
-							<h4 class="tsd-returns-title">Returns <a href="core_texture.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></h4>
+							<div class="tsd-comment tsd-typography">
+								<dl class="tsd-comment-tags">
+									<dt>description</dt>
+									<dd><p>Set data into element array buffer</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>params: <a href="../interfaces/types.webglelementbufferinterface.html" class="tsd-signature-type" data-tsd-kind="Interface">WebGLElementBufferInterface</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="core_geometry.geometry.html" class="tsd-signature-type" data-tsd-kind="Class">Geometry</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="delete" class="tsd-anchor"></a>
+					<h3>delete</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">delete<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/3b36800/src/core/geometry.ts#L79">core/geometry.ts:79</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<dl class="tsd-comment-tags">
+									<dt>description</dt>
+									<dd><p>Delete all buffers associated with this geometry</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -209,6 +283,9 @@
 						<a href="../modules/camera_perspective_camera.html">camera/perspective-<wbr>camera</a>
 					</li>
 					<li class=" tsd-kind-module">
+						<a href="../modules/core_framebuffer.html">core/framebuffer</a>
+					</li>
+					<li class="current tsd-kind-module">
 						<a href="../modules/core_geometry.html">core/geometry</a>
 					</li>
 					<li class=" tsd-kind-module">
@@ -221,9 +298,6 @@
 						<a href="../modules/core_program.html">core/program</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="../modules/core_render_target.html">core/render-<wbr>target</a>
-					</li>
-					<li class="current tsd-kind-module">
 						<a href="../modules/core_texture.html">core/texture</a>
 					</li>
 					<li class=" tsd-kind-module">
@@ -233,7 +307,7 @@
 						<a href="../modules/index.html">index</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="../modules/ts_types.html">ts-<wbr>types</a>
+						<a href="../modules/types.html">types</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="../modules/utils_gl_constants.html">utils/gl-<wbr>constants</a>
@@ -254,22 +328,28 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-class tsd-parent-kind-module">
-						<a href="core_texture.default.html" class="tsd-kind-icon">default</a>
+						<a href="core_geometry.geometry.html" class="tsd-kind-icon">Geometry</a>
 						<ul>
 							<li class=" tsd-kind-constructor tsd-parent-kind-class">
-								<a href="core_texture.default.html#constructor" class="tsd-kind-icon">constructor</a>
+								<a href="core_geometry.geometry.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="core_texture.default.html#_gl" class="tsd-kind-icon">#gl</a>
+								<a href="core_geometry.geometry.html#_gl" class="tsd-kind-icon">#gl</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="core_texture.default.html#texture" class="tsd-kind-icon">texture</a>
+								<a href="core_geometry.geometry.html#attributes" class="tsd-kind-icon">attributes</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="core_geometry.geometry.html#vertexcount" class="tsd-kind-icon">vertex<wbr>Count</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="core_texture.default.html#bind" class="tsd-kind-icon">bind</a>
+								<a href="core_geometry.geometry.html#addattribute" class="tsd-kind-icon">add<wbr>Attribute</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="core_texture.default.html#unbind" class="tsd-kind-icon">unbind</a>
+								<a href="core_geometry.geometry.html#addindex" class="tsd-kind-icon">add<wbr>Index</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="core_geometry.geometry.html#delete" class="tsd-kind-icon">delete</a>
 							</li>
 						</ul>
 					</li>

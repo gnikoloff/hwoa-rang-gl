@@ -89,25 +89,23 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="camera_perspective_camera.default.html#_position" class="tsd-kind-icon">_position</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="camera_perspective_camera.default.html#_projectionmatrix" class="tsd-kind-icon">_projection<wbr>Matrix</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="camera_perspective_camera.default.html#_viewmatrix" class="tsd-kind-icon">_view<wbr>Matrix</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="camera_perspective_camera.default.html#aspect" class="tsd-kind-icon">aspect</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="camera_perspective_camera.default.html#far" class="tsd-kind-icon">far</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="camera_perspective_camera.default.html#fieldofview" class="tsd-kind-icon">field<wbr>OfView</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="camera_perspective_camera.default.html#lookatposition" class="tsd-kind-icon">look<wbr>AtPosition</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="camera_perspective_camera.default.html#near" class="tsd-kind-icon">near</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="camera_perspective_camera.default.html#position" class="tsd-kind-icon">position</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="camera_perspective_camera.default.html#projectionmatrix" class="tsd-kind-icon">projection<wbr>Matrix</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="camera_perspective_camera.default.html#viewmatrix" class="tsd-kind-icon">view<wbr>Matrix</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="camera_perspective_camera.default.html#zoom" class="tsd-kind-icon">zoom</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><a href="camera_perspective_camera.default.html#up_vector" class="tsd-kind-icon">UP_<wbr>VECTOR</a></li>
-							</ul>
-						</section>
-						<section class="tsd-index-section ">
-							<h3>Accessors</h3>
-							<ul class="tsd-index-list">
-								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="camera_perspective_camera.default.html#projectionmatrix" class="tsd-kind-icon">projection<wbr>Matrix</a></li>
-								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="camera_perspective_camera.default.html#viewmatrix" class="tsd-kind-icon">view<wbr>Matrix</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="camera_perspective_camera.default.html#lookat" class="tsd-kind-icon">look<wbr>At</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="camera_perspective_camera.default.html#updateprojectionmatrix" class="tsd-kind-icon">update<wbr>Projection<wbr>Matrix</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="camera_perspective_camera.default.html#updateviewmatrix" class="tsd-kind-icon">update<wbr>View<wbr>Matrix</a></li>
 							</ul>
 						</section>
@@ -120,28 +118,28 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new default<span class="tsd-signature-symbol">(</span>fieldOfView<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, aspect<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, near<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, far<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="camera_perspective_camera.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></li>
+						<li class="tsd-signature tsd-kind-icon">new default<span class="tsd-signature-symbol">(</span>fieldOfView<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, aspect<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, near<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, far<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="camera_perspective_camera.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/43c8d65/src/camera/perspective-camera.js#L7">camera/perspective-camera.js:7</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/3b36800/src/camera/perspective-camera.ts#L17">camera/perspective-camera.ts:17</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>fieldOfView: <span class="tsd-signature-type">any</span></h5>
+									<h5>fieldOfView: <span class="tsd-signature-type">number</span></h5>
 								</li>
 								<li>
-									<h5>aspect: <span class="tsd-signature-type">any</span></h5>
+									<h5>aspect: <span class="tsd-signature-type">number</span></h5>
 								</li>
 								<li>
-									<h5>near: <span class="tsd-signature-type">any</span></h5>
+									<h5>near: <span class="tsd-signature-type">number</span></h5>
 								</li>
 								<li>
-									<h5>far: <span class="tsd-signature-type">any</span></h5>
+									<h5>far: <span class="tsd-signature-type">number</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="camera_perspective_camera.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></h4>
@@ -152,92 +150,104 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
-					<a name="_position" class="tsd-anchor"></a>
-					<h3>_position</h3>
-					<div class="tsd-signature tsd-kind-icon">_position<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
+					<a name="aspect" class="tsd-anchor"></a>
+					<h3>aspect</h3>
+					<div class="tsd-signature tsd-kind-icon">aspect<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/3b36800/src/camera/perspective-camera.ts#L15">camera/perspective-camera.ts:15</a></li>
+						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
-					<a name="_projectionmatrix" class="tsd-anchor"></a>
-					<h3>_projection<wbr>Matrix</h3>
-					<div class="tsd-signature tsd-kind-icon">_projection<wbr>Matrix<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">mat4</span></div>
+					<a name="far" class="tsd-anchor"></a>
+					<h3>far</h3>
+					<div class="tsd-signature tsd-kind-icon">far<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/3b36800/src/camera/perspective-camera.ts#L17">camera/perspective-camera.ts:17</a></li>
+						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
-					<a name="_viewmatrix" class="tsd-anchor"></a>
-					<h3>_view<wbr>Matrix</h3>
-					<div class="tsd-signature tsd-kind-icon">_view<wbr>Matrix<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">mat4</span></div>
+					<a name="fieldofview" class="tsd-anchor"></a>
+					<h3>field<wbr>OfView</h3>
+					<div class="tsd-signature tsd-kind-icon">field<wbr>OfView<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/3b36800/src/camera/perspective-camera.ts#L14">camera/perspective-camera.ts:14</a></li>
+						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="lookatposition" class="tsd-anchor"></a>
 					<h3>look<wbr>AtPosition</h3>
-					<div class="tsd-signature tsd-kind-icon">look<wbr>AtPosition<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = ...</span></div>
+					<div class="tsd-signature tsd-kind-icon">look<wbr>AtPosition<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/43c8d65/src/camera/perspective-camera.js#L7">camera/perspective-camera.js:7</a></li>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/3b36800/src/camera/perspective-camera.ts#L7">camera/perspective-camera.ts:7</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="near" class="tsd-anchor"></a>
+					<h3>near</h3>
+					<div class="tsd-signature tsd-kind-icon">near<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/3b36800/src/camera/perspective-camera.ts#L16">camera/perspective-camera.ts:16</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="position" class="tsd-anchor"></a>
 					<h3>position</h3>
-					<div class="tsd-signature tsd-kind-icon">position<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = ...</span></div>
+					<div class="tsd-signature tsd-kind-icon">position<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/43c8d65/src/camera/perspective-camera.js#L6">camera/perspective-camera.js:6</a></li>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/3b36800/src/camera/perspective-camera.ts#L6">camera/perspective-camera.ts:6</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="projectionmatrix" class="tsd-anchor"></a>
+					<h3>projection<wbr>Matrix</h3>
+					<div class="tsd-signature tsd-kind-icon">projection<wbr>Matrix<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">mat4</span><span class="tsd-signature-symbol"> = ...</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/3b36800/src/camera/perspective-camera.ts#L9">camera/perspective-camera.ts:9</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="viewmatrix" class="tsd-anchor"></a>
+					<h3>view<wbr>Matrix</h3>
+					<div class="tsd-signature tsd-kind-icon">view<wbr>Matrix<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">mat4</span><span class="tsd-signature-symbol"> = ...</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/3b36800/src/camera/perspective-camera.ts#L10">camera/perspective-camera.ts:10</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="zoom" class="tsd-anchor"></a>
+					<h3>zoom</h3>
+					<div class="tsd-signature tsd-kind-icon">zoom<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 1</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/3b36800/src/camera/perspective-camera.ts#L12">camera/perspective-camera.ts:12</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-static">
 					<a name="up_vector" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagStatic">Static</span> UP_<wbr>VECTOR</h3>
-					<div class="tsd-signature tsd-kind-icon">UP_<wbr>VECTOR<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = ...</span></div>
+					<div class="tsd-signature tsd-kind-icon">UP_<wbr>VECTOR<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">ReadonlyVec3</span><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/43c8d65/src/camera/perspective-camera.js#L4">camera/perspective-camera.js:4</a></li>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/3b36800/src/camera/perspective-camera.ts#L4">camera/perspective-camera.ts:4</a></li>
 						</ul>
 					</aside>
-				</section>
-			</section>
-			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Accessors</h2>
-				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
-					<a name="projectionmatrix" class="tsd-anchor"></a>
-					<h3>projection<wbr>Matrix</h3>
-					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> projectionMatrix<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">mat4</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/43c8d65/src/camera/perspective-camera.js#L16">camera/perspective-camera.js:16</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">mat4</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
-					<a name="viewmatrix" class="tsd-anchor"></a>
-					<h3>view<wbr>Matrix</h3>
-					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> viewMatrix<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">mat4</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/43c8d65/src/camera/perspective-camera.js#L20">camera/perspective-camera.js:20</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">mat4</span></h4>
-						</li>
-					</ul>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
@@ -246,22 +256,39 @@
 					<a name="lookat" class="tsd-anchor"></a>
 					<h3>look<wbr>At</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">look<wbr>At<span class="tsd-signature-symbol">(</span>target<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">look<wbr>At<span class="tsd-signature-symbol">(</span>target<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="camera_perspective_camera.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/43c8d65/src/camera/perspective-camera.js#L32">camera/perspective-camera.js:32</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/3b36800/src/camera/perspective-camera.ts#L49">camera/perspective-camera.ts:49</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>target: <span class="tsd-signature-type">any</span></h5>
+									<h5>target: <span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">]</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+							<h4 class="tsd-returns-title">Returns <a href="camera_perspective_camera.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="updateprojectionmatrix" class="tsd-anchor"></a>
+					<h3>update<wbr>Projection<wbr>Matrix</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">update<wbr>Projection<wbr>Matrix<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="camera_perspective_camera.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/3b36800/src/camera/perspective-camera.ts#L38">camera/perspective-camera.ts:38</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="camera_perspective_camera.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -269,16 +296,16 @@
 					<a name="updateviewmatrix" class="tsd-anchor"></a>
 					<h3>update<wbr>View<wbr>Matrix</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">update<wbr>View<wbr>Matrix<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">update<wbr>View<wbr>Matrix<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="camera_perspective_camera.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/43c8d65/src/camera/perspective-camera.js#L28">camera/perspective-camera.js:28</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/3b36800/src/camera/perspective-camera.ts#L28">camera/perspective-camera.ts:28</a></li>
 								</ul>
 							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+							<h4 class="tsd-returns-title">Returns <a href="camera_perspective_camera.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -300,6 +327,9 @@
 						<a href="../modules/camera_perspective_camera.html">camera/perspective-<wbr>camera</a>
 					</li>
 					<li class=" tsd-kind-module">
+						<a href="../modules/core_framebuffer.html">core/framebuffer</a>
+					</li>
+					<li class=" tsd-kind-module">
 						<a href="../modules/core_geometry.html">core/geometry</a>
 					</li>
 					<li class=" tsd-kind-module">
@@ -312,9 +342,6 @@
 						<a href="../modules/core_program.html">core/program</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="../modules/core_render_target.html">core/render-<wbr>target</a>
-					</li>
-					<li class=" tsd-kind-module">
 						<a href="../modules/core_texture.html">core/texture</a>
 					</li>
 					<li class=" tsd-kind-module">
@@ -324,7 +351,7 @@
 						<a href="../modules/index.html">index</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="../modules/ts_types.html">ts-<wbr>types</a>
+						<a href="../modules/types.html">types</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="../modules/utils_gl_constants.html">utils/gl-<wbr>constants</a>
@@ -351,31 +378,40 @@
 								<a href="camera_perspective_camera.default.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="camera_perspective_camera.default.html#_position" class="tsd-kind-icon">_position</a>
+								<a href="camera_perspective_camera.default.html#aspect" class="tsd-kind-icon">aspect</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="camera_perspective_camera.default.html#_projectionmatrix" class="tsd-kind-icon">_projection<wbr>Matrix</a>
+								<a href="camera_perspective_camera.default.html#far" class="tsd-kind-icon">far</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="camera_perspective_camera.default.html#_viewmatrix" class="tsd-kind-icon">_view<wbr>Matrix</a>
+								<a href="camera_perspective_camera.default.html#fieldofview" class="tsd-kind-icon">field<wbr>OfView</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="camera_perspective_camera.default.html#lookatposition" class="tsd-kind-icon">look<wbr>AtPosition</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="camera_perspective_camera.default.html#near" class="tsd-kind-icon">near</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="camera_perspective_camera.default.html#position" class="tsd-kind-icon">position</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="camera_perspective_camera.default.html#projectionmatrix" class="tsd-kind-icon">projection<wbr>Matrix</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="camera_perspective_camera.default.html#viewmatrix" class="tsd-kind-icon">view<wbr>Matrix</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="camera_perspective_camera.default.html#zoom" class="tsd-kind-icon">zoom</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-static">
 								<a href="camera_perspective_camera.default.html#up_vector" class="tsd-kind-icon">UP_<wbr>VECTOR</a>
 							</li>
-							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
-								<a href="camera_perspective_camera.default.html#projectionmatrix" class="tsd-kind-icon">projection<wbr>Matrix</a>
-							</li>
-							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
-								<a href="camera_perspective_camera.default.html#viewmatrix" class="tsd-kind-icon">view<wbr>Matrix</a>
-							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="camera_perspective_camera.default.html#lookat" class="tsd-kind-icon">look<wbr>At</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="camera_perspective_camera.default.html#updateprojectionmatrix" class="tsd-kind-icon">update<wbr>Projection<wbr>Matrix</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="camera_perspective_camera.default.html#updateviewmatrix" class="tsd-kind-icon">update<wbr>View<wbr>Matrix</a>

@@ -73,6 +73,7 @@
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="utils_math.html#clamp" class="tsd-kind-icon">clamp</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="utils_math.html#ispowerof2" class="tsd-kind-icon">is<wbr>Power<wbr>Of2</a></li>
 							</ul>
 						</section>
 					</div>
@@ -84,28 +85,61 @@
 					<a name="clamp" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> clamp</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">clamp<span class="tsd-signature-symbol">(</span>num<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, min<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, max<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+						<li class="tsd-signature tsd-kind-icon">clamp<span class="tsd-signature-symbol">(</span>num<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, min<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, max<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/43c8d65/src/utils/math.js#L1">utils/math.js:1</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/3b36800/src/utils/math.ts#L8">utils/math.ts:8</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Clamp number to a given range</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>num: <span class="tsd-signature-type">any</span></h5>
+									<h5>num: <span class="tsd-signature-type">number</span></h5>
 								</li>
 								<li>
-									<h5>min: <span class="tsd-signature-type">any</span></h5>
+									<h5>min: <span class="tsd-signature-type">number</span></h5>
 								</li>
 								<li>
-									<h5>max: <span class="tsd-signature-type">any</span></h5>
+									<h5>max: <span class="tsd-signature-type">number</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="ispowerof2" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> is<wbr>Power<wbr>Of2</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Power<wbr>Of2<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/3b36800/src/utils/math.ts#L16">utils/math.ts:16</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Check if number is power of 2</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>value: <span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -127,6 +161,9 @@
 						<a href="camera_perspective_camera.html">camera/perspective-<wbr>camera</a>
 					</li>
 					<li class=" tsd-kind-module">
+						<a href="core_framebuffer.html">core/framebuffer</a>
+					</li>
+					<li class=" tsd-kind-module">
 						<a href="core_geometry.html">core/geometry</a>
 					</li>
 					<li class=" tsd-kind-module">
@@ -139,9 +176,6 @@
 						<a href="core_program.html">core/program</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="core_render_target.html">core/render-<wbr>target</a>
-					</li>
-					<li class=" tsd-kind-module">
 						<a href="core_texture.html">core/texture</a>
 					</li>
 					<li class=" tsd-kind-module">
@@ -151,7 +185,7 @@
 						<a href="index.html">index</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="ts_types.html">ts-<wbr>types</a>
+						<a href="types.html">types</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="utils_gl_constants.html">utils/gl-<wbr>constants</a>
@@ -171,6 +205,9 @@
 				<ul class="before-current">
 					<li class=" tsd-kind-function tsd-parent-kind-module">
 						<a href="utils_math.html#clamp" class="tsd-kind-icon">clamp</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="utils_math.html#ispowerof2" class="tsd-kind-icon">is<wbr>Power<wbr>Of2</a>
 					</li>
 				</ul>
 			</nav>
