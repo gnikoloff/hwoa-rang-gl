@@ -1,9 +1,15 @@
-export const vertexShaderSourceWebGL2Head = `
-  uniform mat4 projectionMatrix;
-  uniform mat4 viewMatrix;
-  uniform mat4 modelMatrix;
+import {
+  MODEL_MATRIX_UNIFORM_NAME,
+  VIEW_MATRIX_UNIFORM_NAME,
+  PROJECTION_MATRIX_UNIFORM_NAME,
+} from './gl-constants'
+
+export const vertexShaderSourceHead = `
+  uniform mat4 ${MODEL_MATRIX_UNIFORM_NAME};
+  uniform mat4 ${VIEW_MATRIX_UNIFORM_NAME};
+  uniform mat4 ${PROJECTION_MATRIX_UNIFORM_NAME};
 `
 
-export const fragmentShaderSourceWebGL2Head = `
+export const fragmentShaderSourceHead = `
   precision highp float;
 `

@@ -4,8 +4,8 @@ import { UniformType } from '../ts-types'
 import { createProgram } from '../utils/gl-utils'
 
 import {
-  vertexShaderSourceWebGL2Head,
-  fragmentShaderSourceWebGL2Head,
+  vertexShaderSourceHead,
+  fragmentShaderSourceHead,
 } from '../utils/shader-snippets'
 
 import {
@@ -14,7 +14,7 @@ import {
   UNIFORM_TYPE_VEC2,
   UNIFORM_TYPE_VEC3,
   UNIFORM_TYPE_VEC4,
-  UNIFORM_TYPE_MATRIX4X4
+  UNIFORM_TYPE_MATRIX4X4,
 } from '../utils/gl-constants'
 export default class Program {
   #gl: WebGLRenderingContext
@@ -31,10 +31,12 @@ export default class Program {
   ) {
     this.#gl = gl
 
-    const vertexShaderSource = `${vertexShaderSourceWebGL2Head}
+    const vertexShaderSource = `
+      ${vertexShaderSourceHead}
       ${inputVertexShaderSource}
     `
-    const fragmentShaderSource = `${fragmentShaderSourceWebGL2Head}
+    const fragmentShaderSource = `
+      ${fragmentShaderSourceHead}
       ${inputFragmentShaderSource}
     `
 
