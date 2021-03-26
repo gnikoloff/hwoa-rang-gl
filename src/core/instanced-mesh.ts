@@ -1,19 +1,20 @@
 import { mat4 } from 'gl-matrix'
 
-import Mesh from './mesh'
+import { Mesh } from './mesh'
 
 import { INSTANCED_OFFSET_MODEL_MATRIX } from '../utils/gl-constants'
 import { getExtension } from '../utils/gl-utils'
-import Geometry from './geometry'
-import { MeshInterface } from '../ts-types'
+import { Geometry } from './geometry'
 
-export default class InstancedMesh extends Mesh {
+import { InstancedMeshInterface } from '../types'
+
+export class InstancedMesh extends Mesh {
   #geometry: Geometry
   #gl: WebGLRenderingContext
+  #instanceAttributes = new Map()
   #instanceExtension
 
   public instanceCount: number
-  public instanceAttributes = new Map()
 
   constructor(
     gl: WebGLRenderingContext,
@@ -23,7 +24,7 @@ export default class InstancedMesh extends Mesh {
       instanceCount = 1,
       vertexShaderSource,
       fragmentShaderSource,
-    }: MeshInterface,
+    }: InstancedMeshInterface,
   ) {
     super(gl, { geometry, uniforms, vertexShaderSource, fragmentShaderSource })
     this.#gl = gl
@@ -85,7 +86,7 @@ export default class InstancedMesh extends Mesh {
     }
     this.vaoExtension.bindVertexArrayOES(null)
 
-    this.instanceAttributes.set(INSTANCED_OFFSET_MODEL_MATRIX, {
+    this.#instanceAttributes.set(INSTANCED_OFFSET_MODEL_MATRIX, {
       location: instanceMatrixLocation,
       typedArray: matrixData,
       buffer: matrixBuffer,
@@ -96,22 +97,30 @@ export default class InstancedMesh extends Mesh {
 
     this.#instanceExtension = getExtension(gl, 'ANGLE_instanced_arrays')
   }
+  /**
+   * @param {number} index - Instance index on which to apply the matrix
+   * @param {Float32Array|Float64Array} matrix - Matrix to control the instance scale, rotation and translation
+   */
   setMatrixAt(index: number, matrix: Float32Array): this {
     const itemsPerInstance = 16
-    const { buffer } = this.instanceAttributes.get(INSTANCED_OFFSET_MODEL_MATRIX)
+    const { buffer } = this.#instanceAttributes.get(
+      INSTANCED_OFFSET_MODEL_MATRIX,
+    )
     this.vaoExtension.bindVertexArrayOES(this.vao)
     this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, buffer)
     this.#gl.bufferSubData(
       this.#gl.ARRAY_BUFFER,
       index * itemsPerInstance * Float32Array.BYTES_PER_ELEMENT,
-      matrix
+      matrix,
     )
 
     this.vaoExtension.bindVertexArrayOES(null)
     return this
   }
+  /**
+   * Draws the instanced mesh
+   */
   draw(): this {
-
     if (this.modelMatrixNeedsUpdate) {
       this.updateModelMatrix()
       this.modelMatrixNeedsUpdate = false

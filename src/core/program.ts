@@ -1,6 +1,6 @@
-import { ProgramInterface } from '../ts-types'
+import { ProgramInterface } from '../types'
 
-import { UniformType } from '../ts-types'
+import { UniformType } from '../types'
 import { createProgram } from '../utils/gl-utils'
 
 import {
@@ -16,20 +16,25 @@ import {
   UNIFORM_TYPE_VEC4,
   UNIFORM_TYPE_MATRIX4X4,
 } from '../utils/gl-constants'
-export default class Program {
+
+/**
+ * Program class for compiling GLSL shaders and linking them in a WebGLProgram and managing its state
+ *
+ * @public
+ */
+export class Program {
   #gl: WebGLRenderingContext
   #program: WebGLProgram
   #attribLocations = new Map()
   #uniformLocations = new Map()
 
-  constructor(
-    gl: WebGLRenderingContext,
-    {
+  constructor(gl: WebGLRenderingContext, params: ProgramInterface) {
+    this.#gl = gl
+
+    const {
       vertexShaderSource: inputVertexShaderSource,
       fragmentShaderSource: inputFragmentShaderSource,
-    }: ProgramInterface,
-  ) {
-    this.#gl = gl
+    } = params
 
     const vertexShaderSource = `
       ${vertexShaderSourceHead}
@@ -46,6 +51,13 @@ export default class Program {
     this.#uniformLocations = new Map()
   }
 
+  /**
+   * Set uniform value. Query the uniform location if necessary and cache it in-memory for future use
+   * @param {string} uniformName
+   * @param {UniformType} uniformType
+   * @param uniformValue
+   * @returns {this}
+   */
   setUniform(
     uniformName: string,
     uniformType: UniformType,
@@ -97,6 +109,11 @@ export default class Program {
     return this
   }
 
+  /**
+   * Get the location for an attribute
+   * @param {string} attribName
+   * @returns {number} attribLocation
+   */
   getAttribLocation(attribName: string): number {
     if (this.#attribLocations.has(attribName)) {
       return this.#attribLocations.get(attribName)
@@ -109,13 +126,28 @@ export default class Program {
     return attribLocation
   }
 
+  /**
+   * Binds the program for use
+   * @returns {this}
+   */
   bind(): this {
     this.#gl.useProgram(this.#program)
     return this
   }
 
+  /**
+   * Uninds the program for use
+   * @returns {this}
+   */
   unbind(): this {
     this.#gl.useProgram(null)
     return this
+  }
+
+  /**
+   * Deletes the program
+   */
+  delete(): void {
+    this.#gl.deleteProgram(this.#program)
   }
 }

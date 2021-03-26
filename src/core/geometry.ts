@@ -1,7 +1,20 @@
 import { createBuffer, createIndexBuffer } from '../utils/gl-utils'
 
 import { INDEX_ATTRIB_NAME, POSITION_ATTRIB_NAME } from '../utils/gl-constants'
-export default class Geometry {
+
+import {
+  WebGLElementBufferInterface,
+  WebGLArrayBufferInterface,
+} from '../types'
+
+/**
+ * Geometry class to hold buffers and attributes for a mesh.
+ * Accepts the data that makes up your model - indices, vertices, uvs, normals, etc.
+ * The only required attribute & buffer to render is "position"
+ *
+ * @public
+ */
+export class Geometry {
   #gl: WebGLRenderingContext
 
   public attributes = new Map()
@@ -11,16 +24,27 @@ export default class Geometry {
     this.#gl = gl
   }
 
-  addIndex({ typedArray }: { typedArray: Uint32Array | Uint16Array }): this {
+  /**
+   * @description Set data into element array buffer
+   * @param {WebGLElementBufferInterface} params
+   * @returns {this}
+   */
+  addIndex(params: WebGLElementBufferInterface): this {
+    const { typedArray } = params
     const buffer = createIndexBuffer(this.#gl, typedArray)
     this.vertexCount = typedArray.length
     this.attributes.set(INDEX_ATTRIB_NAME, { typedArray, buffer })
     return this
   }
 
-  addAttribute(
-    key: string,
-    {
+  /**
+   * @description Add attribute as array buffer
+   * @param {string} key - Name of attribute. Must match attribute name in your GLSL program
+   * @param {WebGLArrayBufferInterface} params
+   * @returns {this}
+   */
+  addAttribute(key: string, params: WebGLArrayBufferInterface): this {
+    const {
       typedArray,
       size = 1,
       type = this.#gl.FLOAT,
@@ -28,16 +52,8 @@ export default class Geometry {
       stride = 0,
       offset = 0,
       instancedDivisor,
-    }: {
-      typedArray: Float32Array | Float64Array
-      size?: number
-      type?: number
-      normalized?: boolean
-      stride?: number
-      offset?: number
-      instancedDivisor: number | null
-    },
-  ): this {
+    } = params
+
     const buffer = createBuffer(this.#gl, typedArray)
 
     if (key === POSITION_ATTRIB_NAME && !this.vertexCount) {
@@ -57,6 +73,9 @@ export default class Geometry {
     return this
   }
 
+  /**
+   * @description Delete all buffers associated with this geometry
+   */
   delete(): void {
     this.attributes.forEach(({ buffer }) => {
       this.#gl.deleteBuffer(buffer)

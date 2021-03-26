@@ -1,7 +1,7 @@
-import { mat4 } from 'gl-matrix'
+import { ReadonlyVec3, mat4 } from 'gl-matrix'
 
 export default class PerspectiveCamera {
-  public static UP_VECTOR: [number, number, number] = [0, 1, 0]
+  public static UP_VECTOR: ReadonlyVec3 = [0, 1, 0]
 
   public position: [number, number, number] = [0, 0, 0]
   public lookAtPosition: [number, number, number] = [0, 0, 0]
@@ -16,12 +16,12 @@ export default class PerspectiveCamera {
   public near: number
   public far: number
 
-  constructor(fieldOfView, aspect, near, far) {
+  constructor(fieldOfView: number, aspect: number, near: number, far: number) {
     this.fieldOfView = fieldOfView
     this.aspect = aspect
     this.near = near
     this.far = far
-    
+
     this.updateProjectionMatrix()
   }
 
@@ -34,9 +34,15 @@ export default class PerspectiveCamera {
     )
     return this
   }
-  
+
   updateProjectionMatrix(): this {
-    mat4.perspective(this.projectionMatrix, this.fieldOfView, this.aspect, this.near, this.far)
+    mat4.perspective(
+      this.projectionMatrix,
+      this.fieldOfView,
+      this.aspect,
+      this.near,
+      this.far,
+    )
     return this
   }
 

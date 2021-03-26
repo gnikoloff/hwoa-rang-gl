@@ -1,8 +1,8 @@
-import type { RenderTargetInterface } from '../ts-types'
+import type { FramebufferInterface } from '../types'
 
-import Texture from './texture'
+import { Texture } from './texture'
 
-export default class Framebuffer {
+export class Framebuffer {
   #gl: WebGLRenderingContext
   #buffer: WebGLFramebuffer
   #depthBuffer: WebGLRenderbuffer
@@ -20,20 +20,26 @@ export default class Framebuffer {
       target = gl.FRAMEBUFFER,
       wrapS = gl.CLAMP_TO_EDGE,
       wrapT = gl.CLAMP_TO_EDGE,
+      minFilter = gl.NEAREST,
+      magFilter = gl.NEAREST,
       format = gl.RGBA,
       internalFormat = format,
+      type = gl.UNSIGNED_BYTE,
       depth = true,
-    }: RenderTargetInterface,
+    }: FramebufferInterface = {},
   ) {
     this.#gl = gl
     this.#width = width
     this.#height = height
 
     this.texture = new Texture(gl, {
+      type,
       format,
       internalFormat,
       wrapS,
       wrapT,
+      minFilter,
+      magFilter,
     })
 
     this.texture.bind().fromSize(width, height).unbind()
@@ -71,21 +77,25 @@ export default class Framebuffer {
 
     gl.bindFramebuffer(target, null)
   }
+
   bind(): this {
     this.#gl.bindFramebuffer(this.#gl.FRAMEBUFFER, this.#buffer)
     return this
   }
+
   unbind(): this {
     this.#gl.bindFramebuffer(this.#gl.FRAMEBUFFER, null)
     return this
   }
-  /**
-   * @description reset texture
-   */
-  reset() {
-    this.texture.bind().fromSize(this.#width, this.#height)
+
+  reset(): this {
+    this.texture
+      .bind()
+      .fromSize(this.#width, this.#height)
+      .unbind()
+    return this
   }
-  delete() {
+  delete(): void {
     this.texture.delete()
     this.#gl.deleteFramebuffer(this.#buffer)
   }
