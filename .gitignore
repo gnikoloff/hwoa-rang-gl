@@ -1,1 +1,9 @@
+<<<<<<< HEAD
 node_modules
+=======
+hwoa-rang-gl-child/
+node_modules
+dist
+docs/docs
+docs/examples/dist
+>>>>>>> origin/main
