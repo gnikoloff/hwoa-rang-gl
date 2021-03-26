@@ -45,6 +45,7 @@
   "dependencies": {
     "gl-matrix": "^3.3.0",
     "http-serve": "^1.0.1",
+    "stats-js": "^1.0.1",
     "typedoc": "^0.20.28"
   }
 }
