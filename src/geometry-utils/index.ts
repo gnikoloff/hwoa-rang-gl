@@ -1,5 +1,10 @@
 import { vec3 } from 'gl-matrix'
 
+import { BoxInterface, PlaneInterface, SphereInterface } from '../types'
+
+/**
+ * @private
+ */
 function buildPlane(
   vertices,
   normal,
@@ -55,13 +60,19 @@ function buildPlane(
   }
 }
 
-export function createPlane({
-  width = 1,
-  height = 1,
-  widthSegments = 1,
-  heightSegments = 1,
-  attributes = {},
-} = {}) {
+/**
+ * Generates geometry data for a quad
+ * @param {PlaneInterface} params
+ * @returns {{ vertices, normal, uv, indices }}
+ */
+export function createPlane(params: PlaneInterface = {}) {
+  const {
+    width = 1,
+    height = 1,
+    widthSegments = 1,
+    heightSegments = 1,
+  } = params
+
   const wSegs = widthSegments
   const hSegs = heightSegments
 
@@ -85,15 +96,17 @@ export function createPlane({
   }
 }
 
-export function createBox({
-  width = 1,
-  height = 1,
-  depth = 1,
-  widthSegments = 1,
-  heightSegments = 1,
-  depthSegments = 1,
-  separateFaces = false,
-} = {}) {
+export function createBox(params: BoxInterface = {}) {
+  const {
+    width = 1,
+    height = 1,
+    depth = 1,
+    widthSegments = 1,
+    heightSegments = 1,
+    depthSegments = 1,
+    separateFaces = false,
+  } = params
+
   const wSegs = widthSegments
   const hSegs = heightSegments
   const dSegs = depthSegments
@@ -465,6 +478,11 @@ export function createBox({
   }
 }
 
+/**
+ * Generates geometry data for a fullscreen quad in normalized coordinates
+ * @param {SphereInterface} params
+ * @returns {{ vertices, uv }}
+ */
 export function createFullscreenQuad() {
   return {
     vertices: new Float32Array([1, 1, -1, 1, -1, -1, -1, -1, 1, -1, 1, 1]),
@@ -472,15 +490,22 @@ export function createFullscreenQuad() {
   }
 }
 
-export function createSphere({
-  radius = 0.5,
-  widthSegments = 16,
-  heightSegments = Math.ceil(widthSegments * 0.5),
-  phiStart = 0,
-  phiLength = Math.PI * 2,
-  thetaStart = 0,
-  thetaLength = Math.PI,
-} = {}) {
+/**
+ * Generates geometry data for a sphere
+ * @param {SphereInterface} params
+ * @returns {{ vertices, normal, uv, indices }}
+ */
+export function createSphere(params: SphereInterface = {}) {
+  const {
+    radius = 0.5,
+    widthSegments = 16,
+    heightSegments = Math.ceil(widthSegments * 0.5),
+    phiStart = 0,
+    phiLength = Math.PI * 2,
+    thetaStart = 0,
+    thetaLength = Math.PI,
+  } = params
+
   const wSegs = widthSegments
   const hSegs = heightSegments
   const pStart = phiStart
