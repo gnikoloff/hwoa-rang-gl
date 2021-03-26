@@ -12,12 +12,9 @@ export default class Geometry {
   }
 
   addIndex({ typedArray }: { typedArray: Uint32Array | Uint16Array }): this {
-    const { count, buffer } = createIndexBuffer(this.#gl, typedArray)
-    this.vertexCount = count
-    this.attributes.set(INDEX_ATTRIB_NAME, {
-      typedArray,
-      buffer,
-    })
+    const buffer = createIndexBuffer(this.#gl, typedArray)
+    this.vertexCount = typedArray.length
+    this.attributes.set(INDEX_ATTRIB_NAME, { typedArray, buffer })
     return this
   }
 

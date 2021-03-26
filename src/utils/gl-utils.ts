@@ -96,15 +96,11 @@ export function createIndexBuffer(
   gl: WebGLRenderingContext,
   indices: Uint16Array | Uint32Array,
   usage: number = STATIC_DRAW,
-): {
-  buffer: WebGLBuffer
-  count: number
-} {
+): WebGLBuffer {
   const buffer = gl.createBuffer()
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer)
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, usage)
-  const count = indices.length
-  return { count, buffer }
+  return buffer
 }
 
 const cachedExtensions = new Map()
