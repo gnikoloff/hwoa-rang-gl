@@ -12,8 +12,9 @@
     "build:examples": "cd docs/examples && npm run start",
     "start:examples:dev": "run-p watch watch:examples serve:examples",
     "start:examples": "run-s build build:examples serve:examples",
-    "start:docs": "typedoc --out docs/docs src/",
-    "serve:docs": "http-serve docs/docs -p 8081"
+    "build:docs": "typedoc --out docs/docs src/ --readme docs/README.md",
+    "serve:docs": "http-serve docs/docs -p 8081",
+    "start:docs": "run-p build:docs serve:docs"
   },
   "keywords": [
     "webgl",
