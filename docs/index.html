@@ -5,9 +5,82 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Docs</title>
+  <style>
+    :root {
+      --border-color: rgba(0, 0, 0, 0.12);
+      --font-stack: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
+    }
+    h1 {
+      font-size: 32px;
+      margin-bottom: 0.3rem;
+    }
+    h2 {
+      font-size: 21px;
+    }
+    code {
+      background-color: rgba(0, 0, 0, 0.075);
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+    body {
+      font-family: var(--font-stack);
+      line-height: 1.6;
+    }
+    article {
+      max-width: 800px;
+      padding: 0 16px;
+      margin: 0 auto;
+    }
+    .app-header {
+      border-bottom: 1px solid var(--border-color);
+    }
+  </style>
 </head>
 <body>
-  <a href="examples">Examples</a>
-  <a href="docs">Docs</a>
+  <article class="content">
+    <header class="app-header">
+      <h1>hwoa-rang-gl</h1>
+      <h2>webgl library</h2>
+    </header>
+
+    <h3>Install</h3>
+    <code>npm i -save &lt;NPM LINK&gt;</code>
+
+    <h3>API Documentation</h3>
+    <a href="docs">hwoa-rang-gl/docs</a>
+
+    <h3>Examples</h3>
+    <a href="examples/dist">hwoa-rang-gl/examples</a>
+
+    <h3>References</h3>
+    <ul>
+      <li>
+        <a href="https://github.com/kenjiSpecial/tubugl">tubugl</a>
+      </li>
+      <li>
+        <a href="https://github.com/oframe/ogl">ogl</a>
+      </li>
+      <li>
+        <a href="https://github.com/tsherif/webgl2examples">WebGL2 examples</a>
+      </li>
+      <li>
+        <a href="https://github.com/mrdoob/three.js/">three.js</a>
+      </li>
+    </ul>
+
+    <h3>Resources</h3>
+    <ul>
+      <li>
+        <a href="https://webglfundamentals.org/">WebGL fundamentals</a>
+      </li>
+      <li>
+        <a href="https://www.haroldserrano.com/blog/understanding-opengl-objects">Understanding OpenGL Objects</a>
+      </li>
+      <li>
+        <a href="https://www.learnopengles.com/tag/mipmap/">Learn OpenGL ES</a>
+      </li>
+    </ul>
+
+  </article>
 </body>
 </html>
