@@ -5,8 +5,10 @@ export { InstancedMesh } from './core/instanced-mesh'
 export { Texture } from './core/texture'
 export { Framebuffer } from './core/framebuffer'
 
-export { default as CameraController } from './camera/camera-controller'
-export { default as PerspectiveCamera } from './camera/perspective-camera'
+export { CameraController } from './camera/camera-controller'
+export { PerspectiveCamera } from './camera/perspective-camera'
+
+export { SwapRenderer } from './extra/swap-renderer'
 
 export * from './utils/gl-utils'
 
