@@ -472,8 +472,8 @@ gui
   .max(100)
   .step(1)
   .onChange((val) => {
-    boxMesh.setUniform('SpotLight.shininess', 'float', val)
-    sphereMesh.setUniform('SpotLight.shininess', 'float', val)
+    boxMesh.use().setUniform('SpotLight.shininess', 'float', val)
+    sphereMesh.use().setUniform('SpotLight.shininess', 'float', val)
   })
 gui
   .add(OPTIONS, 'theta')
@@ -511,8 +511,12 @@ gui
       lightWorldPosition[1],
       cameraPointerUpdateZ,
     )
-    boxMesh.setUniform('SpotLight.worldPosition', 'vec3', lightWorldPosition)
-    sphereMesh.setUniform('SpotLight.worldPosition', 'vec3', lightWorldPosition)
+    boxMesh
+      .use()
+      .setUniform('SpotLight.worldPosition', 'vec3', lightWorldPosition)
+    sphereMesh
+      .use()
+      .setUniform('SpotLight.worldPosition', 'vec3', lightWorldPosition)
   })
 
 gui
@@ -551,8 +555,12 @@ gui
       cameraPointerUpdateY,
       cameraPointerUpdateZ,
     )
-    boxMesh.setUniform('SpotLight.worldPosition', 'vec3', lightWorldPosition)
-    sphereMesh.setUniform('SpotLight.worldPosition', 'vec3', lightWorldPosition)
+    boxMesh
+      .use()
+      .setUniform('SpotLight.worldPosition', 'vec3', lightWorldPosition)
+    sphereMesh
+      .use()
+      .setUniform('SpotLight.worldPosition', 'vec3', lightWorldPosition)
   })
 gui
   .add(OPTIONS, 'specularFactor')
@@ -560,8 +568,8 @@ gui
   .max(1)
   .step(0.05)
   .onChange((val) => {
-    boxMesh.setUniform('SpotLight.specularFactor', 'float', val)
-    sphereMesh.setUniform('SpotLight.specularFactor', 'float', val)
+    boxMesh.use().setUniform('SpotLight.specularFactor', 'float', val)
+    sphereMesh.use().setUniform('SpotLight.specularFactor', 'float', val)
   })
 gui
   .add(OPTIONS, 'innerLimit')
@@ -574,8 +582,8 @@ gui
     }
     lightPointerHelperMeshInner.setScale({ x: val / 180, y: val / 180 })
     val *= Math.PI / 180
-    boxMesh.setUniform('SpotLight.innerLimit', 'float', Math.cos(val))
-    sphereMesh.setUniform('SpotLight.innerLimit', 'float', Math.cos(val))
+    boxMesh.use().setUniform('SpotLight.innerLimit', 'float', Math.cos(val))
+    sphereMesh.use().setUniform('SpotLight.innerLimit', 'float', Math.cos(val))
   })
   .listen()
 gui
@@ -589,30 +597,26 @@ gui
     }
     lightPointerHelperMeshOuter.setScale({ x: val / 180, y: val / 180 })
     val *= Math.PI / 180
-    boxMesh.setUniform('SpotLight.outerLimit', 'float', Math.cos(val))
-    sphereMesh.setUniform('SpotLight.outerLimit', 'float', Math.cos(val))
+    boxMesh.use().setUniform('SpotLight.outerLimit', 'float', Math.cos(val))
+    sphereMesh.use().setUniform('SpotLight.outerLimit', 'float', Math.cos(val))
   })
   .listen()
 
 gui.addColor(OPTIONS, 'lightColor').onChange((newColor) => {
-  boxMesh.setUniform('SpotLight.lightColor', 'vec3', normalizeColor(newColor))
-  sphereMesh.setUniform(
-    'SpotLight.lightColor',
-    'vec3',
-    normalizeColor(newColor),
-  )
+  boxMesh
+    .use()
+    .setUniform('SpotLight.lightColor', 'vec3', normalizeColor(newColor))
+  sphereMesh
+    .use()
+    .setUniform('SpotLight.lightColor', 'vec3', normalizeColor(newColor))
 })
 gui.addColor(OPTIONS, 'specularColor').onChange((newColor) => {
-  sphereMesh.setUniform(
-    'SpotLight.specularColor',
-    'vec3',
-    normalizeColor(newColor),
-  )
-  boxMesh.setUniform(
-    'SpotLight.specularColor',
-    'vec3',
-    normalizeColor(newColor),
-  )
+  sphereMesh
+    .use()
+    .setUniform('SpotLight.specularColor', 'vec3', normalizeColor(newColor))
+  boxMesh
+    .use()
+    .setUniform('SpotLight.specularColor', 'vec3', normalizeColor(newColor))
 })
 
 gui.add(OPTIONS, 'lightsDebug')

@@ -144,7 +144,7 @@ linearFolder
   .min(0)
   .max(150)
   .step(1)
-  .onChange((val) => gltfMesh.setUniform('fogFar', 'float', val))
+  .onChange((val) => gltfMesh.use().setUniform('fogFar', 'float', val))
 
 const exponentialFolder = gui.addFolder('exponential squared fog')
 exponentialFolder.open()
@@ -153,7 +153,7 @@ exponentialFolder
   .min(0)
   .max(0.225)
   .step(0.001)
-  .onChange((val) => gltfMesh2.setUniform('fogDensity', 'float', val))
+  .onChange((val) => gltfMesh2.use().setUniform('fogDensity', 'float', val))
 
 const sharedUniforms = {
   time: { type: 'float', value: 0 },
