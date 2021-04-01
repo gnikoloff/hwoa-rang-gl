@@ -1,6 +1,6 @@
 import { ReadonlyVec3, mat4 } from 'gl-matrix'
 
-export default class PerspectiveCamera {
+export class PerspectiveCamera {
   public static UP_VECTOR: ReadonlyVec3 = [0, 1, 0]
 
   public position: [number, number, number] = [0, 0, 0]

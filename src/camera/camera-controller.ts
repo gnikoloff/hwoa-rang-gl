@@ -30,7 +30,7 @@ class DampedAction {
   }
 }
 
-export default class CameraController {
+export class CameraController {
   private camera: PerspectiveCamera
   private domElement: HTMLElement
   private target: vec3 = vec3.create()
@@ -202,10 +202,10 @@ export default class CameraController {
   startTick(): void {
     this.loopId = requestAnimationFrame(this.tick)
   }
-  pause (): void {
+  pause(): void {
     this._paused = true
   }
-  start (): void {
+  start(): void {
     this._paused = false
   }
   tick(): void {
