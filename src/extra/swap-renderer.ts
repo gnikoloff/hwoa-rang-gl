@@ -89,9 +89,9 @@ export class SwapRenderer {
     return this
   }
 
-  setProgram(programName: string) {
+  useProgram(programName: string) {
     this.#activeProgram = this.#programs.get(programName)
-    this.#activeProgram.bindProgram()
+    this.#activeProgram.use()
     return this
   }
 

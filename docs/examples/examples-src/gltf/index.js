@@ -127,6 +127,8 @@ function loadModel(xhr) {
     `,
   })
 
+  gltfMesh.use()
+
   const image = new Image()
   image.onload = () => {
     texture.fromImage(image)

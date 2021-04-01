@@ -96,7 +96,7 @@ const swapRenderer = new SwapRenderer(gl)
 
 swapRenderer
   .createProgram('blur', VERTEX_SHADER_BASE, FRAGMENT_SHADER_BLUR)
-  .setProgram('blur')
+  .useProgram('blur')
   .setSize(innerWidth, innerHeight)
   .setUniform('texture', 'int', 0)
   .setUniform('uMouse', 'vec2', [-3000, -3000])
@@ -151,7 +151,7 @@ resize()
 window.addEventListener('resize', resize)
 document.addEventListener('mousemove', (e) => {
   swapRenderer
-    .setProgram('blur')
+    .useProgram('blur')
     .setUniform('uMouse', 'vec2', [e.pageX, innerHeight - e.pageY])
 })
 
@@ -162,7 +162,7 @@ function updateFrame(ts) {
 
   stats.begin()
 
-  swapRenderer.setProgram('blur').run([BLUR_PROGRAM_1], BLUR_PROGRAM_2)
+  swapRenderer.useProgram('blur').run([BLUR_PROGRAM_1], BLUR_PROGRAM_2)
 
   gl.clearColor(0.9, 0.9, 0.9, 1)
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)

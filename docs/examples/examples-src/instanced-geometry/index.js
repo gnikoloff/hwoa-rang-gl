@@ -76,6 +76,8 @@ const mesh = new InstancedMesh(gl, {
   `,
 })
 
+mesh.use()
+
 const matrix = mat4.create()
 const translateVec = vec3.create()
 const scaleVec = vec4.create()

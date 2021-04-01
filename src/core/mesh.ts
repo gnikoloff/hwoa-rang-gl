@@ -2,6 +2,8 @@ import { vec3, mat4, ReadonlyVec3 } from 'gl-matrix'
 
 import { Program } from './program'
 import { Geometry } from './geometry'
+import { PerspectiveCamera } from '../camera/perspective-camera'
+import { getExtension } from '../utils/gl-utils'
 
 import {
   INDEX_ATTRIB_NAME,
@@ -13,8 +15,6 @@ import {
 } from '../utils/gl-constants'
 
 import { MeshInterface, OES_vertex_array_objectInterface } from '../types'
-import { getExtension } from '../utils/gl-utils'
-import PerspectiveCamera from '../camera/perspective-camera'
 
 /**
  * Mesh class for holding the geometry, program and shaders for an object.
@@ -113,6 +113,11 @@ export class Mesh {
     return this.#scale
   }
 
+  use(): this {
+    this.program.bind()
+    return this
+  }
+
   /**
    * Set uniform value. Query the uniform location if necessary and cache it in-memory for future use
    * @param {string} uniformName
@@ -121,9 +126,7 @@ export class Mesh {
    * @returns {this}
    */
   setUniform(uniformName, uniformType, uniformValue): this {
-    this.program.bind()
     this.program.setUniform(uniformName, uniformType, uniformValue)
-    this.program.unbind()
     return this
   }
 
@@ -193,13 +196,11 @@ export class Mesh {
       this.#rotationAxisVec3,
     )
     mat4.scale(this.modelMatrix, this.modelMatrix, this.#scaleVec3)
-    this.program.bind()
     this.program.setUniform(
       MODEL_MATRIX_UNIFORM_NAME,
       UNIFORM_TYPE_MATRIX4X4,
       this.modelMatrix,
     )
-    this.program.unbind()
     return this
   }
 
@@ -209,7 +210,6 @@ export class Mesh {
    * @returns {this}
    */
   setCamera(camera): this {
-    this.program.bind()
     this.program.setUniform(
       PROJECTION_MATRIX_UNIFORM_NAME,
       UNIFORM_TYPE_MATRIX4X4,
@@ -220,7 +220,6 @@ export class Mesh {
       UNIFORM_TYPE_MATRIX4X4,
       camera.viewMatrix,
     )
-    this.program.unbind()
     return this
   }
 
@@ -234,7 +233,6 @@ export class Mesh {
       this.modelMatrixNeedsUpdate = false
     }
 
-    this.program.bind()
     this.vaoExtension.bindVertexArrayOES(this.vao)
 
     if (this.hasIndices) {
@@ -249,7 +247,6 @@ export class Mesh {
     }
 
     this.vaoExtension.bindVertexArrayOES(null)
-    this.program.unbind()
     return this
   }
 

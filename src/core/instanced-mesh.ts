@@ -143,7 +143,6 @@ export class InstancedMesh extends Mesh {
         this.instanceCount,
       )
     }
-    this.program.unbind()
     this.vaoExtension.bindVertexArrayOES(null)
     return this
   }

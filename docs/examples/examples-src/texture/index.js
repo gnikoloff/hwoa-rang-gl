@@ -87,6 +87,8 @@ const mesh = new Mesh(gl, {
   `,
 })
 
+mesh.use()
+
 const texture = new Texture(gl)
 texture.bind().setIsFlip()
 
@@ -124,14 +126,6 @@ const anisotropyExtension =
 const maxAnisotropySupported = gl.getParameter(
   anisotropyExtension.MAX_TEXTURE_MAX_ANISOTROPY_EXT,
 )
-
-gui
-  .add(OPTIONS, 'anisotropy')
-  .min(0)
-  .max(maxAnisotropySupported)
-  .onChange((val) => {
-    texture.setAnisotropy(val)
-  })
 
 function updateFrame(ts) {
   ts /= 1000

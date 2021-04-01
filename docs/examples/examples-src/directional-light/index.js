@@ -200,6 +200,7 @@ function updateFrame(ts) {
     texture.bind()
   }
   boxMesh
+    .use()
     .setUniform('lightDirection', 'vec3', lightDirection)
     .setCamera(camera)
     .setRotation(
@@ -210,7 +211,7 @@ function updateFrame(ts) {
     )
     .draw()
 
-  floorHelperMesh.setCamera(camera).draw()
+  floorHelperMesh.use().setCamera(camera).draw()
 
   stats.end()
 

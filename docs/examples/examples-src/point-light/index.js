@@ -268,6 +268,7 @@ function updateFrame(ts) {
   vec3.set(lightWorldPosition, 0, 0, Math.sin(ts * 0.8) * 8)
 
   lightMesh
+    .use()
     .setPosition({
       x: lightWorldPosition[0],
       y: lightWorldPosition[1],
@@ -277,6 +278,7 @@ function updateFrame(ts) {
     .draw()
 
   sphereMesh
+    .use()
     .setUniform('PointLight.worldPosition', 'vec3', lightWorldPosition)
     .setUniform('eyePosition', 'vec3', camera.position)
     .setCamera(camera)

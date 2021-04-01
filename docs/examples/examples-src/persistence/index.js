@@ -173,6 +173,7 @@ function updateFrame(ts) {
   const dy = -mousePosTarget.y
   const dist = Math.sqrt(dx * dx + dy * dy)
   boxMesh
+    .use()
     .setRotation({ x: mousePos.x, y: mousePos.y, z: mousePos.y }, dist)
     .setPosition({
       x: mousePos.x * 5,
@@ -186,9 +187,9 @@ function updateFrame(ts) {
     // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
     prevRenderTarget.texture.bind()
-    fadeMesh.draw()
+    fadeMesh.use().draw()
 
-    boxMesh.setCamera(camera).draw()
+    boxMesh.use().setCamera(camera).draw()
 
     currentRenderTarget.unbind()
   }
@@ -198,7 +199,7 @@ function updateFrame(ts) {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
   currentRenderTarget.texture.bind()
-  resultMesh.draw()
+  resultMesh.use().draw()
 
   const temp = prevRenderTarget
   prevRenderTarget = currentRenderTarget

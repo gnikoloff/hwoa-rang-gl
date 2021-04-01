@@ -196,13 +196,13 @@ function updateFrame(ts) {
   gl.clearColor(0.9, 0.9, 0.9, 1)
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-  boxMesh.setCamera(camera).draw()
+  boxMesh.use().setCamera(camera).draw()
 
-  lineMesh.setCamera(camera).draw()
+  lineMesh.use().setCamera(camera).draw()
 
-  sphereMesh.setCamera(camera).draw()
+  sphereMesh.use().setCamera(camera).draw()
 
-  planeMesh.setCamera(camera).draw()
+  planeMesh.use().setCamera(camera).draw()
 
   stats.end()
 

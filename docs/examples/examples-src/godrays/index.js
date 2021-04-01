@@ -227,7 +227,7 @@ for (let i = 0; i < BOXES_COUNT; i++) {
 }
 
 gui.add(OPTS, 'debugMode').onChange((val) => {
-  boxesMesh.setUniform('debugMode', 'float', val)
+  boxesMesh.use().setUniform('debugMode', 'float', val)
 })
 gui
   .add(OPTS, 'factor')
@@ -235,7 +235,7 @@ gui
   .max(1.15)
   .step(0.01)
   .onChange((val) => {
-    planeMesh.setUniform('factor', 'float', val)
+    planeMesh.use().setUniform('factor', 'float', val)
   })
 gui.add(OPTS, 'spread').min(1).max(5).step(0.5)
 
@@ -271,6 +271,7 @@ function updateFrame(ts) {
   }
 
   sphereMesh
+    .use()
     .setCamera(camera)
     .setPosition({
       x: Math.sin(ts) * 4,
@@ -279,7 +280,7 @@ function updateFrame(ts) {
     })
     .draw()
 
-  boxesMesh.setCamera(camera).draw()
+  boxesMesh.use().setCamera(camera).draw()
 
   if (!OPTS.debugMode) {
     renderTargetBlurX.unbind()
@@ -289,6 +290,7 @@ function updateFrame(ts) {
       writeBuffer.texture.bind()
       const radius = BLUR_ITERATIONS - i * OPTS.spread - 1
       planeMesh
+        .use()
         .setUniform(
           'blurDirection',
           'vec2',
@@ -310,7 +312,7 @@ function updateFrame(ts) {
 
     readBuffer.texture.bind()
 
-    planeMesh.draw()
+    planeMesh.use().draw()
   }
 
   // readBuffer.unbindTexture()

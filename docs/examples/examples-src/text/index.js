@@ -144,6 +144,8 @@ const mesh = new Mesh(gl, {
   `,
 })
 
+mesh.use()
+
 gui.add(OPTIONS, 'debugMode').onChange((debugMode) => {
   texCanvas.style.display = debugMode ? 'block' : 'none'
 })

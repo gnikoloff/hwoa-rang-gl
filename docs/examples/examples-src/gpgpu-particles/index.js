@@ -177,7 +177,7 @@ swapRenderer
     VERTEX_SHADER_UPDATE_POSITIONS,
     FRAGMENT_SHADER_UPDATE_POSITIONS,
   )
-  .setProgram('updatePosition')
+  .useProgram('updatePosition')
   .setUniform('positionsTexture', 'int', 0)
   .setUniform('velocitiesTexture', 'int', 1)
   .setUniform('textureDimensions', 'vec2', [
@@ -262,7 +262,7 @@ document.addEventListener('click', (e) => {
       positions,
     )
     .createFramebuffer(POSITIONS1_PROGRAM, particleTexWidth, particleTexHeight)
-    .setProgram('updatePosition')
+    .useProgram('updatePosition')
     .setUniform('curlNoiseFactor', 'float', 150 + Math.random() * 100)
     .setUniform('positionFactor', 'float', 0.001 + Math.random() * 0.009)
 })
@@ -276,7 +276,7 @@ function updateFrame(ts) {
 
   swapRenderer
     .setSize(particleTexWidth, particleTexHeight)
-    .setProgram('updatePosition')
+    .useProgram('updatePosition')
     .setUniform('deltaTime', 'float', dt)
     .run([POSITIONS1_PROGRAM, VELOCITY_PROGRAM], POSITIONS2_PROGRAM)
 
@@ -289,7 +289,7 @@ function updateFrame(ts) {
   gl.activeTexture(gl.TEXTURE0)
   posTexture.bind()
 
-  drawMesh.draw()
+  drawMesh.use().draw()
 
   swapRenderer.swap(POSITIONS1_PROGRAM, POSITIONS2_PROGRAM)
 

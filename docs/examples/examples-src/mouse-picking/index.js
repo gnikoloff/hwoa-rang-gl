@@ -217,7 +217,7 @@ function updateFrame(ts) {
   )
 
   meshes.forEach((mesh) => {
-    mesh.setCamera(camera).draw()
+    mesh.use().setCamera(camera).draw()
   })
 
   mousePickTarget.bind()
@@ -228,6 +228,7 @@ function updateFrame(ts) {
 
   hoverMeshes.forEach((mesh) => {
     mesh
+      .use()
       .setCamera(camera)
       .setUniform('projectionMatrix', 'mat4', frustumProjectionMatrix)
       .draw()
@@ -246,15 +247,15 @@ function updateFrame(ts) {
   if (id > 0) {
     if (id !== lastHoverId) {
       meshes.forEach((mesh) => {
-        mesh.setUniform('hovered', 'float', 0)
+        mesh.use().setUniform('hovered', 'float', 0)
       })
     }
     const hoverMesh = meshes.find(({ id: ownID }) => ownID === id)
-    hoverMesh.setUniform('hovered', 'float', 1)
+    hoverMesh.use().setUniform('hovered', 'float', 1)
     lastHoverId = id
   } else {
     meshes.forEach((mesh) => {
-      mesh.setUniform('hovered', 'float', 0)
+      mesh.use().setUniform('hovered', 'float', 0)
     })
   }
 

@@ -70,6 +70,7 @@ const mesh = new Mesh(gl, {
   `,
 })
 
+mesh.use()
 mesh.drawMode = gl.POINTS
 
 mesh.setCamera(camera)

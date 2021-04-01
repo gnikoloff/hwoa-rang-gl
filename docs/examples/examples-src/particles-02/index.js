@@ -151,6 +151,7 @@ new CameraController(camera, canvas)
   const scale = 2
   mesh.setScale({ x: scale, y: scale, z: scale })
   mesh.drawMode = 0
+  mesh.use()
 }
 
 document.body.appendChild(canvas)

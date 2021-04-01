@@ -639,6 +639,7 @@ function updateFrame(ts) {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
   boxMesh
+    .use()
     .setUniform('eyePosition', 'vec3', camera.position)
     // .setUniform('SpotLight.lightDirection', 'vec3', lightDirection)
     .setCamera(camera)
@@ -651,18 +652,19 @@ function updateFrame(ts) {
     .draw()
 
   sphereMesh
+    .use()
     .setUniform('eyePosition', 'vec3', camera.position)
     // .setUniform('SpotLight.lightDirection', 'vec3', lightDirection)
     .setCamera(camera)
     .draw()
 
-  floorHelperMesh.setCamera(camera).draw()
+  floorHelperMesh.use().setCamera(camera).draw()
 
   if (OPTIONS.lightsDebug) {
     // lightHelperMesh.setCamera(camera).draw()
 
-    lightPointerHelperMeshInner.setCamera(camera).draw()
-    lightPointerHelperMeshOuter.setCamera(camera).draw()
+    lightPointerHelperMeshInner.use().setCamera(camera).draw()
+    lightPointerHelperMeshOuter.use().setCamera(camera).draw()
   }
 
   stats.end()
