@@ -3,10 +3,9 @@ import { mat4 } from 'gl-matrix'
 
 import {
   Geometry,
-  GeometryUtils,
   Mesh,
-  Texture,
   getExtension,
+  SwapRenderer,
 } from '../../../../dist/esm'
 
 const VERTEX_SHADER_UPDATE_POSITIONS = `
@@ -24,23 +23,88 @@ const FRAGMENT_SHADER_UPDATE_POSITIONS = `
   uniform vec2 canvasDimensions;
   uniform vec3 mousePos;
   uniform float deltaTime;
+  uniform float curlNoiseFactor;
+  uniform float positionFactor;
 
   vec2 euclideanModulo(vec2 n, vec2 m) {
     return mod(mod(n, m) + m, m);
+  }
+
+  vec4 permute(vec4 x){return mod(x*x*34.+x,289.);}
+  float snoise(vec3 v){
+    const vec2 C = 1./vec2(6,3);
+    const vec4 D = vec4(0,.5,1,2);
+    vec3 i  = floor(v + dot(v, C.yyy));
+    vec3 x0 = v - i + dot(i, C.xxx);
+    vec3 g = step(x0.yzx, x0.xyz);
+    vec3 l = 1. - g;
+    vec3 i1 = min( g.xyz, l.zxy );
+    vec3 i2 = max( g.xyz, l.zxy );
+    vec3 x1 = x0 - i1 + C.x;
+    vec3 x2 = x0 - i2 + C.y;
+    vec3 x3 = x0 - D.yyy;
+    i = mod(i,289.);
+    vec4 p = permute( permute( permute(
+      i.z + vec4(0., i1.z, i2.z, 1.))
+    + i.y + vec4(0., i1.y, i2.y, 1.))
+    + i.x + vec4(0., i1.x, i2.x, 1.));
+    vec3 ns = .142857142857 * D.wyz - D.xzx;
+    vec4 j = p - 49. * floor(p * ns.z * ns.z);
+    vec4 x_ = floor(j * ns.z);
+    vec4 x = x_ * ns.x + ns.yyyy;
+    vec4 y = floor(j - 7. * x_ ) *ns.x + ns.yyyy;
+    vec4 h = 1. - abs(x) - abs(y);
+    vec4 b0 = vec4( x.xy, y.xy );
+    vec4 b1 = vec4( x.zw, y.zw );
+    vec4 sh = -step(h, vec4(0));
+    vec4 a0 = b0.xzyw + (floor(b0)*2.+ 1.).xzyw*sh.xxyy ;
+    vec4 a1 = b1.xzyw + (floor(b1)*2.+ 1.).xzyw*sh.zzww ;
+    vec3 p0 = vec3(a0.xy,h.x);
+    vec3 p1 = vec3(a0.zw,h.y);
+    vec3 p2 = vec3(a1.xy,h.z);
+    vec3 p3 = vec3(a1.zw,h.w);
+    vec4 norm = inversesqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
+    p0 *= norm.x;
+    p1 *= norm.y;
+    p2 *= norm.z;
+    p3 *= norm.w;
+    vec4 m = max(.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.);
+    return .5 + 12. * dot( m * m * m, vec4( dot(p0,x0), dot(p1,x1),dot(p2,x2), dot(p3,x3) ) );
+  }
+
+  vec3 snoiseVec3( vec3 x ){
+    return vec3(  snoise(vec3( x )*2.-1.),
+                  snoise(vec3( x.y - 19.1 , x.z + 33.4 , x.x + 47.2 ))*2.-1.,
+                  snoise(vec3( x.z + 74.2 , x.x - 124.5 , x.y + 99.4 )*2.-1.)
+    );
+  }
+
+  vec3 curlNoise( vec3 p ){
+    const float e = .1;
+    vec3 dx = vec3( e   , 0.0 , 0.0 );
+    vec3 dy = vec3( 0.0 , e   , 0.0 );
+    vec3 dz = vec3( 0.0 , 0.0 , e   );
+
+    vec3 p_x0 = snoiseVec3( p - dx );
+    vec3 p_x1 = snoiseVec3( p + dx );
+    vec3 p_y0 = snoiseVec3( p - dy );
+    vec3 p_y1 = snoiseVec3( p + dy );
+    vec3 p_z0 = snoiseVec3( p - dz );
+    vec3 p_z1 = snoiseVec3( p + dz );
+
+    float x = p_y1.z - p_y0.z - p_z1.y + p_z0.y;
+    float y = p_z1.x - p_z0.x - p_x1.z + p_x0.z;
+    float z = p_x1.y - p_x0.y - p_y1.x + p_y0.x;
+
+    const float divisor = 1.0 / ( 2.0 * e );
+    return normalize( vec3( x , y , z ) * divisor );
   }
 
   void main () {
     vec2 texCoords = gl_FragCoord.xy / textureDimensions;
     vec2 position = texture2D(positionsTexture, texCoords).xy;
     vec2 velocity = texture2D(velocitiesTexture, texCoords).xy;
-    vec2 newPosition = euclideanModulo(position + velocity * deltaTime, canvasDimensions);
-
-    float dist = distance(position, mousePos.xy);
-    float maxDist = mousePos.z;
-
-    newPosition.x -= (maxDist - clamp(dist, -maxDist, maxDist)) * velocity.x * 0.1;
-    newPosition.y -= (maxDist - clamp(dist, -maxDist, maxDist)) * velocity.y * 0.1;
-
+    vec2 newPosition = euclideanModulo(position + curlNoise(vec3(position.xy * positionFactor, 0.0)).xy * curlNoiseFactor * deltaTime, canvasDimensions);
     gl_FragColor = vec4(newPosition, 1, 1);
   }
 `
@@ -72,6 +136,10 @@ const FRAGMENT_SHADER_PARTICLES = `
   }
 `
 
+const POSITIONS1_PROGRAM = 'position1'
+const POSITIONS2_PROGRAM = 'position2'
+const VELOCITY_PROGRAM = 'velocity'
+
 const stats = new Stats()
 document.body.appendChild(stats.domElement)
 
@@ -80,7 +148,13 @@ const canvas = document.createElement('canvas')
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
 const errorLogWrapper = document.getElementById('error-log')
 const infoLogWrapper = document.getElementById('info-log')
-// const webglLint = getExtension(gl, 'GMAN_debug_helper')
+
+const particleTexWidth = 500
+const particleTexHeight = 500
+const numParticles = particleTexWidth * particleTexHeight
+const ids = new Array(numParticles).fill().map((_, i) => i)
+
+getExtension(gl, 'GMAN_debug_helper')
 
 checkExtensionsSupport()
 
@@ -95,135 +169,62 @@ const orthoProjectionMatrix = mat4.create()
   mat4.ortho(orthoProjectionMatrix, left, right, bottom, top, near, far)
 }
 
-const particleTexWidth = 500
-const particleTexHeight = 500
-const numParticles = particleTexWidth * particleTexHeight
+const swapRenderer = new SwapRenderer(gl)
 
-infoLogWrapper.innerText = `Rendering ${humanizeNumber(numParticles)} particles`
+swapRenderer
+  .createProgram(
+    'updatePosition',
+    VERTEX_SHADER_UPDATE_POSITIONS,
+    FRAGMENT_SHADER_UPDATE_POSITIONS,
+  )
+  .setProgram('updatePosition')
+  .setUniform('positionsTexture', 'int', 0)
+  .setUniform('velocitiesTexture', 'int', 1)
+  .setUniform('textureDimensions', 'vec2', [
+    particleTexWidth,
+    particleTexHeight,
+  ])
+  .setUniform('canvasDimensions', 'vec2', [innerWidth, innerHeight])
+  .setUniform('deltaTime', 'float', 0)
+  .setUniform('curlNoiseFactor', 'float', 200)
+  .setUniform('positionFactor', 'float', 0.005)
 
-const ids = new Array(numParticles).fill().map((_, i) => i)
 const positions = new Float32Array(
   ids.map((_) => [rand(innerWidth), rand(innerHeight), 0, 0]).flat(),
 )
+swapRenderer
+  .createTexture(
+    POSITIONS1_PROGRAM,
+    particleTexWidth,
+    particleTexHeight,
+    positions,
+  )
+  .createFramebuffer(POSITIONS1_PROGRAM, particleTexWidth, particleTexHeight)
+
+swapRenderer
+  .createTexture(POSITIONS2_PROGRAM, particleTexWidth, particleTexHeight)
+  .createFramebuffer(POSITIONS2_PROGRAM, particleTexWidth, particleTexHeight)
+
 const velocities = new Float32Array(
   ids.map((_) => [rand(-300, 300), rand(-300, 300), 0, 0]).flat(),
 )
+swapRenderer
+  .createTexture(
+    VELOCITY_PROGRAM,
+    particleTexWidth,
+    particleTexHeight,
+    velocities,
+  )
+  .createFramebuffer(VELOCITY_PROGRAM, particleTexWidth, particleTexHeight)
 
-const velicityTexture = new Texture(gl, {
-  format: gl.RGBA,
-  internalFormat: gl.RGBA,
-  type: gl.FLOAT,
-})
-// webglLint.tagObject(velicityTexture.getTexture(), 'velocity textiure')
-velicityTexture
-  .bind()
-  .fromData(velocities, particleTexWidth, particleTexHeight)
-  .unbind()
-
-// const velicityTexture = new Texture(gl, {
-//   image: velocities,
-//   width: particleTexWidth,
-//   height: particleTexHeight,
-//   format: gl.RGBA,
-//   internalFormat: gl.RGBA,
-//   minFilter: gl.NEAREST,
-//   magFilter: gl.NEAREST,
-//   type: gl.FLOAT,
-// })
-// const positionTex1 = new Texture(gl, {
-//   image: positions,
-//   width: particleTexWidth,
-//   height: particleTexHeight,
-//   format: gl.RGBA,
-//   internalFormat: gl.RGBA,
-//   minFilter: gl.NEAREST,
-//   magFilter: gl.NEAREST,
-//   type: gl.FLOAT,
-// })
-// const positionTex2 = new Texture(gl, {
-//   image: null,
-//   width: particleTexWidth,
-//   height: particleTexHeight,
-//   format: gl.RGBA,
-//   internalFormat: gl.RGBA,
-//   minFilter: gl.NEAREST,
-//   magFilter: gl.NEAREST,
-//   type: gl.FLOAT,
-// })
-
-const positionTex1 = new Texture(gl, {
-  format: gl.RGBA,
-  internalFormat: gl.RGBA,
-  type: gl.FLOAT,
-})
-// webglLint.tagObject(positionTex1.getTexture(), 'position 1')
-positionTex1
-  .bind()
-  .fromData(positions, particleTexWidth, particleTexHeight)
-  .unbind()
-
-const positionTex2 = new Texture(gl, {
-  format: gl.RGBA,
-  internalFormat: gl.RGBA,
-  type: gl.FLOAT,
-})
-// webglLint.tagObject(positionTex2.getTexture(), 'position 2')
-positionTex2.bind().fromSize(particleTexWidth, particleTexHeight).unbind()
-
-// const positionTex1 = new Texture(gl, {
-//   image: positions,
-//   width: particleTexWidth,
-//   height: particleTexHeight,
-//   format: gl.RGBA,
-//   internalFormat: gl.RGBA,
-//   minFilter: gl.NEAREST,
-//   magFilter: gl.NEAREST,
-//   type: gl.FLOAT,
-// })
-
-const positionsFB1 = createFramebuffer(gl, positionTex1.getTexture())
-const positionsFB2 = createFramebuffer(gl, positionTex2.getTexture())
+infoLogWrapper.innerText = `Rendering ${humanizeNumber(numParticles)} particles`
 
 let oldTime = 0
-let oldPositionsInfo = {
-  fb: positionsFB1,
-  tex: positionTex1.getTexture(),
-}
-let newPositionsInfo = {
-  fb: positionsFB2,
-  tex: positionTex2.getTexture(),
-}
-
-let updatePositionsMesh
 let drawMesh
-let oldMouseX = innerWidth / 2
-let oldMouseY = innerHeight / 2
 
 gl.enable(gl.BLEND)
 gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 gl.enable(gl.DEPTH_TEST)
-
-{
-  const { vertices } = GeometryUtils.createFullscreenQuad()
-  const geometry = new Geometry(gl)
-  geometry.addAttribute('position', { typedArray: vertices, size: 2 })
-
-  const textureDimensions = [particleTexWidth, particleTexHeight]
-  const canvasDimensions = [innerWidth, innerHeight]
-  updatePositionsMesh = new Mesh(gl, {
-    geometry,
-    uniforms: {
-      positionsTexture: { type: 'int', value: 0 },
-      velocitiesTexture: { type: 'int', value: 1 },
-      textureDimensions: { type: 'vec2', value: textureDimensions },
-      canvasDimensions: { type: 'vec2', value: canvasDimensions },
-      mousePos: { type: 'vec3', value: [innerWidth / 2, innerHeight / 2, 40] },
-      deltaTime: { type: 'float', value: 0 },
-    },
-    vertexShaderSource: VERTEX_SHADER_UPDATE_POSITIONS,
-    fragmentShaderSource: FRAGMENT_SHADER_UPDATE_POSITIONS,
-  })
-}
 
 {
   const geometry = new Geometry(gl)
@@ -249,18 +250,21 @@ document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)
 resize()
 window.addEventListener('resize', resize)
-document.addEventListener('mousemove', (e) => {
-  const dx = Math.min(e.pageX - oldMouseX, 100)
-  const dy = Math.min(e.pageY - oldMouseY, 100)
-  const dist = Math.sqrt(dx * dx + dy * dy)
-  console.log(dx, dy)
-  oldMouseX = e.pageX
-  oldMouseY = e.pageY
-  updatePositionsMesh.setUniform('mousePos', 'vec3', [
-    e.pageX,
-    innerHeight - e.pageY,
-    dist + 20,
-  ])
+document.addEventListener('click', (e) => {
+  const positions = new Float32Array(
+    ids.map((_) => [rand(innerWidth), rand(innerHeight), 0, 0]).flat(),
+  )
+  swapRenderer
+    .createTexture(
+      POSITIONS1_PROGRAM,
+      particleTexWidth,
+      particleTexHeight,
+      positions,
+    )
+    .createFramebuffer(POSITIONS1_PROGRAM, particleTexWidth, particleTexHeight)
+    .setProgram('updatePosition')
+    .setUniform('curlNoiseFactor', 'float', 150 + Math.random() * 100)
+    .setUniform('positionFactor', 'float', 0.001 + Math.random() * 0.009)
 })
 
 function updateFrame(ts) {
@@ -269,55 +273,26 @@ function updateFrame(ts) {
   oldTime = ts
 
   stats.begin()
-  gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)
+
+  swapRenderer
+    .setSize(particleTexWidth, particleTexHeight)
+    .setProgram('updatePosition')
+    .setUniform('deltaTime', 'float', dt)
+    .run([POSITIONS1_PROGRAM, VELOCITY_PROGRAM], POSITIONS2_PROGRAM)
+
   gl.clearColor(0.9, 0.9, 0.9, 1)
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+  gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)
 
-  // gl.viewport(0, 0, particleTexWidth, particleTexHeight)
-  // gl.activeTexture(gl.TEXTURE0)
-  // gl.bindTexture(gl.TEXTURE_2D, oldPositionsInfo.tex)
-  // gl.activeTexture(gl.TEXTURE0 + 1)
-  // gl.bindTexture(gl.TEXTURE_2D, velicityTexture.texture)
-
-  // updatePositionsMesh.setUniform('deltaTime', 'float', dt).draw()
-
-  gl.bindFramebuffer(gl.FRAMEBUFFER, newPositionsInfo.fb)
-  gl.viewport(0, 0, particleTexWidth, particleTexHeight)
+  const posTexture = swapRenderer.getTexture(POSITIONS1_PROGRAM)
 
   gl.activeTexture(gl.TEXTURE0)
-  gl.bindTexture(gl.TEXTURE_2D, oldPositionsInfo.tex)
-  gl.activeTexture(gl.TEXTURE0 + 1)
-  gl.bindTexture(gl.TEXTURE_2D, velicityTexture.getTexture())
-
-  updatePositionsMesh.setUniform('deltaTime', 'float', dt).draw()
-
-  // {
-  //   const results = new Uint8Array(particleTexWidth * particleTexHeight * 4)
-  //   gl.readPixels(
-  //     0,
-  //     0,
-  //     particleTexWidth,
-  //     particleTexHeight,
-  //     gl.RGBA,
-  //     gl.FLOAT,
-  //     results,
-  //   )
-  //   debugger
-  // }
-
-  gl.bindFramebuffer(gl.FRAMEBUFFER, null)
-  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
-
-  gl.activeTexture(gl.TEXTURE0)
-  gl.bindTexture(gl.TEXTURE_2D, newPositionsInfo.tex)
+  posTexture.bind()
 
   drawMesh.draw()
 
-  {
-    const temp = oldPositionsInfo
-    oldPositionsInfo = newPositionsInfo
-    newPositionsInfo = temp
-  }
+  swapRenderer.swap(POSITIONS1_PROGRAM, POSITIONS2_PROGRAM)
+
   stats.end()
 
   requestAnimationFrame(updateFrame)
@@ -336,20 +311,6 @@ function resize() {
   canvas.height = innerHeight * dpr
   canvas.style.setProperty('width', `${innerWidth}px`)
   canvas.style.setProperty('height', `${innerHeight}px`)
-}
-
-function createFramebuffer(gl, tex) {
-  const fb = gl.createFramebuffer()
-  gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
-  gl.framebufferTexture2D(
-    gl.FRAMEBUFFER,
-    gl.COLOR_ATTACHMENT0,
-    gl.TEXTURE_2D,
-    tex,
-    0,
-  )
-  gl.bindFramebuffer(gl.FRAMEBUFFER, null)
-  return fb
 }
 
 function checkExtensionsSupport() {
