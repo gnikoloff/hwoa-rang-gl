@@ -7,6 +7,7 @@ export { Framebuffer } from './core/framebuffer'
 
 export { CameraController } from './camera/camera-controller'
 export { PerspectiveCamera } from './camera/perspective-camera'
+export { OrthographicCamera } from './camera/orthographic-camera'
 
 export { SwapRenderer } from './extra/swap-renderer'
 
