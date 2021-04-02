@@ -36,6 +36,11 @@ export class SwapRenderer {
     return texture
   }
 
+  addTexture(name: string, texture: Texture) {
+    this.#textures.set(name, texture)
+    return this
+  }
+
   createTexture(
     name: string,
     width: number,
@@ -53,7 +58,12 @@ export class SwapRenderer {
       texture.fromSize(width, height)
     }
     texture.unbind()
-    this.#textures.set(name, texture)
+    this.addTexture(name, texture)
+    return this
+  }
+
+  addFramebuffer(name: string, framebuffer: Framebuffer) {
+    this.#framebuffers.set(name, framebuffer)
     return this
   }
 
@@ -65,7 +75,7 @@ export class SwapRenderer {
       depth: false,
       inputTexture,
     })
-    this.#framebuffers.set(name, framebuffer)
+    this.addFramebuffer(name, framebuffer)
     return this
   }
 
@@ -108,10 +118,15 @@ export class SwapRenderer {
   run(inputNameArr: string[], outputName: string) {
     const framebuffer = this.#framebuffers.get(outputName)
     framebuffer.bind()
-    const ext = this.#gl.getExtension('GMAN_debug_helper')
+    // const ext = this.#gl.getExtension('GMAN_debug_helper')
+    // ext.setConfiguration({
+    //   failUnsetUniforms: false,
+    // })
+
     for (let i = 0; i < inputNameArr.length; i++) {
       const inputName = inputNameArr[i]
       const inputTexture = this.#textures.get(inputName)
+      // console.log(ext.getTagForObject(inputTexture))
       this.#gl.activeTexture(this.#gl.TEXTURE0 + i)
       inputTexture.bind()
     }
