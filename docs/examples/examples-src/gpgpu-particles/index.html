@@ -9,15 +9,17 @@
     * { margin: 0; padding: 0; }
     #error-log {
       position: fixed;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      display: flex;
+      top: 5vh;
+      right: 5vw;
+      bottom: 5vh;
+      left: 5vw;
       align-items: center;
       justify-content: center;
       flex-direction: column;
       font-family: monospace;
+      background: white;
+      color: #111;
+      display: none;;
     }
     #info-log {
       position: fixed;
@@ -33,7 +35,7 @@
 <body>
   <div id="info-log"></div>
   <div id="error-log"></div>
-  <script src="https://greggman.github.io/webgl-lint/webgl-lint.js" crossorigin></script>
+  <!-- <script src="https://greggman.github.io/webgl-lint/webgl-lint.js" crossorigin></script> -->
 
   <script src="index.js"></script>
 </body>

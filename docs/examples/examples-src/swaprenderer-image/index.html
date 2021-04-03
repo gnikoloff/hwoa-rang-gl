@@ -15,11 +15,26 @@
       font-size: 14px;
       user-select: none;
     }
+    #error-log {
+      position: fixed;
+      top: 5vh;
+      right: 5vw;
+      bottom: 5vh;
+      left: 5vw;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      font-family: monospace;
+      background: white;
+      color: #111;
+      display: none;;
+    }
   </style>
 </head>
 <body>
+  <div id="error-log"></div>
   <div class="attribution">Photo by <a href="https://unsplash.com/@zhangkaiyv" target="_blank" rel="noopener noreferrer">Zhang Kaiyv</a></div>
-  <script src="https://greggman.github.io/webgl-lint/webgl-lint.js" crossorigin></script>
+  <!-- <script src="https://greggman.github.io/webgl-lint/webgl-lint.js" crossorigin></script> -->
   <script src="index.js"></script>
 </body>
 </html>

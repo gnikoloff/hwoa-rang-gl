@@ -18,13 +18,8 @@ export class SwapRenderer {
     this.#gl = gl
 
     const ext1 = getExtension(gl, 'OES_texture_float')
-
     if (!ext1) {
       // TODO: handle
-    }
-    const ext2 = getExtension(gl, 'WEBGL_color_buffer_float')
-    if (!ext2) {
-      // TODO: handle missing extension
     }
   }
 
@@ -46,10 +41,13 @@ export class SwapRenderer {
     width: number,
     height: number,
     data: Float32Array | null,
+    filtering = this.#gl.NEAREST,
   ) {
     const texture = new Texture(this.#gl, {
       type: this.#gl.FLOAT,
       format: this.#gl.RGBA,
+      minFilter: filtering,
+      magFilter: filtering,
     })
     texture.bind()
     if (data) {
@@ -116,8 +114,13 @@ export class SwapRenderer {
   }
 
   run(inputNameArr: string[], outputName: string) {
-    const framebuffer = this.#framebuffers.get(outputName)
-    framebuffer.bind()
+    let framebuffer
+    if (outputName) {
+      framebuffer = this.#framebuffers.get(outputName)
+      framebuffer.bind()
+    } else {
+      this.#gl.bindFramebuffer(this.#gl.FRAMEBUFFER, null)
+    }
     // const ext = this.#gl.getExtension('GMAN_debug_helper')
     // ext.setConfiguration({
     //   failUnsetUniforms: false,
@@ -131,23 +134,24 @@ export class SwapRenderer {
       inputTexture.bind()
     }
     this.#activeProgram.draw()
-    framebuffer.unbind()
+    if (framebuffer) {
+      framebuffer.unbind()
+    }
     return this
   }
 
   swap(name1: string, name2: string) {
     const tex1 = this.#textures.get(name1)
     const tex2 = this.#textures.get(name2)
-    let temp = tex1
     this.#textures.set(name1, tex2)
-    this.#textures.set(name2, temp)
+    this.#textures.set(name2, tex1)
 
     const fbo1 = this.#framebuffers.get(name1)
     const fbo2 = this.#framebuffers.get(name2)
-    temp = fbo1
-
     this.#framebuffers.set(name1, fbo2)
-    this.#framebuffers.set(name2, temp)
+    this.#framebuffers.set(name2, fbo1)
+
+    return this
   }
 
   reset() {
