@@ -13,129 +13,61 @@ import {
 
 const UP_VECTOR = [0, 1, 0]
 
+// prettier-ignore
 const CUBE_VERTICES = [
-  0,
-  0,
-  -1,
-  1,
-  0,
-  -1,
-  0,
-  1,
-  -1,
-  1,
-  1,
-  -1,
-  0,
-  0,
-  1,
-  1,
-  0,
-  1,
-  0,
-  1,
-  1,
-  1,
-  1,
-  1,
+  -1, -1, -1,
+    1, -1, -1,
+  -1,  1, -1,
+    1,  1, -1,
+  -1, -1,  1,
+    1, -1,  1,
+  -1,  1,  1,
+    1,  1,  1,
 ]
 
+// prettier-ignore
 const CUBE_INDICES = [
-  0,
-  1,
-  1,
-  3,
-  3,
-  2,
-  2,
-  0,
+  0, 1,
+  1, 3,
+  3, 2,
+  2, 0,
 
-  4,
-  5,
-  5,
-  7,
-  7,
-  6,
-  6,
-  4,
+  4, 5,
+  5, 7,
+  7, 6,
+  6, 4,
 
-  0,
-  4,
-  1,
-  5,
-  3,
-  7,
-  2,
-  6,
+  0, 4,
+  1, 5,
+  3, 7,
+  2, 6,
 ]
 
+// prettier-ignore
 const CHECKERBOARD_TEXTURE_DATA = [
-  // data
-  0xff,
-  0xcc,
-  0xff,
-  0xcc,
-  0xff,
-  0xcc,
-  0xff,
-  0xcc,
-  0xcc,
-  0xff,
-  0xcc,
-  0xff,
-  0xcc,
-  0xff,
-  0xcc,
-  0xff,
-  0xff,
-  0xcc,
-  0xff,
-  0xcc,
-  0xff,
-  0xcc,
-  0xff,
-  0xcc,
-  0xcc,
-  0xff,
-  0xcc,
-  0xff,
-  0xcc,
-  0xff,
-  0xcc,
-  0xff,
-  0xff,
-  0xcc,
-  0xff,
-  0xcc,
-  0xff,
-  0xcc,
-  0xff,
-  0xcc,
-  0xcc,
-  0xff,
-  0xcc,
-  0xff,
-  0xcc,
-  0xff,
-  0xcc,
-  0xff,
-  0xff,
-  0xcc,
-  0xff,
-  0xcc,
-  0xff,
-  0xcc,
-  0xff,
-  0xcc,
-  0xcc,
-  0xff,
-  0xcc,
-  0xff,
-  0xcc,
-  0xff,
-  0xcc,
-  0xff,
+  0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC,
+  0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF,
+  0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC,
+  0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF,
+  0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC,
+  0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF,
+  0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC,
+  0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF,
 ]
+
+const CUBE_VERTEX_SHADER = `
+  attribute vec4 position;
+  void main() {
+    gl_Position = projectionMatrix * viewMatrix * modelMatrix * position;
+  }
+`
+
+const CUBE_FRAGMENT_SHADER = `
+  uniform vec4 color;
+  void main() {
+    gl_FragColor = color;
+  }
+`
 
 const CHECKERED_VERTEX_SHADER = `
   uniform mat4 textureMatrix;
@@ -174,7 +106,7 @@ const CHECKERED_FRAGMENT_SHADER = `
         projectedTexcoord.y >= 0.0 &&
         projectedTexcoord.y <= 1.0;
     
-    vec4 projectedTexColor = texture2D(projectedTexture, projectedTexcoord.xy);
+    vec4 projectedTexColor = texture2D(projectedTexture, vec2(projectedTexcoord.x, 1.0 - projectedTexcoord.y));
     vec4 texColor = texture2D(texture, v_uv) * colorMult;
   
     float projectedAmount = inRange ? 1.0 : 0.0;
@@ -182,14 +114,19 @@ const CHECKERED_FRAGMENT_SHADER = `
   }
 `
 
+const STEP_VAL = 0.05
+
 const OPTIONS = {
-  posX: 3.5,
-  posY: 4.4,
-  posZ: 4.7,
-  targetX: 0.8,
-  targetY: 0,
-  targetZ: 4.7,
-  projectionScale: 1,
+  posX: 0.55,
+  posY: -1.4,
+  posZ: -8.8,
+  targetX: -1.4,
+  targetY: -20,
+  targetZ: 3.5,
+  projectionScaleX: 1.3,
+  projectionScaleY: 1.3,
+  perspective: true,
+  fieldOfView: 18.25,
 }
 
 const stats = new Stats()
@@ -209,10 +146,11 @@ let cubeMesh
 let projectedTexture
 
 const textureWorldMatrix = mat4.create()
+const textureProjectionMatrix = mat4.create()
+const cubeWorldMatrix = mat4.create()
+
 const projectionPos = vec3.create()
 const projectionTarget = vec3.create()
-const projectionScaleVec = vec3.create()
-const cubeScaleVec = vec3.create()
 
 const updateTexMatrix = ({
   posX = OPTIONS.posX,
@@ -221,36 +159,118 @@ const updateTexMatrix = ({
   targetX = OPTIONS.targetX,
   targetY = OPTIONS.targetY,
   targetZ = OPTIONS.targetZ,
-  projectionScale = OPTIONS.projectionScale,
+  projectionScaleX = OPTIONS.projectionScaleX,
+  projectionScaleY = OPTIONS.projectionScaleY,
+  perspective = OPTIONS.perspective,
+  fieldOfView = OPTIONS.fieldOfView,
 } = {}) => {
   vec3.set(projectionPos, posX, posY, posZ)
   vec3.set(projectionTarget, targetX, targetY, targetZ)
-  vec3.set(projectionScaleVec, projectionScale, 0, projectionScale)
 
-  mat4.identity(textureWorldMatrix)
   mat4.lookAt(textureWorldMatrix, projectionPos, projectionTarget, UP_VECTOR)
-  mat4.scale(textureWorldMatrix, textureWorldMatrix, projectionScaleVec)
-  // mat4.invert(textureWorldMatrix, textureWorldMatrix)
-  sphereMesh.setUniform('textureMatrix', 'mat4', textureWorldMatrix)
-  planeMesh.setUniform('textureMatrix', 'mat4', textureWorldMatrix)
 
-  vec3.set(cubeScaleVec, 1, 1, 100)
+  const near = 0.1
+  const far = 200
+
+  if (perspective) {
+    mat4.perspective(
+      textureProjectionMatrix,
+      (fieldOfView * Math.PI) / 180,
+      projectionScaleX / projectionScaleY,
+      near,
+      far,
+    )
+  } else {
+    mat4.ortho(
+      textureProjectionMatrix,
+      -projectionScaleX / 2,
+      projectionScaleX / 2,
+      -projectionScaleY / 2,
+      projectionScaleY / 2,
+      near,
+      far,
+    )
+  }
+
+  const textureWorldMatrixInv = mat4.create()
+  mat4.invert(textureWorldMatrixInv, textureWorldMatrix)
+
+  const textureMatrix = mat4.create()
+  const transformVec = vec3.create()
+  vec3.set(transformVec, 0.5, 0.5, 0.5)
+  mat4.translate(textureMatrix, textureMatrix, transformVec)
+  mat4.scale(textureMatrix, textureMatrix, transformVec)
+  mat4.mul(textureMatrix, textureMatrix, textureProjectionMatrix)
+  mat4.mul(textureMatrix, textureMatrix, textureWorldMatrixInv)
+
+  sphereMesh.use().setUniform('textureMatrix', 'mat4', textureMatrix)
+  planeMesh.use().setUniform('textureMatrix', 'mat4', textureMatrix)
+
+  const textureProjectionMatrixInv = mat4.create()
+  mat4.invert(textureProjectionMatrixInv, textureProjectionMatrix)
+
+  mat4.mul(cubeWorldMatrix, textureWorldMatrix, textureProjectionMatrixInv)
+
   cubeMesh
+    .use()
     .setCamera(camera)
-    .setUniform('modelMatrix', 'mat4', textureWorldMatrix)
+    .setUniform('modelMatrix', 'mat4', cubeWorldMatrix)
 }
 
-gui.add(OPTIONS, 'posX').min(-20).max(20).step(1).onChange(updateTexMatrix)
-gui.add(OPTIONS, 'posY').min(-20).max(20).step(1).onChange(updateTexMatrix)
-gui.add(OPTIONS, 'posZ').min(-20).max(20).step(1).onChange(updateTexMatrix)
-gui.add(OPTIONS, 'targetX').min(-20).max(20).step(1).onChange(updateTexMatrix)
-gui.add(OPTIONS, 'targetY').min(-20).max(20).step(1).onChange(updateTexMatrix)
-gui.add(OPTIONS, 'targetZ').min(-20).max(20).step(1).onChange(updateTexMatrix)
 gui
-  .add(OPTIONS, 'projectionScale')
+  .add(OPTIONS, 'posX')
+  .min(-20)
+  .max(20)
+  .step(STEP_VAL)
+  .onChange(updateTexMatrix)
+gui
+  .add(OPTIONS, 'posY')
+  .min(-20)
+  .max(20)
+  .step(STEP_VAL)
+  .onChange(updateTexMatrix)
+gui
+  .add(OPTIONS, 'posZ')
+  .min(-20)
+  .max(20)
+  .step(STEP_VAL)
+  .onChange(updateTexMatrix)
+gui
+  .add(OPTIONS, 'targetX')
+  .min(-20)
+  .max(20)
+  .step(STEP_VAL)
+  .onChange(updateTexMatrix)
+gui
+  .add(OPTIONS, 'targetY')
+  .min(-20)
+  .max(20)
+  .step(STEP_VAL)
+  .onChange(updateTexMatrix)
+gui
+  .add(OPTIONS, 'targetZ')
+  .min(-20)
+  .max(20)
+  .step(STEP_VAL)
+  .onChange(updateTexMatrix)
+gui
+  .add(OPTIONS, 'projectionScaleX')
   .min(0.1)
   .max(5)
   .step(0.1)
+  .onChange(updateTexMatrix)
+gui
+  .add(OPTIONS, 'projectionScaleY')
+  .min(0.1)
+  .max(5)
+  .step(0.1)
+  .onChange(updateTexMatrix)
+gui.add(OPTIONS, 'perspective').onChange(updateTexMatrix)
+gui
+  .add(OPTIONS, 'fieldOfView')
+  .min(1)
+  .max(180)
+  .step(STEP_VAL)
   .onChange(updateTexMatrix)
 
 gl.enable(gl.BLEND)
@@ -265,19 +285,19 @@ const camera = new PerspectiveCamera(
   0.1,
   100,
 )
-camera.position = [7, 7, 12]
+camera.position = [-7.9, 7.26, -13.1]
 camera.lookAt([0, 0, 0])
 
 new CameraController(camera, canvas)
 
 const checkeredTexture = new Texture(gl, {
-  width: 8,
-  height: 8,
   format: gl.LUMINANCE,
-  image: new Uint8Array(CHECKERBOARD_TEXTURE_DATA),
   magFilter: gl.NEAREST,
   minFilter: gl.NEAREST,
 })
+checkeredTexture
+  .bind()
+  .fromData(new Uint8Array(CHECKERBOARD_TEXTURE_DATA), 8, 8)
 
 const sharedUniforms = {
   texture: { type: 'int', value: 0 },
@@ -288,7 +308,7 @@ const sharedUniforms = {
 /* ---- Sphere mesh ---- */
 {
   const { indices, vertices, uv } = GeometryUtils.createSphere({
-    radius: 1,
+    radius: 2,
     widthSegments: 12,
     heightSegments: 5,
   })
@@ -314,13 +334,14 @@ const sharedUniforms = {
     vertexShaderSource: CHECKERED_VERTEX_SHADER,
     fragmentShaderSource: CHECKERED_FRAGMENT_SHADER,
   })
+  sphereMesh.setPosition({ y: 3 })
 }
 
 /* ---- Plane mesh ---- */
 {
   const { indices, vertices, uv } = GeometryUtils.createPlane({
-    width: 20,
-    height: 20,
+    width: 40,
+    height: 40,
   })
   const geometry = new Geometry(gl)
   geometry
@@ -350,34 +371,51 @@ const sharedUniforms = {
   cubeMesh = new Mesh(gl, {
     geometry,
     uniforms: {
-      color: { type: 'vec4', value: [0, 0, 0, 1] },
+      color: { type: 'vec4', value: [0, 0, 0, 0.8] },
     },
-    vertexShaderSource: `
-      attribute vec4 position;
-      void main() {
-        gl_Position = projectionMatrix * viewMatrix * modelMatrix * position;
-      }
-    `,
-    fragmentShaderSource: `
-      uniform vec4 color;
-      void main() {
-        gl_FragColor = color;
-      }
-    `,
+    vertexShaderSource: CUBE_VERTEX_SHADER,
+    fragmentShaderSource: CUBE_FRAGMENT_SHADER,
   })
   cubeMesh.drawMode = gl.LINES
 }
 
-const img = new Image()
-img.onload = () => {
+{
+  const w = 512
+  const h = 512
+  const texCanvas = document.createElement('canvas')
+  const ctx = texCanvas.getContext('2d')
+  texCanvas.width = w
+  texCanvas.height = h
+
+  ctx.fillStyle = '#e67e22'
+  ctx.fillRect(0, 0, w, h)
+
+  ctx.fillStyle = 'red'
+  ctx.strokeStyle = 'white'
+  ctx.lineWidth = 1
+
+  ctx.font = '170px Helvetica'
+  const lineHeight = 140
+  const startX = 20
+  const startY = 160
+
+  ctx.fillText('hwoa-', startX, startY)
+  // ctx.strokeText('hwoa', startX, startY)
+
+  ctx.fillText('rang-', startX, startY + lineHeight)
+  // ctx.strokeText('rang', startX, startY + lineHeight)
+
+  ctx.fillText('gl', startX, startY + lineHeight * 2)
+  // ctx.strokeText('gl', startX, startY + lineHeight * 2)
+
   projectedTexture = new Texture(gl, {
-    image: img,
-    width: img.naturalWidth,
-    height: img.naturalHeight,
-    anisotropy: 8,
+    minFilter: gl.LINEAR_MIPMAP_LINEAR,
   })
+    .bind()
+    .fromImage(texCanvas)
+    .setIsFlip()
+    .generateMipmap()
 }
-img.src = '../assets/images/tekken2-cover.jpg'
 
 updateTexMatrix()
 document.body.appendChild(canvas)
@@ -404,10 +442,10 @@ function updateFrame(ts) {
     projectedTexture.bind()
   }
 
-  sphereMesh.setCamera(camera).draw()
-  planeMesh.setCamera(camera).draw()
+  sphereMesh.use().setCamera(camera).draw()
+  planeMesh.use().setCamera(camera).draw()
 
-  cubeMesh.setCamera(camera).draw()
+  cubeMesh.use().setCamera(camera).draw()
 
   stats.end()
 

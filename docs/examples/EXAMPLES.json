@@ -43,8 +43,8 @@
         "label": "Enviornment Map"
       },
       {
-        "label": "Planar Perspective Projection",
-        "id": "planar-perspective-projection"
+        "label": "Projection Mapping",
+        "id": "projection-mapping"
       }
     ]
   },
@@ -98,6 +98,10 @@
       {
         "label": "Image",
         "id": "swaprenderer-image"
+      },
+      {
+        "label": "Fluid",
+        "id": "swaprenderer-fluid"
       }
     ]
   },
