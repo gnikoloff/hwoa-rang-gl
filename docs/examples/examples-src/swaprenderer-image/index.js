@@ -83,7 +83,7 @@ const FRAGMENT_SHADER_ADVECT = `
 const stats = new Stats()
 document.body.appendChild(stats.domElement)
 
-const dpr = devicePixelRatio
+const dpr = Math.min(devicePixelRatio, 2)
 const canvas = document.createElement('canvas')
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
 const errorLogWrapper = document.getElementById('error-log')
@@ -175,7 +175,10 @@ const swapRenderer = new SwapRenderer(gl)
   })
 }
 
-const imageTexture = new Texture(gl)
+const imageTexture = new Texture(gl, {
+  minFilter: gl.NEAREST,
+  magFilter: gl.NEAREST,
+})
 
 imageTexture.bind().fromSize(1, 1).setIsFlip()
 
@@ -184,6 +187,8 @@ image.onload = () => {
   imageTexture.bind().fromImage(image)
 
   framebufferSource = new Framebuffer(gl, {
+    minFilter: gl.NEAREST,
+    magFilter: gl.NEAREST,
     width: innerWidth,
     height: innerHeight,
     type: gl.FLOAT,
@@ -192,6 +197,8 @@ image.onload = () => {
   })
 
   framebufferTarget = new Framebuffer(gl, {
+    minFilter: gl.NEAREST,
+    magFilter: gl.NEAREST,
     width: innerWidth,
     height: innerHeight,
     type: gl.FLOAT,
@@ -221,7 +228,7 @@ image.onload = () => {
     .unbind()
 
   framebufferSource.bind()
-  gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)
+  gl.viewport(0, 0, innerWidth, innerHeight)
   gl.clearColor(0, 0, 0, 1)
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
   velocityTexture.bind()
@@ -231,7 +238,7 @@ image.onload = () => {
   framebufferSource.unbind()
 
   framebufferTarget.bind()
-  gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)
+  gl.viewport(0, 0, innerWidth, innerHeight)
   gl.clearColor(0, 0, 0, 1)
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
   velocityTexture.bind()
@@ -293,7 +300,7 @@ document.body.addEventListener('click', () => {
     .unbind()
 
   framebufferSource.bind()
-  gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)
+  gl.viewport(0, 0, innerWidth, innerHeight)
   gl.clearColor(0, 0, 0, 1)
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
   velocityTexture.bind()
@@ -303,7 +310,7 @@ document.body.addEventListener('click', () => {
   framebufferSource.unbind()
 
   framebufferTarget.bind()
-  gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)
+  gl.viewport(0, 0, innerWidth, innerHeight)
   gl.clearColor(1, 0, 0, 1)
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
   velocityTexture.bind()
@@ -335,6 +342,8 @@ function updateFrame(ts) {
     gl.enable(gl.BLEND)
     gl.blendEquation(gl.FUNC_ADD)
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+
+    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)
 
     gl.activeTexture(gl.TEXTURE0)
     tex.bind()

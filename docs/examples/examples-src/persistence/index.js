@@ -24,7 +24,7 @@ const fullscreenQuadVertShader = `
 const stats = new Stats()
 document.body.appendChild(stats.domElement)
 
-const dpr = devicePixelRatio
+const dpr = Math.min(devicePixelRatio, 2)
 const canvas = document.createElement('canvas')
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
 
@@ -166,8 +166,8 @@ function updateFrame(ts) {
 
   stats.begin()
 
-  mousePos.x += (mousePosTarget.x - mousePos.x) * (dt * 2)
-  mousePos.y += (mousePosTarget.y - mousePos.y) * (dt * 2)
+  mousePos.x += (mousePosTarget.x - mousePos.x) * dt
+  mousePos.y += (mousePosTarget.y - mousePos.y) * dt
 
   const dx = -mousePosTarget.x
   const dy = -mousePosTarget.y

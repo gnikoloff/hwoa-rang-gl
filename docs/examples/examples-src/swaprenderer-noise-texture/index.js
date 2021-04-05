@@ -85,7 +85,7 @@ const BLUR_PROGRAM_2 = 'blur2'
 const stats = new Stats()
 document.body.appendChild(stats.domElement)
 
-const dpr = devicePixelRatio
+const dpr = Math.min(devicePixelRatio, 2)
 const canvas = document.createElement('canvas')
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
 const errorLogWrapper = document.getElementById('error-log')
@@ -162,7 +162,10 @@ function updateFrame(ts) {
 
   stats.begin()
 
-  swapRenderer.useProgram('blur').run([BLUR_PROGRAM_1], BLUR_PROGRAM_2)
+  swapRenderer
+    .setSize(innerWidth, innerHeight)
+    .useProgram('blur')
+    .run([BLUR_PROGRAM_1], BLUR_PROGRAM_2)
 
   gl.clearColor(0.9, 0.9, 0.9, 1)
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)

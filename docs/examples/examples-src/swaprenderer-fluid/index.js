@@ -299,7 +299,7 @@ const config = {
 const stats = new Stats()
 document.body.appendChild(stats.domElement)
 
-const dpr = devicePixelRatio
+const dpr = Math.min(devicePixelRatio, 2)
 const canvas = document.createElement('canvas')
 const params = {
   alpha: false,
@@ -421,8 +421,8 @@ camera.lookAt([0, 0, 0])
 const sceneFramebuffer = new Framebuffer(gl, {
   minFilter: gl.LINEAR,
   magFilter: gl.LINEAR,
-  width: innerWidth,
-  height: innerHeight,
+  width: innerWidth * dpr,
+  height: innerHeight * dpr,
 })
 
 const swapRenderer = new SwapRenderer(gl)
@@ -450,7 +450,22 @@ document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)
 resize()
 window.addEventListener('resize', resize)
+
 document.body.addEventListener('mousemove', onMouseMove)
+document.body.addEventListener('mouseenter', onMouseEnter)
+
+function onMouseEnter(e) {
+  const ptX = e.clientX
+  const ptY = e.clientY
+  targetMouse[0] = (ptX / innerWidth) * 2 - 1
+  targetMouse[1] = (ptY / innerHeight) * -2 + 1
+
+  mouse[0] = targetMouse[0]
+  mouse[1] = targetMouse[1]
+
+  lastMouse[0] = targetMouse[0]
+  lastMouse[1] = targetMouse[1]
+}
 
 function onMouseMove(e) {
   const ptX = e.clientX
