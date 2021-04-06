@@ -1,5 +1,6 @@
 import Stats from 'stats-js'
 import { mat4 } from 'gl-matrix'
+import throttle from 'lodash.throttle'
 
 import {
   PerspectiveCamera,
@@ -8,6 +9,9 @@ import {
   GeometryUtils,
   Mesh,
   Framebuffer,
+  UNIFORM_TYPE_FLOAT,
+  UNIFORM_TYPE_MATRIX4X4,
+  UNIFORM_TYPE_VEC4,
 } from '../../../../dist/esm'
 
 const SHAPE_COUNT = 50
@@ -40,7 +44,7 @@ const fragmentShaderSource = `
 const stats = new Stats()
 document.body.appendChild(stats.domElement)
 
-const dpr = devicePixelRatio
+const dpr = Math.min(devicePixelRatio, 2)
 const canvas = document.createElement('canvas')
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
 const fieldOfViewRadians = (45 * Math.PI) / 180
@@ -112,7 +116,7 @@ for (let i = 0; i < SHAPE_COUNT; ++i) {
   const mesh = new Mesh(gl, {
     geometry: randGeometry,
     uniforms: {
-      hovered: { type: 'float', value: 0 },
+      hovered: { type: UNIFORM_TYPE_FLOAT, value: 0 },
     },
     vertexShaderSource,
     fragmentShaderSource,
@@ -142,7 +146,7 @@ for (let i = 0; i < SHAPE_COUNT; ++i) {
     geometry: randGeometry,
     uniforms: {
       u_id: {
-        type: 'vec4',
+        type: UNIFORM_TYPE_VEC4,
         value: [
           ((id >> 0) & 0xff) / 0xff,
           ((id >> 8) & 0xff) / 0xff,
@@ -170,8 +174,8 @@ for (let i = 0; i < SHAPE_COUNT; ++i) {
 document.body.appendChild(canvas)
 document.body.addEventListener('mousemove', onMouseMove)
 requestAnimationFrame(updateFrame)
-resize()
-window.addEventListener('resize', resize)
+sizeCanvas()
+window.addEventListener('resize', throttle(resize))
 
 function onMouseMove(e) {
   const rect = canvas.getBoundingClientRect()
@@ -217,7 +221,7 @@ function updateFrame(ts) {
   )
 
   meshes.forEach((mesh) => {
-    mesh.setCamera(camera).draw()
+    mesh.use().setCamera(camera).draw()
   })
 
   mousePickTarget.bind()
@@ -228,8 +232,13 @@ function updateFrame(ts) {
 
   hoverMeshes.forEach((mesh) => {
     mesh
+      .use()
       .setCamera(camera)
-      .setUniform('projectionMatrix', 'mat4', frustumProjectionMatrix)
+      .setUniform(
+        'projectionMatrix',
+        UNIFORM_TYPE_MATRIX4X4,
+        frustumProjectionMatrix,
+      )
       .draw()
   })
 
@@ -246,15 +255,15 @@ function updateFrame(ts) {
   if (id > 0) {
     if (id !== lastHoverId) {
       meshes.forEach((mesh) => {
-        mesh.setUniform('hovered', 'float', 0)
+        mesh.use().setUniform('hovered', UNIFORM_TYPE_FLOAT, 0)
       })
     }
     const hoverMesh = meshes.find(({ id: ownID }) => ownID === id)
-    hoverMesh.setUniform('hovered', 'float', 1)
+    hoverMesh.use().setUniform('hovered', UNIFORM_TYPE_FLOAT, 1)
     lastHoverId = id
   } else {
     meshes.forEach((mesh) => {
-      mesh.setUniform('hovered', 'float', 0)
+      mesh.use().setUniform('hovered', UNIFORM_TYPE_FLOAT, 0)
     })
   }
 
@@ -266,6 +275,13 @@ function updateFrame(ts) {
 }
 
 function resize() {
+  camera.aspect = innerWidth / innerHeight
+  camera.updateProjectionMatrix()
+
+  sizeCanvas()
+}
+
+function sizeCanvas() {
   canvas.width = innerWidth * dpr
   canvas.height = innerHeight * dpr
   canvas.style.setProperty('width', `${innerWidth}px`)

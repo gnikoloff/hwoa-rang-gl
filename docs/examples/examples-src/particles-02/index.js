@@ -1,10 +1,13 @@
 import Stats from 'stats-js'
+import throttle from 'lodash.throttle'
+
 import {
   PerspectiveCamera,
   CameraController,
   Mesh,
   Geometry,
 } from '../../../../dist/esm'
+import { UNIFORM_TYPE_FLOAT } from '../../../../dist/esm/utils/gl-constants'
 
 const OPTIONS = {
   tweenFactor: 1,
@@ -13,7 +16,7 @@ const OPTIONS = {
 const stats = new Stats()
 document.body.appendChild(stats.domElement)
 
-const dpr = devicePixelRatio
+const dpr = Math.min(devicePixelRatio, 2)
 const canvas = document.createElement('canvas')
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
 
@@ -92,8 +95,8 @@ new CameraController(camera, canvas)
   mesh = new Mesh(gl, {
     geometry,
     uniforms: {
-      time: { type: 'float', value: 0 },
-      tweenFactor: { type: 'float', value: OPTIONS.tweenFactor },
+      time: { type: UNIFORM_TYPE_FLOAT, value: 0 },
+      tweenFactor: { type: UNIFORM_TYPE_FLOAT, value: OPTIONS.tweenFactor },
     },
     vertexShaderSource: `
       uniform float tweenFactor;
@@ -151,12 +154,13 @@ new CameraController(camera, canvas)
   const scale = 2
   mesh.setScale({ x: scale, y: scale, z: scale })
   mesh.drawMode = 0
+  mesh.use()
 }
 
 document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)
-resize()
-window.addEventListener('resize', resize)
+sizeCanvas()
+window.addEventListener('resize', throttle(resize, 100))
 
 function updateFrame(ts) {
   ts /= 1000
@@ -174,8 +178,8 @@ function updateFrame(ts) {
     (tweenTarget - OPTIONS.tweenFactor) * easeOutCirc(dt * 0.175)
 
   mesh
-    .setUniform('time', 'float', ts)
-    .setUniform('tweenFactor', 'float', OPTIONS.tweenFactor)
+    .setUniform('time', UNIFORM_TYPE_FLOAT, ts)
+    .setUniform('tweenFactor', UNIFORM_TYPE_FLOAT, OPTIONS.tweenFactor)
     .setCamera(camera)
     .draw()
 
@@ -189,6 +193,13 @@ function easeOutCirc(x) {
 }
 
 function resize() {
+  camera.aspect = innerWidth / innerHeight
+  camera.updateProjectionMatrix()
+
+  sizeCanvas()
+}
+
+function sizeCanvas() {
   canvas.width = innerWidth * dpr
   canvas.height = innerHeight * dpr
   canvas.style.setProperty('width', `${innerWidth}px`)

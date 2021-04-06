@@ -1,7 +1,10 @@
 import Stats from 'stats-js'
 import { vec3 } from 'gl-matrix'
+import throttle from 'lodash.throttle'
 
 import {
+  UNIFORM_TYPE_INT,
+  UNIFORM_TYPE_VEC3,
   PerspectiveCamera,
   CameraController,
   Geometry,
@@ -13,7 +16,7 @@ import {
 const stats = new Stats()
 document.body.appendChild(stats.domElement)
 
-const dpr = devicePixelRatio
+const dpr = Math.min(devicePixelRatio, 2)
 const canvas = document.createElement('canvas')
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
 
@@ -65,8 +68,8 @@ vec3.normalize(lightDirection, lightDirection)
   boxMesh = new Mesh(gl, {
     geometry,
     uniforms: {
-      diffuse: { type: 'int', value: 0 },
-      lightDirection: { type: 'vec3', value: lightDirection },
+      diffuse: { type: UNIFORM_TYPE_INT, value: 0 },
+      lightDirection: { type: UNIFORM_TYPE_VEC3, value: lightDirection },
     },
     vertexShaderSource: `
       attribute vec4 position;
@@ -102,8 +105,7 @@ vec3.normalize(lightDirection, lightDirection)
   })
 }
 
-texture = new Texture(gl)
-texture.bind().setIsFlip().fromSize(1, 1).unbind()
+texture = new Texture(gl).bind().setIsFlip().fromSize(1, 1)
 
 const image = new Image()
 image.onload = () => {
@@ -182,8 +184,8 @@ image.src = '/assets/textures/webgl-logo.png'
 
 document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)
-resize()
-window.addEventListener('resize', resize)
+sizeCanvas()
+window.addEventListener('resize', throttle(resize, 100))
 
 function updateFrame(ts) {
   ts /= 1000
@@ -200,7 +202,8 @@ function updateFrame(ts) {
     texture.bind()
   }
   boxMesh
-    .setUniform('lightDirection', 'vec3', lightDirection)
+    .use()
+    .setUniform('lightDirection', UNIFORM_TYPE_VEC3, lightDirection)
     .setCamera(camera)
     .setRotation(
       {
@@ -210,7 +213,7 @@ function updateFrame(ts) {
     )
     .draw()
 
-  floorHelperMesh.setCamera(camera).draw()
+  floorHelperMesh.use().setCamera(camera).draw()
 
   stats.end()
 
@@ -218,6 +221,12 @@ function updateFrame(ts) {
 }
 
 function resize() {
+  camera.aspect = innerWidth / innerHeight
+  camera.updateProjectionMatrix()
+  sizeCanvas()
+}
+
+function sizeCanvas() {
   canvas.width = innerWidth * dpr
   canvas.height = innerHeight * dpr
   canvas.style.setProperty('width', `${innerWidth}px`)

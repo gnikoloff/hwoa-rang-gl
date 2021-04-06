@@ -1,5 +1,6 @@
 import Stats from 'stats-js'
 import * as dat from 'dat.gui'
+import throttle from 'lodash.throttle'
 
 import {
   PerspectiveCamera,
@@ -9,6 +10,7 @@ import {
   Mesh,
   Texture,
   getExtension,
+  UNIFORM_TYPE_INT,
 } from '../../../../dist/esm'
 
 const gui = new dat.GUI()
@@ -17,7 +19,7 @@ gui.width = 420
 const stats = new Stats()
 document.body.appendChild(stats.domElement)
 
-const dpr = devicePixelRatio
+const dpr = Math.min(devicePixelRatio, 2)
 const canvas = document.createElement('canvas')
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
 
@@ -63,7 +65,7 @@ geometry
 const mesh = new Mesh(gl, {
   geometry,
   uniforms: {
-    diffuse: { type: 'int', value: 0 },
+    diffuse: { type: UNIFORM_TYPE_INT, value: 0 },
   },
   vertexShaderSource: `
     attribute vec4 position;
@@ -87,8 +89,9 @@ const mesh = new Mesh(gl, {
   `,
 })
 
-const texture = new Texture(gl)
-texture.bind().setIsFlip()
+mesh.use()
+
+const texture = new Texture(gl).bind().fromSize(1, 1).setIsFlip()
 
 const image = new Image()
 image.onload = () => {
@@ -98,8 +101,8 @@ image.src = '/assets/textures/zhang-kaiyv-mh2o8DuHaMM-unsplash.png'
 
 document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)
-resize()
-window.addEventListener('resize', resize)
+sizeCanvas()
+window.addEventListener('resize', throttle(resize, 100))
 
 gui
   .add(OPTIONS, 'minFilter', [
@@ -125,14 +128,6 @@ const maxAnisotropySupported = gl.getParameter(
   anisotropyExtension.MAX_TEXTURE_MAX_ANISOTROPY_EXT,
 )
 
-gui
-  .add(OPTIONS, 'anisotropy')
-  .min(0)
-  .max(maxAnisotropySupported)
-  .onChange((val) => {
-    texture.setAnisotropy(val)
-  })
-
 function updateFrame(ts) {
   ts /= 1000
   const dt = ts - oldTime
@@ -152,6 +147,13 @@ function updateFrame(ts) {
 }
 
 function resize() {
+  camera.aspect = innerWidth / innerHeight
+  camera.updateProjectionMatrix()
+
+  sizeCanvas()
+}
+
+function sizeCanvas() {
   canvas.width = innerWidth * dpr
   canvas.height = innerHeight * dpr
   canvas.style.setProperty('width', `${innerWidth}px`)

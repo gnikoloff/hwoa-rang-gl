@@ -1,6 +1,7 @@
 import Stats from 'stats-js'
 import * as dat from 'dat.gui'
 import { vec3, mat4 } from 'gl-matrix'
+import throttle from 'lodash.throttle'
 
 import {
   PerspectiveCamera,
@@ -8,6 +9,8 @@ import {
   Geometry,
   GeometryUtils,
   Mesh,
+  UNIFORM_TYPE_FLOAT,
+  UNIFORM_TYPE_VEC3,
 } from '../../../../dist/esm'
 
 const litObjectVertexShader = `
@@ -203,7 +206,7 @@ const OPTIONS = {
 const stats = new Stats()
 document.body.appendChild(stats.domElement)
 
-const dpr = devicePixelRatio
+const dpr = Math.min(devicePixelRatio, 2)
 const canvas = document.createElement('canvas')
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
 const spotLightMat = mat4.create()
@@ -242,31 +245,34 @@ const lightWorldPosition = vec3.create()
 vec3.set(lightWorldPosition, 0, 0, MOVEMENT_LIGHT_RADIUS)
 
 const litObjectSharedUniforms = {
-  eyePosition: { type: 'vec3', value: camera.position },
-  'SpotLight.worldPosition': { type: 'vec3', value: lightWorldPosition },
-  'SpotLight.shininess': { type: 'float', value: OPTIONS.shininess },
+  eyePosition: { type: UNIFORM_TYPE_VEC3, value: camera.position },
+  'SpotLight.worldPosition': {
+    type: UNIFORM_TYPE_VEC3,
+    value: lightWorldPosition,
+  },
+  'SpotLight.shininess': { type: UNIFORM_TYPE_FLOAT, value: OPTIONS.shininess },
   'SpotLight.lightColor': {
-    type: 'vec3',
+    type: UNIFORM_TYPE_VEC3,
     value: normalizeColor(OPTIONS.lightColor),
   },
   'SpotLight.specularColor': {
-    type: 'vec3',
+    type: UNIFORM_TYPE_VEC3,
     value: normalizeColor(OPTIONS.specularColor),
   },
   'SpotLight.specularFactor': {
-    type: 'float',
+    type: UNIFORM_TYPE_FLOAT,
     value: OPTIONS.specularFactor,
   },
   'SpotLight.lightDirection': {
-    type: 'vec3',
+    type: UNIFORM_TYPE_VEC3,
     value: [0, 0, 0],
   },
   'SpotLight.innerLimit': {
-    type: 'float',
+    type: UNIFORM_TYPE_FLOAT,
     value: Math.cos((OPTIONS.innerLimit * Math.PI) / 180),
   },
   'SpotLight.outerLimit': {
-    type: 'float',
+    type: UNIFORM_TYPE_FLOAT,
     value: Math.cos((OPTIONS.outerLimit * Math.PI) / 180),
   },
 }
@@ -363,7 +369,7 @@ const litObjectSharedUniforms = {
   lightPointerHelperMeshInner = new Mesh(gl, {
     geometry,
     uniforms: {
-      color: { type: 'vec3', value: [0, 1, 0] },
+      color: { type: UNIFORM_TYPE_VEC3, value: [0, 1, 0] },
     },
     vertexShaderSource: helperVertexShader,
     fragmentShaderSource: helperFragmentShader,
@@ -391,7 +397,7 @@ const litObjectSharedUniforms = {
   lightPointerHelperMeshOuter = new Mesh(gl, {
     geometry,
     uniforms: {
-      color: { type: 'vec3', value: [0, 0, 1] },
+      color: { type: UNIFORM_TYPE_VEC3, value: [0, 0, 1] },
     },
     vertexShaderSource: helperVertexShader,
     fragmentShaderSource: helperFragmentShader,
@@ -452,7 +458,7 @@ const litObjectSharedUniforms = {
   floorHelperMesh = new Mesh(gl, {
     geometry,
     uniforms: {
-      color: { type: 'vec3', value: [0.5, 0.5, 0.5] },
+      color: { type: UNIFORM_TYPE_VEC3, value: [0.5, 0.5, 0.5] },
     },
     vertexShaderSource: helperVertexShader,
     fragmentShaderSource: helperFragmentShader,
@@ -472,8 +478,8 @@ gui
   .max(100)
   .step(1)
   .onChange((val) => {
-    boxMesh.setUniform('SpotLight.shininess', 'float', val)
-    sphereMesh.setUniform('SpotLight.shininess', 'float', val)
+    boxMesh.use().setUniform('SpotLight.shininess', UNIFORM_TYPE_FLOAT, val)
+    sphereMesh.use().setUniform('SpotLight.shininess', UNIFORM_TYPE_FLOAT, val)
   })
 gui
   .add(OPTIONS, 'theta')
@@ -511,8 +517,20 @@ gui
       lightWorldPosition[1],
       cameraPointerUpdateZ,
     )
-    boxMesh.setUniform('SpotLight.worldPosition', 'vec3', lightWorldPosition)
-    sphereMesh.setUniform('SpotLight.worldPosition', 'vec3', lightWorldPosition)
+    boxMesh
+      .use()
+      .setUniform(
+        'SpotLight.worldPosition',
+        UNIFORM_TYPE_VEC3,
+        lightWorldPosition,
+      )
+    sphereMesh
+      .use()
+      .setUniform(
+        'SpotLight.worldPosition',
+        UNIFORM_TYPE_VEC3,
+        lightWorldPosition,
+      )
   })
 
 gui
@@ -551,8 +569,20 @@ gui
       cameraPointerUpdateY,
       cameraPointerUpdateZ,
     )
-    boxMesh.setUniform('SpotLight.worldPosition', 'vec3', lightWorldPosition)
-    sphereMesh.setUniform('SpotLight.worldPosition', 'vec3', lightWorldPosition)
+    boxMesh
+      .use()
+      .setUniform(
+        'SpotLight.worldPosition',
+        UNIFORM_TYPE_VEC3,
+        lightWorldPosition,
+      )
+    sphereMesh
+      .use()
+      .setUniform(
+        'SpotLight.worldPosition',
+        UNIFORM_TYPE_VEC3,
+        lightWorldPosition,
+      )
   })
 gui
   .add(OPTIONS, 'specularFactor')
@@ -560,8 +590,12 @@ gui
   .max(1)
   .step(0.05)
   .onChange((val) => {
-    boxMesh.setUniform('SpotLight.specularFactor', 'float', val)
-    sphereMesh.setUniform('SpotLight.specularFactor', 'float', val)
+    boxMesh
+      .use()
+      .setUniform('SpotLight.specularFactor', UNIFORM_TYPE_FLOAT, val)
+    sphereMesh
+      .use()
+      .setUniform('SpotLight.specularFactor', UNIFORM_TYPE_FLOAT, val)
   })
 gui
   .add(OPTIONS, 'innerLimit')
@@ -574,8 +608,12 @@ gui
     }
     lightPointerHelperMeshInner.setScale({ x: val / 180, y: val / 180 })
     val *= Math.PI / 180
-    boxMesh.setUniform('SpotLight.innerLimit', 'float', Math.cos(val))
-    sphereMesh.setUniform('SpotLight.innerLimit', 'float', Math.cos(val))
+    boxMesh
+      .use()
+      .setUniform('SpotLight.innerLimit', UNIFORM_TYPE_FLOAT, Math.cos(val))
+    sphereMesh
+      .use()
+      .setUniform('SpotLight.innerLimit', UNIFORM_TYPE_FLOAT, Math.cos(val))
   })
   .listen()
 gui
@@ -589,30 +627,46 @@ gui
     }
     lightPointerHelperMeshOuter.setScale({ x: val / 180, y: val / 180 })
     val *= Math.PI / 180
-    boxMesh.setUniform('SpotLight.outerLimit', 'float', Math.cos(val))
-    sphereMesh.setUniform('SpotLight.outerLimit', 'float', Math.cos(val))
+    boxMesh
+      .use()
+      .setUniform('SpotLight.outerLimit', UNIFORM_TYPE_FLOAT, Math.cos(val))
+    sphereMesh
+      .use()
+      .setUniform('SpotLight.outerLimit', UNIFORM_TYPE_FLOAT, Math.cos(val))
   })
   .listen()
 
 gui.addColor(OPTIONS, 'lightColor').onChange((newColor) => {
-  boxMesh.setUniform('SpotLight.lightColor', 'vec3', normalizeColor(newColor))
-  sphereMesh.setUniform(
-    'SpotLight.lightColor',
-    'vec3',
-    normalizeColor(newColor),
-  )
+  boxMesh
+    .use()
+    .setUniform(
+      'SpotLight.lightColor',
+      UNIFORM_TYPE_VEC3,
+      normalizeColor(newColor),
+    )
+  sphereMesh
+    .use()
+    .setUniform(
+      'SpotLight.lightColor',
+      UNIFORM_TYPE_VEC3,
+      normalizeColor(newColor),
+    )
 })
 gui.addColor(OPTIONS, 'specularColor').onChange((newColor) => {
-  sphereMesh.setUniform(
-    'SpotLight.specularColor',
-    'vec3',
-    normalizeColor(newColor),
-  )
-  boxMesh.setUniform(
-    'SpotLight.specularColor',
-    'vec3',
-    normalizeColor(newColor),
-  )
+  sphereMesh
+    .use()
+    .setUniform(
+      'SpotLight.specularColor',
+      UNIFORM_TYPE_VEC3,
+      normalizeColor(newColor),
+    )
+  boxMesh
+    .use()
+    .setUniform(
+      'SpotLight.specularColor',
+      UNIFORM_TYPE_VEC3,
+      normalizeColor(newColor),
+    )
 })
 
 gui.add(OPTIONS, 'lightsDebug')
@@ -624,8 +678,8 @@ lightDirection = [-spotLightMat[8], -spotLightMat[9], -spotLightMat[10]]
 
 document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)
-resize()
-window.addEventListener('resize', resize)
+sizeCanvas()
+window.addEventListener('resize', throttle(resize, 100))
 
 function updateFrame(ts) {
   ts /= 1000
@@ -639,8 +693,8 @@ function updateFrame(ts) {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
   boxMesh
-    .setUniform('eyePosition', 'vec3', camera.position)
-    // .setUniform('SpotLight.lightDirection', 'vec3', lightDirection)
+    .use()
+    .setUniform('eyePosition', UNIFORM_TYPE_VEC3, camera.position)
     .setCamera(camera)
     .setRotation(
       {
@@ -651,18 +705,18 @@ function updateFrame(ts) {
     .draw()
 
   sphereMesh
-    .setUniform('eyePosition', 'vec3', camera.position)
-    // .setUniform('SpotLight.lightDirection', 'vec3', lightDirection)
+    .use()
+    .setUniform('eyePosition', UNIFORM_TYPE_VEC3, camera.position)
     .setCamera(camera)
     .draw()
 
-  floorHelperMesh.setCamera(camera).draw()
+  floorHelperMesh.use().setCamera(camera).draw()
 
   if (OPTIONS.lightsDebug) {
     // lightHelperMesh.setCamera(camera).draw()
 
-    lightPointerHelperMeshInner.setCamera(camera).draw()
-    lightPointerHelperMeshOuter.setCamera(camera).draw()
+    lightPointerHelperMeshInner.use().setCamera(camera).draw()
+    lightPointerHelperMeshOuter.use().setCamera(camera).draw()
   }
 
   stats.end()
@@ -671,6 +725,13 @@ function updateFrame(ts) {
 }
 
 function resize() {
+  camera.aspect = innerWidth / innerHeight
+  camera.updateProjectionMatrix()
+
+  sizeCanvas()
+}
+
+function sizeCanvas() {
   canvas.width = innerWidth * dpr
   canvas.height = innerHeight * dpr
   canvas.style.setProperty('width', `${innerWidth}px`)

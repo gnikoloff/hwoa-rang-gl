@@ -30,7 +30,7 @@ class DampedAction {
   }
 }
 
-export default class CameraController {
+export class CameraController {
   private camera: PerspectiveCamera
   private domElement: HTMLElement
   private target: vec3 = vec3.create()
@@ -87,7 +87,10 @@ export default class CameraController {
   private _panDelta = { x: 0, y: 0 }
   private _panEnd = { x: 0, y: 0 }
   private _paused = false
-  constructor(camera, domElement = document.body) {
+  private _isDebug = false
+  private _outputEl: HTMLDivElement
+
+  constructor(camera, domElement = document.body, isDebug = false) {
     if (!camera) {
       console.error('camera is undefined')
     }
@@ -146,6 +149,27 @@ export default class CameraController {
     this._bindEvens()
     this.setEventHandler()
     this.startTick()
+    this._isDebug = isDebug
+
+    if (isDebug) {
+      this._outputEl = document.createElement('div')
+      this._outputEl.setAttribute(
+        'style',
+        `
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      z-index: 999;
+      font-family: monospace;
+      font-size: 14px;
+      user-select: none;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 4px;
+      padding: 3px 6px;
+    `,
+      )
+      document.body.appendChild(this._outputEl)
+    }
   }
   setEventHandler() {
     this.domElement.addEventListener(
@@ -202,16 +226,23 @@ export default class CameraController {
   startTick(): void {
     this.loopId = requestAnimationFrame(this.tick)
   }
-  pause (): void {
+  pause(): void {
     this._paused = true
   }
-  start (): void {
+  start(): void {
     this._paused = false
   }
   tick(): void {
     if (!this._paused) {
       this.updateDampedAction()
       this.updateCamera()
+
+      if (this._isDebug) {
+        const cameraX = Math.round(this.camera.position[0] * 100) / 100
+        const cameraY = Math.round(this.camera.position[1] * 100) / 100
+        const cameraZ = Math.round(this.camera.position[2] * 100) / 100
+        this._outputEl.textContent = `x: ${cameraX} y: ${cameraY} z: ${cameraZ}`
+      }
     }
     this.loopId = requestAnimationFrame(this.tick)
   }

@@ -1,5 +1,6 @@
 import Stats from 'stats-js'
 import * as dat from 'dat.gui'
+import throttle from 'lodash.throttle'
 
 import {
   PerspectiveCamera,
@@ -8,12 +9,13 @@ import {
   GeometryUtils,
   Mesh,
   Texture,
+  UNIFORM_TYPE_INT,
 } from '../../../../dist/esm'
 
 const stats = new Stats()
 document.body.appendChild(stats.domElement)
 
-const dpr = devicePixelRatio
+const dpr = Math.min(devicePixelRatio, 2)
 const canvas = document.createElement('canvas')
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
 
@@ -120,7 +122,7 @@ geometry
 const mesh = new Mesh(gl, {
   geometry,
   uniforms: {
-    diffuse: { type: 'int', value: 0 },
+    diffuse: { type: UNIFORM_TYPE_INT, value: 0 },
   },
   vertexShaderSource: `
     attribute vec4 position;
@@ -144,14 +146,16 @@ const mesh = new Mesh(gl, {
   `,
 })
 
+mesh.use()
+
 gui.add(OPTIONS, 'debugMode').onChange((debugMode) => {
   texCanvas.style.display = debugMode ? 'block' : 'none'
 })
 
 document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)
-resize()
-window.addEventListener('resize', resize)
+sizeCanvas()
+window.addEventListener('resize', throttle(resize, 100))
 
 function updateFrame(ts) {
   ts /= 1000
@@ -174,6 +178,13 @@ function updateFrame(ts) {
 }
 
 function resize() {
+  camera.aspect = innerWidth / innerHeight
+  camera.updateProjectionMatrix()
+
+  sizeCanvas()
+}
+
+function sizeCanvas() {
   canvas.width = innerWidth * dpr
   canvas.height = innerHeight * dpr
   canvas.style.setProperty('width', `${innerWidth}px`)

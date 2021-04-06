@@ -1,12 +1,19 @@
 import Stats from 'stats-js'
-import { PerspectiveCamera, Mesh, Geometry } from '../../../../dist/esm'
+import throttle from 'lodash.throttle'
+
+import {
+  PerspectiveCamera,
+  Mesh,
+  Geometry,
+  UNIFORM_TYPE_FLOAT,
+} from '../../../../dist/esm'
 
 const PARTICLE_COUNT = 500
 
 const stats = new Stats()
 document.body.appendChild(stats.domElement)
 
-const dpr = devicePixelRatio
+const dpr = Math.min(devicePixelRatio, 2)
 const canvas = document.createElement('canvas')
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
 
@@ -58,7 +65,7 @@ const mesh = new Mesh(gl, {
       );
 
       float dist = distance(cameraPosition, gl_Position);
-      gl_PointSize = dist * 0.175;
+      gl_PointSize = dist * 0.225;
     }
   `,
   fragmentShaderSource: `
@@ -70,17 +77,16 @@ const mesh = new Mesh(gl, {
   `,
 })
 
+mesh.use()
 mesh.drawMode = gl.POINTS
-
-mesh.setCamera(camera)
 
 document.body.appendChild(canvas)
 setInterval(() => {
   spacingTarget = Math.random() * 0.85 + 0.15
 }, 5000)
 requestAnimationFrame(updateFrame)
-resize()
-window.addEventListener('resize', resize)
+sizeCanvas()
+window.addEventListener('resize', throttle(resize, 100))
 
 function updateFrame(ts) {
   ts /= 1000
@@ -96,8 +102,9 @@ function updateFrame(ts) {
   spacing += (spacingTarget - spacing) * (dt * 20)
 
   mesh
-    .setUniform('time', 'float', ts)
-    .setUniform('spacing', 'float', spacing)
+    .setCamera(camera)
+    .setUniform('time', UNIFORM_TYPE_FLOAT, ts)
+    .setUniform('spacing', UNIFORM_TYPE_FLOAT, spacing)
     .draw()
 
   stats.end()
@@ -106,6 +113,13 @@ function updateFrame(ts) {
 }
 
 function resize() {
+  camera.aspect = innerWidth / innerHeight
+  camera.updateProjectionMatrix()
+
+  sizeCanvas()
+}
+
+function sizeCanvas() {
   canvas.width = innerWidth * dpr
   canvas.height = innerHeight * dpr
   canvas.style.setProperty('width', `${innerWidth}px`)

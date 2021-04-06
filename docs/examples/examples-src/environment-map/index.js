@@ -1,7 +1,13 @@
+import {
+  UNIFORM_TYPE_INT,
+  UNIFORM_TYPE_MATRIX4X4,
+  UNIFORM_TYPE_VEC3,
+} from '../../../../dist/esm/utils/gl-constants'
+
 const stats = new Stats()
 document.body.appendChild(stats.domElement)
 
-const dpr = devicePixelRatio
+const dpr = Math.min(devicePixelRatio, 2)
 const canvas = document.createElement('canvas')
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
 
@@ -103,8 +109,8 @@ boxGeometry
 const boxMesh = new hwoaRangGL.Mesh(gl, {
   geometry: boxGeometry,
   uniforms: {
-    texture: { type: 'int', value: 0 },
-    worldCameraPosition: { type: 'vec3', value: camera.position },
+    texture: { type: UNIFORM_TYPE_INT, value: 0 },
+    worldCameraPosition: { type: UNIFORM_TYPE_VEC3, value: camera.position },
   },
   vertexShaderSource: `
     attribute vec4 position;
@@ -152,8 +158,11 @@ quadGeometry.addAttribute('position', {
 const quadMesh = new hwoaRangGL.Mesh(gl, {
   geometry: quadGeometry,
   uniforms: {
-    skybox: { type: 'int', value: 0 },
-    viewDirectionProjectionInverse: { type: 'mat4', value: null },
+    skybox: { type: UNIFORM_TYPE_INT, value: 0 },
+    viewDirectionProjectionInverse: {
+      type: UNIFORM_TYPE_MATRIX4X4,
+      value: null,
+    },
   },
   vertexShaderSource: `
     attribute vec4 position;
@@ -197,13 +206,13 @@ function updateFrame(ts) {
   quadMesh
     .setUniform(
       'viewDirectionProjectionInverse',
-      'mat4',
+      UNIFORM_TYPE_MATRIX4X4,
       camera.getViewDirectionProjectionInverseMatrix(),
     )
     .draw()
 
   boxMesh
-    .setUniform('worldCameraPosition', 'vec3', camera.position)
+    .setUniform('worldCameraPosition', UNIFORM_TYPE_VEC3, camera.position)
     // .setRotation({ y: 1 }, ts)
     .setCamera(camera)
     .draw()

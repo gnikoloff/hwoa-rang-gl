@@ -7,6 +7,14 @@
   <title>GPGPU Particles</title>
   <style>
     * { margin: 0; padding: 0; }
+    .attribution {
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      font-family: sans-serif;
+      font-size: 14px;
+      user-select: none;
+    }
     #error-log {
       position: fixed;
       top: 5vh;
@@ -21,22 +29,21 @@
       color: #111;
       display: none;;
     }
-    #info-log {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      padding: 4px 14px;
-      background: rgba(255, 255, 255, 0.82);
-      color: #111;
-      font-family: monospace;
-    }
   </style>
 </head>
 <body>
-  <div id="info-log"></div>
-  <div id="error-log"></div>
+  <!-- <div class="attribution">Photo by <a href="https://unsplash.com/@zhangkaiyv" target="_blank" rel="noopener noreferrer">Zhang Kaiyv</a></div> -->
   <!-- <script src="https://greggman.github.io/webgl-lint/webgl-lint.js" crossorigin></script> -->
+  <!-- <script
+    src="https://greggman.github.io/webgl-lint/webgl-lint.js"
+    data-gman-debug-helper='
+      {
+        "failUnsetUniforms": false
+      }
+    '
+  ></script> -->
 
+  <div id="error-log"></div>
   <script src="index.js"></script>
 </body>
 </html>

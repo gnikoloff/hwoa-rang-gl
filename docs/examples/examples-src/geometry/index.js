@@ -1,4 +1,5 @@
 import Stats from 'stats-js'
+import throttle from 'lodash.throttle'
 
 import {
   PerspectiveCamera,
@@ -32,7 +33,7 @@ const regularFragmentShader = `
 const stats = new Stats()
 document.body.appendChild(stats.domElement)
 
-const dpr = devicePixelRatio
+const dpr = Math.min(devicePixelRatio, 2)
 const canvas = document.createElement('canvas')
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
 
@@ -182,8 +183,8 @@ new CameraController(camera, canvas)
 
 document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)
-resize()
-window.addEventListener('resize', resize)
+sizeCanvas()
+window.addEventListener('resize', throttle(resize, 100))
 
 function updateFrame(ts) {
   ts /= 1000
@@ -196,13 +197,13 @@ function updateFrame(ts) {
   gl.clearColor(0.9, 0.9, 0.9, 1)
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-  boxMesh.setCamera(camera).draw()
+  boxMesh.use().setCamera(camera).draw()
 
-  lineMesh.setCamera(camera).draw()
+  lineMesh.use().setCamera(camera).draw()
 
-  sphereMesh.setCamera(camera).draw()
+  sphereMesh.use().setCamera(camera).draw()
 
-  planeMesh.setCamera(camera).draw()
+  planeMesh.use().setCamera(camera).draw()
 
   stats.end()
 
@@ -210,6 +211,13 @@ function updateFrame(ts) {
 }
 
 function resize() {
+  camera.aspect = innerWidth / innerHeight
+  camera.updateProjectionMatrix()
+
+  sizeCanvas()
+}
+
+function sizeCanvas() {
   canvas.width = innerWidth * dpr
   canvas.height = innerHeight * dpr
   canvas.style.setProperty('width', `${innerWidth}px`)

@@ -1,30 +1,71 @@
 import Stats from 'stats-js'
+import throttle from 'lodash.throttle'
 
 import {
   PerspectiveCamera,
+  OrthographicCamera,
   CameraController,
   Geometry,
   GeometryUtils,
   Mesh,
   Framebuffer,
+  UNIFORM_TYPE_INT,
 } from '../../../../dist/esm'
 
-const fullscreenQuadVertShader = `
+const QUAD_VERTEX_SHADER = `
   attribute vec4 position;
   attribute vec2 uv;
 
   varying vec2 v_uv;
 
   void main () {
-    gl_Position = position;
+    gl_Position = projectionMatrix * viewMatrix * modelMatrix * position;
     v_uv = uv;
+  }
+`
+
+const FADE_QUAD_FRAGMENT_SHADER = `
+  uniform sampler2D diffuse;
+  varying vec2 v_uv;
+
+  void main () {
+    vec4 fadeColor = vec4(0.9, 0.9, 0.9, 1.0);
+    gl_FragColor = mix(texture2D(diffuse, v_uv), fadeColor, 0.2);
+  }
+`
+
+const RESULT_QUAD_FRAGMENT_SHADER = `
+  uniform sampler2D diffuse;
+  varying vec2 v_uv;
+
+  void main () {
+    gl_FragColor = texture2D(diffuse, v_uv);
+  }
+`
+
+const BOXES_VERTEX_SHADER = `
+  attribute vec4 position;
+  attribute vec2 uv;
+
+  varying vec2 v_uv;
+
+  void main () {
+    gl_Position = projectionMatrix * viewMatrix * modelMatrix * position;
+    v_uv = uv;
+  }
+`
+
+const BOXES_FRAGMENT_SHADER = `
+  varying vec2 v_uv;
+  void main () {
+    gl_FragColor = vec4(v_uv.x, 0.0, v_uv.y, 1.0);
   }
 `
 
 const stats = new Stats()
 document.body.appendChild(stats.domElement)
 
-const dpr = devicePixelRatio
+const dpr = Math.min(devicePixelRatio, 2)
 const canvas = document.createElement('canvas')
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
 
@@ -47,16 +88,20 @@ gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 gl.enable(gl.CULL_FACE)
 gl.depthFunc(gl.LEQUAL)
 
-const camera = new PerspectiveCamera(
+const perspCamera = new PerspectiveCamera(
   (45 * Math.PI) / 180,
   innerWidth / innerHeight,
   0.1,
   100,
 )
-camera.position = [0, 0, 10]
-camera.lookAt([0, 0, 0])
+perspCamera.position = [0, 0, 10]
+perspCamera.lookAt([0, 0, 0])
 
-new CameraController(camera, canvas)
+const orthoCamera = new OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0.1, 2)
+orthoCamera.position = [0, 0, 1]
+orthoCamera.lookAt([0, 0, 0])
+
+new CameraController(perspCamera, canvas)
 
 const { indices, vertices, uv } = GeometryUtils.createBox()
 const boxGeometry = new Geometry(gl)
@@ -73,35 +118,26 @@ boxGeometry
 
 const boxMesh = new Mesh(gl, {
   geometry: boxGeometry,
-  vertexShaderSource: `
-    attribute vec4 position;
-    attribute vec2 uv;
-
-    varying vec2 v_uv;
-
-    void main () {
-      gl_Position = projectionMatrix * viewMatrix * modelMatrix * position;
-      v_uv = uv;
-    }
-  `,
-  fragmentShaderSource: `
-    varying vec2 v_uv;
-    void main () {
-      gl_FragColor = vec4(v_uv.x, 0.0, v_uv.y, 1.0);
-    }
-  `,
+  vertexShaderSource: BOXES_VERTEX_SHADER,
+  fragmentShaderSource: BOXES_FRAGMENT_SHADER,
 })
 
 const {
+  indices: fullscreenQuadIndices,
   vertices: fullscreenQuadVertices,
   uv: fullscreenQuadUvs,
-} = GeometryUtils.createFullscreenQuad()
+} = GeometryUtils.createPlane({
+  width: 1,
+  height: 1,
+})
+
 const geometry = new Geometry(gl)
 
 geometry
+  .addIndex({ typedArray: fullscreenQuadIndices })
   .addAttribute('position', {
     typedArray: fullscreenQuadVertices,
-    size: 2,
+    size: 3,
   })
   .addAttribute('uv', {
     typedArray: fullscreenQuadUvs,
@@ -111,34 +147,19 @@ geometry
 const fadeMesh = new Mesh(gl, {
   geometry,
   uniforms: {
-    diffuse: { type: 'int', value: 0 },
+    diffuse: { type: UNIFORM_TYPE_INT, value: 0 },
   },
-  vertexShaderSource: fullscreenQuadVertShader,
-  fragmentShaderSource: `
-    uniform sampler2D diffuse;
-    varying vec2 v_uv;
-
-    void main () {
-      vec4 fadeColor = vec4(0.9, 0.9, 0.9, 1.0);
-      gl_FragColor = mix(texture2D(diffuse, v_uv), fadeColor, 0.2);
-    }
-  `,
+  vertexShaderSource: QUAD_VERTEX_SHADER,
+  fragmentShaderSource: FADE_QUAD_FRAGMENT_SHADER,
 })
 
 const resultMesh = new Mesh(gl, {
   geometry,
   uniforms: {
-    diffuse: { type: 'int', value: 0 },
+    diffuse: { type: UNIFORM_TYPE_INT, value: 0 },
   },
-  vertexShaderSource: fullscreenQuadVertShader,
-  fragmentShaderSource: `
-    uniform sampler2D diffuse;
-    varying vec2 v_uv;
-
-    void main () {
-      gl_FragColor = texture2D(diffuse, v_uv);
-    }
-  `,
+  vertexShaderSource: QUAD_VERTEX_SHADER,
+  fragmentShaderSource: RESULT_QUAD_FRAGMENT_SHADER,
 })
 
 document.body.addEventListener('mousemove', (e) => {
@@ -156,8 +177,8 @@ document.body.addEventListener('mousemove', (e) => {
 
 document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)
-resize()
-window.addEventListener('resize', resize)
+sizeCanvas()
+window.addEventListener('resize', throttle(resize, 100))
 
 function updateFrame(ts) {
   ts /= 1000
@@ -166,8 +187,8 @@ function updateFrame(ts) {
 
   stats.begin()
 
-  mousePos.x += (mousePosTarget.x - mousePos.x) * (dt * 2)
-  mousePos.y += (mousePosTarget.y - mousePos.y) * (dt * 2)
+  mousePos.x += (mousePosTarget.x - mousePos.x) * dt
+  mousePos.y += (mousePosTarget.y - mousePos.y) * dt
 
   const dx = -mousePosTarget.x
   const dy = -mousePosTarget.y
@@ -186,9 +207,9 @@ function updateFrame(ts) {
     // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
     prevRenderTarget.texture.bind()
-    fadeMesh.draw()
+    fadeMesh.use().setCamera(orthoCamera).draw()
 
-    boxMesh.setCamera(camera).draw()
+    boxMesh.use().setCamera(perspCamera).draw()
 
     currentRenderTarget.unbind()
   }
@@ -198,7 +219,7 @@ function updateFrame(ts) {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
   currentRenderTarget.texture.bind()
-  resultMesh.draw()
+  resultMesh.use().setCamera(orthoCamera).draw()
 
   const temp = prevRenderTarget
   prevRenderTarget = currentRenderTarget
@@ -210,6 +231,18 @@ function updateFrame(ts) {
 }
 
 function resize() {
+  perspCamera.aspect = innerWidth / innerHeight
+  perspCamera.updateProjectionMatrix()
+
+  orthoCamera.updateProjectionMatrix()
+
+  prevRenderTarget.updateWithSize(innerWidth, innerHeight, true)
+  currentRenderTarget.updateWithSize(innerWidth, innerHeight, true)
+
+  sizeCanvas()
+}
+
+function sizeCanvas() {
   canvas.width = innerWidth * dpr
   canvas.height = innerHeight * dpr
   canvas.style.setProperty('width', `${innerWidth}px`)
