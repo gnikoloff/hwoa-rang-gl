@@ -30,8 +30,8 @@ export class Texture {
       unpackAlignment = 1,
       wrapS = gl.CLAMP_TO_EDGE,
       wrapT = gl.CLAMP_TO_EDGE,
-      minFilter = gl.NEAREST,
-      magFilter = gl.NEAREST,
+      minFilter = gl.LINEAR,
+      magFilter = gl.LINEAR,
     }: TextureInterface = {},
   ) {
     this.#gl = gl
