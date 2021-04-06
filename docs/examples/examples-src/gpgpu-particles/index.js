@@ -12,7 +12,7 @@ const VERTEX_SHADER_UPDATE_POSITIONS = `
   attribute vec4 position;
 
   void main () {
-    gl_Position = position;
+    gl_Position = projectionMatrix * viewMatrix * modelMatrix * position;
   }
 `
 
@@ -196,6 +196,10 @@ swapRenderer
 const positions = new Float32Array(
   ids.map((_) => [rand(innerWidth), rand(innerHeight), 0, 0]).flat(),
 )
+const velocities = new Float32Array(
+  ids.map((_) => [rand(-300, 300), rand(-300, 300), 0, 0]).flat(),
+)
+
 swapRenderer
   .createTexture(
     POSITIONS1_PROGRAM,
@@ -205,14 +209,9 @@ swapRenderer
   )
   .createFramebuffer(POSITIONS1_PROGRAM, particleTexWidth, particleTexHeight)
 
-swapRenderer
   .createTexture(POSITIONS2_PROGRAM, particleTexWidth, particleTexHeight)
   .createFramebuffer(POSITIONS2_PROGRAM, particleTexWidth, particleTexHeight)
 
-const velocities = new Float32Array(
-  ids.map((_) => [rand(-300, 300), rand(-300, 300), 0, 0]).flat(),
-)
-swapRenderer
   .createTexture(
     VELOCITY_PROGRAM,
     particleTexWidth,
