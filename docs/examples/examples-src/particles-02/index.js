@@ -7,6 +7,7 @@ import {
   Mesh,
   Geometry,
 } from '../../../../dist/esm'
+import { UNIFORM_TYPE_FLOAT } from '../../../../dist/esm/utils/gl-constants'
 
 const OPTIONS = {
   tweenFactor: 1,
@@ -94,8 +95,8 @@ new CameraController(camera, canvas)
   mesh = new Mesh(gl, {
     geometry,
     uniforms: {
-      time: { type: 'float', value: 0 },
-      tweenFactor: { type: 'float', value: OPTIONS.tweenFactor },
+      time: { type: UNIFORM_TYPE_FLOAT, value: 0 },
+      tweenFactor: { type: UNIFORM_TYPE_FLOAT, value: OPTIONS.tweenFactor },
     },
     vertexShaderSource: `
       uniform float tweenFactor;
@@ -177,8 +178,8 @@ function updateFrame(ts) {
     (tweenTarget - OPTIONS.tweenFactor) * easeOutCirc(dt * 0.175)
 
   mesh
-    .setUniform('time', 'float', ts)
-    .setUniform('tweenFactor', 'float', OPTIONS.tweenFactor)
+    .setUniform('time', UNIFORM_TYPE_FLOAT, ts)
+    .setUniform('tweenFactor', UNIFORM_TYPE_FLOAT, OPTIONS.tweenFactor)
     .setCamera(camera)
     .draw()
 

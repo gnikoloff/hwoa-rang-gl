@@ -9,6 +9,8 @@ import {
   Geometry,
   GeometryUtils,
   Mesh,
+  UNIFORM_TYPE_FLOAT,
+  UNIFORM_TYPE_VEC3,
 } from '../../../../dist/esm'
 
 const litObjectVertexShader = `
@@ -243,31 +245,34 @@ const lightWorldPosition = vec3.create()
 vec3.set(lightWorldPosition, 0, 0, MOVEMENT_LIGHT_RADIUS)
 
 const litObjectSharedUniforms = {
-  eyePosition: { type: 'vec3', value: camera.position },
-  'SpotLight.worldPosition': { type: 'vec3', value: lightWorldPosition },
-  'SpotLight.shininess': { type: 'float', value: OPTIONS.shininess },
+  eyePosition: { type: UNIFORM_TYPE_VEC3, value: camera.position },
+  'SpotLight.worldPosition': {
+    type: UNIFORM_TYPE_VEC3,
+    value: lightWorldPosition,
+  },
+  'SpotLight.shininess': { type: UNIFORM_TYPE_FLOAT, value: OPTIONS.shininess },
   'SpotLight.lightColor': {
-    type: 'vec3',
+    type: UNIFORM_TYPE_VEC3,
     value: normalizeColor(OPTIONS.lightColor),
   },
   'SpotLight.specularColor': {
-    type: 'vec3',
+    type: UNIFORM_TYPE_VEC3,
     value: normalizeColor(OPTIONS.specularColor),
   },
   'SpotLight.specularFactor': {
-    type: 'float',
+    type: UNIFORM_TYPE_FLOAT,
     value: OPTIONS.specularFactor,
   },
   'SpotLight.lightDirection': {
-    type: 'vec3',
+    type: UNIFORM_TYPE_VEC3,
     value: [0, 0, 0],
   },
   'SpotLight.innerLimit': {
-    type: 'float',
+    type: UNIFORM_TYPE_FLOAT,
     value: Math.cos((OPTIONS.innerLimit * Math.PI) / 180),
   },
   'SpotLight.outerLimit': {
-    type: 'float',
+    type: UNIFORM_TYPE_FLOAT,
     value: Math.cos((OPTIONS.outerLimit * Math.PI) / 180),
   },
 }
@@ -364,7 +369,7 @@ const litObjectSharedUniforms = {
   lightPointerHelperMeshInner = new Mesh(gl, {
     geometry,
     uniforms: {
-      color: { type: 'vec3', value: [0, 1, 0] },
+      color: { type: UNIFORM_TYPE_VEC3, value: [0, 1, 0] },
     },
     vertexShaderSource: helperVertexShader,
     fragmentShaderSource: helperFragmentShader,
@@ -392,7 +397,7 @@ const litObjectSharedUniforms = {
   lightPointerHelperMeshOuter = new Mesh(gl, {
     geometry,
     uniforms: {
-      color: { type: 'vec3', value: [0, 0, 1] },
+      color: { type: UNIFORM_TYPE_VEC3, value: [0, 0, 1] },
     },
     vertexShaderSource: helperVertexShader,
     fragmentShaderSource: helperFragmentShader,
@@ -453,7 +458,7 @@ const litObjectSharedUniforms = {
   floorHelperMesh = new Mesh(gl, {
     geometry,
     uniforms: {
-      color: { type: 'vec3', value: [0.5, 0.5, 0.5] },
+      color: { type: UNIFORM_TYPE_VEC3, value: [0.5, 0.5, 0.5] },
     },
     vertexShaderSource: helperVertexShader,
     fragmentShaderSource: helperFragmentShader,
@@ -473,8 +478,8 @@ gui
   .max(100)
   .step(1)
   .onChange((val) => {
-    boxMesh.use().setUniform('SpotLight.shininess', 'float', val)
-    sphereMesh.use().setUniform('SpotLight.shininess', 'float', val)
+    boxMesh.use().setUniform('SpotLight.shininess', UNIFORM_TYPE_FLOAT, val)
+    sphereMesh.use().setUniform('SpotLight.shininess', UNIFORM_TYPE_FLOAT, val)
   })
 gui
   .add(OPTIONS, 'theta')
@@ -514,10 +519,18 @@ gui
     )
     boxMesh
       .use()
-      .setUniform('SpotLight.worldPosition', 'vec3', lightWorldPosition)
+      .setUniform(
+        'SpotLight.worldPosition',
+        UNIFORM_TYPE_VEC3,
+        lightWorldPosition,
+      )
     sphereMesh
       .use()
-      .setUniform('SpotLight.worldPosition', 'vec3', lightWorldPosition)
+      .setUniform(
+        'SpotLight.worldPosition',
+        UNIFORM_TYPE_VEC3,
+        lightWorldPosition,
+      )
   })
 
 gui
@@ -558,10 +571,18 @@ gui
     )
     boxMesh
       .use()
-      .setUniform('SpotLight.worldPosition', 'vec3', lightWorldPosition)
+      .setUniform(
+        'SpotLight.worldPosition',
+        UNIFORM_TYPE_VEC3,
+        lightWorldPosition,
+      )
     sphereMesh
       .use()
-      .setUniform('SpotLight.worldPosition', 'vec3', lightWorldPosition)
+      .setUniform(
+        'SpotLight.worldPosition',
+        UNIFORM_TYPE_VEC3,
+        lightWorldPosition,
+      )
   })
 gui
   .add(OPTIONS, 'specularFactor')
@@ -569,8 +590,12 @@ gui
   .max(1)
   .step(0.05)
   .onChange((val) => {
-    boxMesh.use().setUniform('SpotLight.specularFactor', 'float', val)
-    sphereMesh.use().setUniform('SpotLight.specularFactor', 'float', val)
+    boxMesh
+      .use()
+      .setUniform('SpotLight.specularFactor', UNIFORM_TYPE_FLOAT, val)
+    sphereMesh
+      .use()
+      .setUniform('SpotLight.specularFactor', UNIFORM_TYPE_FLOAT, val)
   })
 gui
   .add(OPTIONS, 'innerLimit')
@@ -583,8 +608,12 @@ gui
     }
     lightPointerHelperMeshInner.setScale({ x: val / 180, y: val / 180 })
     val *= Math.PI / 180
-    boxMesh.use().setUniform('SpotLight.innerLimit', 'float', Math.cos(val))
-    sphereMesh.use().setUniform('SpotLight.innerLimit', 'float', Math.cos(val))
+    boxMesh
+      .use()
+      .setUniform('SpotLight.innerLimit', UNIFORM_TYPE_FLOAT, Math.cos(val))
+    sphereMesh
+      .use()
+      .setUniform('SpotLight.innerLimit', UNIFORM_TYPE_FLOAT, Math.cos(val))
   })
   .listen()
 gui
@@ -598,26 +627,46 @@ gui
     }
     lightPointerHelperMeshOuter.setScale({ x: val / 180, y: val / 180 })
     val *= Math.PI / 180
-    boxMesh.use().setUniform('SpotLight.outerLimit', 'float', Math.cos(val))
-    sphereMesh.use().setUniform('SpotLight.outerLimit', 'float', Math.cos(val))
+    boxMesh
+      .use()
+      .setUniform('SpotLight.outerLimit', UNIFORM_TYPE_FLOAT, Math.cos(val))
+    sphereMesh
+      .use()
+      .setUniform('SpotLight.outerLimit', UNIFORM_TYPE_FLOAT, Math.cos(val))
   })
   .listen()
 
 gui.addColor(OPTIONS, 'lightColor').onChange((newColor) => {
   boxMesh
     .use()
-    .setUniform('SpotLight.lightColor', 'vec3', normalizeColor(newColor))
+    .setUniform(
+      'SpotLight.lightColor',
+      UNIFORM_TYPE_VEC3,
+      normalizeColor(newColor),
+    )
   sphereMesh
     .use()
-    .setUniform('SpotLight.lightColor', 'vec3', normalizeColor(newColor))
+    .setUniform(
+      'SpotLight.lightColor',
+      UNIFORM_TYPE_VEC3,
+      normalizeColor(newColor),
+    )
 })
 gui.addColor(OPTIONS, 'specularColor').onChange((newColor) => {
   sphereMesh
     .use()
-    .setUniform('SpotLight.specularColor', 'vec3', normalizeColor(newColor))
+    .setUniform(
+      'SpotLight.specularColor',
+      UNIFORM_TYPE_VEC3,
+      normalizeColor(newColor),
+    )
   boxMesh
     .use()
-    .setUniform('SpotLight.specularColor', 'vec3', normalizeColor(newColor))
+    .setUniform(
+      'SpotLight.specularColor',
+      UNIFORM_TYPE_VEC3,
+      normalizeColor(newColor),
+    )
 })
 
 gui.add(OPTIONS, 'lightsDebug')
@@ -645,8 +694,7 @@ function updateFrame(ts) {
 
   boxMesh
     .use()
-    .setUniform('eyePosition', 'vec3', camera.position)
-    // .setUniform('SpotLight.lightDirection', 'vec3', lightDirection)
+    .setUniform('eyePosition', UNIFORM_TYPE_VEC3, camera.position)
     .setCamera(camera)
     .setRotation(
       {
@@ -658,8 +706,7 @@ function updateFrame(ts) {
 
   sphereMesh
     .use()
-    .setUniform('eyePosition', 'vec3', camera.position)
-    // .setUniform('SpotLight.lightDirection', 'vec3', lightDirection)
+    .setUniform('eyePosition', UNIFORM_TYPE_VEC3, camera.position)
     .setCamera(camera)
     .draw()
 

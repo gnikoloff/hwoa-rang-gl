@@ -1,7 +1,12 @@
 import Stats from 'stats-js'
 import throttle from 'lodash.throttle'
 
-import { getExtension, SwapRenderer } from '../../../../dist/esm'
+import {
+  getExtension,
+  SwapRenderer,
+  UNIFORM_TYPE_INT,
+  UNIFORM_TYPE_VEC2,
+} from '../../../../dist/esm'
 
 const VERTEX_SHADER_BASE = `
   attribute vec4 position;
@@ -95,13 +100,13 @@ swapRenderer
   .createProgram(BLUR_PROGRAM, VERTEX_SHADER_BASE, FRAGMENT_SHADER_BLUR)
   .useProgram(BLUR_PROGRAM)
   .setSize(innerWidth, innerHeight)
-  .setUniform('texture', 'int', 0)
-  .setUniform('uMouse', 'vec2', [-3000, -3000])
-  .setUniform('uWindow', 'vec2', [innerWidth, innerHeight])
+  .setUniform('texture', UNIFORM_TYPE_INT, 0)
+  .setUniform('uMouse', UNIFORM_TYPE_VEC2, [-3000, -3000])
+  .setUniform('uWindow', UNIFORM_TYPE_VEC2, [innerWidth, innerHeight])
 
   .createProgram(VIS_PROGRAM, VERTEX_SHADER_BASE, FRAGMENT_SHADER_DISPLAY)
   .useProgram(VIS_PROGRAM)
-  .setUniform('tDiffuse', 'int', 0)
+  .setUniform('tDiffuse', UNIFORM_TYPE_INT, 0)
 
 let oldTime = 0
 
@@ -117,7 +122,7 @@ window.addEventListener('resize', throttle(resize, 100))
 document.addEventListener('mousemove', (e) => {
   swapRenderer
     .useProgram(BLUR_PROGRAM)
-    .setUniform('uMouse', 'vec2', [e.pageX, innerHeight - e.pageY])
+    .setUniform('uMouse', UNIFORM_TYPE_VEC2, [e.pageX, innerHeight - e.pageY])
 })
 
 function updateFrame(ts) {
@@ -158,7 +163,7 @@ function resize() {
     .createFramebuffer(BLUR2, innerWidth, innerHeight)
 
     .useProgram(BLUR_PROGRAM)
-    .setUniform('uWindow', 'vec2', [innerWidth, innerHeight])
+    .setUniform('uWindow', UNIFORM_TYPE_VEC2, [innerWidth, innerHeight])
 }
 
 function checkExtensionsSupport() {

@@ -9,6 +9,7 @@ import {
   GeometryUtils,
   Mesh,
   Framebuffer,
+  UNIFORM_TYPE_INT,
 } from '../../../../dist/esm'
 
 const QUAD_VERTEX_SHADER = `
@@ -146,7 +147,7 @@ geometry
 const fadeMesh = new Mesh(gl, {
   geometry,
   uniforms: {
-    diffuse: { type: 'int', value: 0 },
+    diffuse: { type: UNIFORM_TYPE_INT, value: 0 },
   },
   vertexShaderSource: QUAD_VERTEX_SHADER,
   fragmentShaderSource: FADE_QUAD_FRAGMENT_SHADER,
@@ -155,7 +156,7 @@ const fadeMesh = new Mesh(gl, {
 const resultMesh = new Mesh(gl, {
   geometry,
   uniforms: {
-    diffuse: { type: 'int', value: 0 },
+    diffuse: { type: UNIFORM_TYPE_INT, value: 0 },
   },
   vertexShaderSource: QUAD_VERTEX_SHADER,
   fragmentShaderSource: RESULT_QUAD_FRAGMENT_SHADER,

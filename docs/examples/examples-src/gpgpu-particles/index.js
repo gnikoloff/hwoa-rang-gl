@@ -6,6 +6,9 @@ import {
   getExtension,
   SwapRenderer,
   OrthographicCamera,
+  UNIFORM_TYPE_FLOAT,
+  UNIFORM_TYPE_VEC2,
+  UNIFORM_TYPE_INT,
 } from '../../../../dist/esm'
 
 const VERTEX_SHADER_UPDATE_POSITIONS = `
@@ -182,16 +185,16 @@ swapRenderer
     FRAGMENT_SHADER_UPDATE_POSITIONS,
   )
   .useProgram('updatePosition')
-  .setUniform('positionsTexture', 'int', 0)
-  .setUniform('velocitiesTexture', 'int', 1)
-  .setUniform('textureDimensions', 'vec2', [
+  .setUniform('positionsTexture', UNIFORM_TYPE_INT, 0)
+  .setUniform('velocitiesTexture', UNIFORM_TYPE_INT, 1)
+  .setUniform('textureDimensions', UNIFORM_TYPE_VEC2, [
     particleTexWidth,
     particleTexHeight,
   ])
-  .setUniform('canvasDimensions', 'vec2', [innerWidth, innerHeight])
-  .setUniform('deltaTime', 'float', 0)
-  .setUniform('curlNoiseFactor', 'float', 200)
-  .setUniform('positionFactor', 'float', 0.005)
+  .setUniform('canvasDimensions', UNIFORM_TYPE_VEC2, [innerWidth, innerHeight])
+  .setUniform('deltaTime', UNIFORM_TYPE_FLOAT, 0)
+  .setUniform('curlNoiseFactor', UNIFORM_TYPE_FLOAT, 200)
+  .setUniform('positionFactor', UNIFORM_TYPE_FLOAT, 0.005)
 
 const positions = new Float32Array(
   ids.map((_) => [rand(innerWidth), rand(innerHeight), 0, 0]).flat(),
@@ -239,8 +242,8 @@ gl.enable(gl.DEPTH_TEST)
   drawMesh = new Mesh(gl, {
     geometry,
     uniforms: {
-      positionsTexture: { type: 'int', value: 0 },
-      textureDimensions: { type: 'vec2', value: textureDimensions },
+      positionsTexture: { type: UNIFORM_TYPE_INT, value: 0 },
+      textureDimensions: { type: UNIFORM_TYPE_VEC2, value: textureDimensions },
     },
     vertexShaderSource: VERTEX_SHADER_PARTICLES,
     fragmentShaderSource: FRAGMENT_SHADER_PARTICLES,
@@ -265,8 +268,16 @@ document.addEventListener('click', (e) => {
     )
     .createFramebuffer(POSITIONS1_PROGRAM, particleTexWidth, particleTexHeight)
     .useProgram('updatePosition')
-    .setUniform('curlNoiseFactor', 'float', 150 + Math.random() * 100)
-    .setUniform('positionFactor', 'float', 0.001 + Math.random() * 0.009)
+    .setUniform(
+      'curlNoiseFactor',
+      UNIFORM_TYPE_FLOAT,
+      150 + Math.random() * 100,
+    )
+    .setUniform(
+      'positionFactor',
+      UNIFORM_TYPE_FLOAT,
+      0.001 + Math.random() * 0.009,
+    )
 })
 
 function updateFrame(ts) {
@@ -279,7 +290,7 @@ function updateFrame(ts) {
   swapRenderer
     .setSize(particleTexWidth, particleTexHeight)
     .useProgram('updatePosition')
-    .setUniform('deltaTime', 'float', dt)
+    .setUniform('deltaTime', UNIFORM_TYPE_FLOAT, dt)
     .run([POSITIONS1_PROGRAM, VELOCITY_PROGRAM], POSITIONS2_PROGRAM)
 
   gl.clearColor(0.9, 0.9, 0.9, 1)

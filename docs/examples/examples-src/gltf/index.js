@@ -8,6 +8,8 @@ import {
   Geometry,
   Mesh,
   Texture,
+  UNIFORM_TYPE_INT,
+  UNIFORM_TYPE_VEC3,
 } from '../../../../dist/esm'
 
 import GLTF from './GLTFLoader'
@@ -92,8 +94,8 @@ function loadModel(xhr) {
   gltfMesh = new Mesh(gl, {
     geometry,
     uniforms: {
-      lightDirection: { type: 'vec3', value: lightDirection },
-      diffuse: { type: 'int', value: 0 },
+      lightDirection: { type: UNIFORM_TYPE_VEC3, value: lightDirection },
+      diffuse: { type: UNIFORM_TYPE_INT, value: 0 },
     },
     vertexShaderSource: `
       attribute vec4 position;

@@ -3,6 +3,8 @@ import { vec3 } from 'gl-matrix'
 import throttle from 'lodash.throttle'
 
 import {
+  UNIFORM_TYPE_INT,
+  UNIFORM_TYPE_VEC3,
   PerspectiveCamera,
   CameraController,
   Geometry,
@@ -66,8 +68,8 @@ vec3.normalize(lightDirection, lightDirection)
   boxMesh = new Mesh(gl, {
     geometry,
     uniforms: {
-      diffuse: { type: 'int', value: 0 },
-      lightDirection: { type: 'vec3', value: lightDirection },
+      diffuse: { type: UNIFORM_TYPE_INT, value: 0 },
+      lightDirection: { type: UNIFORM_TYPE_VEC3, value: lightDirection },
     },
     vertexShaderSource: `
       attribute vec4 position;
@@ -201,7 +203,7 @@ function updateFrame(ts) {
   }
   boxMesh
     .use()
-    .setUniform('lightDirection', 'vec3', lightDirection)
+    .setUniform('lightDirection', UNIFORM_TYPE_VEC3, lightDirection)
     .setCamera(camera)
     .setRotation(
       {

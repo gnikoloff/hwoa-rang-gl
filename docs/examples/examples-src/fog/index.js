@@ -8,6 +8,9 @@ import {
   CameraController,
   Geometry,
   InstancedMesh,
+  UNIFORM_TYPE_FLOAT,
+  UNIFORM_TYPE_VEC3,
+  UNIFORM_TYPE_VEC4,
 } from '../../../../dist/esm'
 
 import GLTF from './GLTFLoader'
@@ -143,7 +146,9 @@ linearFolder
   .min(0)
   .max(150)
   .step(1)
-  .onChange((val) => gltfMesh.use().setUniform('fogFar', 'float', val))
+  .onChange((val) =>
+    gltfMesh.use().setUniform('fogFar', UNIFORM_TYPE_FLOAT, val),
+  )
 
 const exponentialFolder = gui.addFolder('exponential squared fog')
 exponentialFolder.open()
@@ -152,15 +157,17 @@ exponentialFolder
   .min(0)
   .max(0.225)
   .step(0.001)
-  .onChange((val) => gltfMesh2.use().setUniform('fogDensity', 'float', val))
+  .onChange((val) =>
+    gltfMesh2.use().setUniform('fogDensity', UNIFORM_TYPE_FLOAT, val),
+  )
 
 const sharedUniforms = {
-  time: { type: 'float', value: 0 },
-  lightDirection: { type: 'vec3', value: lightDirection },
-  fogColor: { type: 'vec4', value: FOG_COLOR },
-  fogNear: { type: 'float', value: OPTIONS.fogNear },
-  fogFar: { type: 'float', value: OPTIONS.fogFar },
-  fogDensity: { type: 'float', value: OPTIONS.fogDensity },
+  time: { type: UNIFORM_TYPE_FLOAT, value: 0 },
+  lightDirection: { type: UNIFORM_TYPE_VEC3, value: lightDirection },
+  fogColor: { type: UNIFORM_TYPE_VEC4, value: FOG_COLOR },
+  fogNear: { type: UNIFORM_TYPE_FLOAT, value: OPTIONS.fogNear },
+  fogFar: { type: UNIFORM_TYPE_FLOAT, value: OPTIONS.fogFar },
+  fogDensity: { type: UNIFORM_TYPE_FLOAT, value: OPTIONS.fogDensity },
 }
 
 document.body.appendChild(canvas)
@@ -272,7 +279,11 @@ function updateFrame(ts) {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
   if (gltfMesh) {
-    gltfMesh.use().setUniform('time', 'float', ts).setCamera(camera).draw()
+    gltfMesh
+      .use()
+      .setUniform('time', UNIFORM_TYPE_FLOAT, ts)
+      .setCamera(camera)
+      .draw()
   }
 
   gl.scissor(
@@ -284,7 +295,11 @@ function updateFrame(ts) {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
   if (gltfMesh2) {
-    gltfMesh2.use().setUniform('time', 'float', ts).setCamera(camera).draw()
+    gltfMesh2
+      .use()
+      .setUniform('time', UNIFORM_TYPE_FLOAT, ts)
+      .setCamera(camera)
+      .draw()
   }
 
   stats.end()

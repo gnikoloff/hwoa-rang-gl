@@ -1,7 +1,12 @@
 import Stats from 'stats-js'
 import throttle from 'lodash.throttle'
 
-import { PerspectiveCamera, Mesh, Geometry } from '../../../../dist/esm'
+import {
+  PerspectiveCamera,
+  Mesh,
+  Geometry,
+  UNIFORM_TYPE_FLOAT,
+} from '../../../../dist/esm'
 
 const PARTICLE_COUNT = 500
 
@@ -98,8 +103,8 @@ function updateFrame(ts) {
 
   mesh
     .setCamera(camera)
-    .setUniform('time', 'float', ts)
-    .setUniform('spacing', 'float', spacing)
+    .setUniform('time', UNIFORM_TYPE_FLOAT, ts)
+    .setUniform('spacing', UNIFORM_TYPE_FLOAT, spacing)
     .draw()
 
   stats.end()

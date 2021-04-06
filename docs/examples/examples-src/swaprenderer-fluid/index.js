@@ -10,6 +10,9 @@ import {
   PerspectiveCamera,
   GeometryUtils,
   Framebuffer,
+  UNIFORM_TYPE_FLOAT,
+  UNIFORM_TYPE_INT,
+  UNIFORM_TYPE_VEC2,
 } from '../../../../dist/esm'
 
 import { vec3, mat4 } from 'gl-matrix'
@@ -341,7 +344,7 @@ gui
   .onChange((val) => {
     swapRenderer
       .useProgram(PROGRAM_ADVECT)
-      .setUniform('scale', 'float', config.scale)
+      .setUniform('scale', UNIFORM_TYPE_FLOAT, config.scale)
   })
 gui.add(config, 'programMode', [
   PROGRAM_ADVECT,
@@ -374,7 +377,6 @@ camera.lookAt([0, 0, 0])
   drawMesh = new InstancedMesh(gl, {
     geometry,
     instanceCount: 50,
-    uniforms: {},
     vertexShaderSource: `
       attribute vec4 position;
       attribute vec2 uv;
@@ -522,21 +524,21 @@ function updateFluid() {
     .run([VELOCITY0], CURL)
 
     .useProgram(PROGRAM_VORTICITY)
-    .setUniform('dt', 'float', 1 / 60)
-    .setUniform('curl', 'float', config.curl)
+    .setUniform('dt', UNIFORM_TYPE_FLOAT, 1 / 60)
+    .setUniform('curl', UNIFORM_TYPE_FLOAT, config.curl)
     .run([VELOCITY0, CURL], VELOCITY1)
     .swap(VELOCITY0, VELOCITY1)
 
     .useProgram(PROGRAM_INTERACTION_FORCE)
-    .setUniform('cursor', 'vec2', mouse)
-    .setUniform('velocity', 'vec2', mouseVelocity)
+    .setUniform('cursor', UNIFORM_TYPE_VEC2, mouse)
+    .setUniform('velocity', UNIFORM_TYPE_VEC2, mouseVelocity)
     .run([VELOCITY0], VELOCITY1)
 
     .useProgram(PROGRAM_DIVERGENCE)
     .run([VELOCITY1], VELOCITY_DIVERGENCE)
 
     .useProgram(PROGRAM_CLEAR)
-    .setUniform('value', 'float', config.pressure)
+    .setUniform('value', UNIFORM_TYPE_FLOAT, config.pressure)
     .run([PRESSURE0], PRESSURE1)
 
     .swap(PRESSURE0, PRESSURE1)
@@ -584,55 +586,55 @@ function resize() {
     .setSize(bgWidth, bgHeight)
 
     .useProgram(PROGRAM_ADVECT)
-    .setUniform('source', 'int', 0)
-    .setUniform('velocity', 'int', 1)
-    .setUniform('dt', 'float', 1 / 60)
-    .setUniform('scale', 'float', config.scale)
-    .setUniform('px1', 'vec2', px1)
-    .setUniform('px', 'vec2', px)
+    .setUniform('source', UNIFORM_TYPE_INT, 0)
+    .setUniform('velocity', UNIFORM_TYPE_INT, 1)
+    .setUniform('dt', UNIFORM_TYPE_FLOAT, 1 / 60)
+    .setUniform('scale', UNIFORM_TYPE_FLOAT, config.scale)
+    .setUniform('px1', UNIFORM_TYPE_VEC2, px1)
+    .setUniform('px', UNIFORM_TYPE_VEC2, px)
 
     .useProgram(PROGRAM_INTERACTION_FORCE)
-    .setUniform('px', 'vec2', px)
-    .setUniform('cursor', 'vec2', mouse)
-    .setUniform('uBase', 'int', 0)
-    .setUniform('velocity', 'vec2', mouseVelocity)
+    .setUniform('px', UNIFORM_TYPE_VEC2, px)
+    .setUniform('cursor', UNIFORM_TYPE_VEC2, mouse)
+    .setUniform('uBase', UNIFORM_TYPE_INT, 0)
+    .setUniform('velocity', UNIFORM_TYPE_VEC2, mouseVelocity)
 
     .useProgram(PROGRAM_DIVERGENCE)
-    .setUniform('velocity', 'int', 0)
-    .setUniform('px', 'vec2', px)
+    .setUniform('velocity', UNIFORM_TYPE_INT, 0)
+    .setUniform('px', UNIFORM_TYPE_VEC2, px)
 
     .useProgram(PROGRAM_CLEAR)
-    .setUniform('pressure', 'int', 0)
-    .setUniform('value', 'float', config.pressure)
-    .setUniform('px', 'vec2', px)
+    .setUniform('pressure', UNIFORM_TYPE_INT, 0)
+    .setUniform('value', UNIFORM_TYPE_FLOAT, config.pressure)
+    .setUniform('px', UNIFORM_TYPE_VEC2, px)
 
     .useProgram(PROGRAM_CURL)
-    .setUniform('velocity', 'int', 0)
-    .setUniform('px', 'vec2', px)
+    .setUniform('velocity', UNIFORM_TYPE_INT, 0)
+    .setUniform('px', UNIFORM_TYPE_VEC2, px)
 
     .useProgram(PROGRAM_VORTICITY)
-    .setUniform('velocity', 'int', 0)
-    .setUniform('uCurl', 'int', 1)
-    .setUniform('px', 'vec2', px)
+    .setUniform('velocity', UNIFORM_TYPE_INT, 0)
+    .setUniform('uCurl', UNIFORM_TYPE_INT, 1)
+    .setUniform('px', UNIFORM_TYPE_VEC2, px)
 
     .useProgram(PROGRAM_JACOBI)
-    .setUniform('pressure', 'int', 0)
-    .setUniform('divergence', 'int', 1)
-    .setUniform('px', 'vec2', px)
-    .setUniform('alpha', 'float', -1)
-    .setUniform('beta', 'float', 0.25)
+    .setUniform('pressure', UNIFORM_TYPE_INT, 0)
+    .setUniform('divergence', UNIFORM_TYPE_INT, 1)
+    .setUniform('px', UNIFORM_TYPE_VEC2, px)
+    .setUniform('alpha', UNIFORM_TYPE_FLOAT, -1)
+    .setUniform('beta', UNIFORM_TYPE_FLOAT, 0.25)
 
     .useProgram(PROGRAM_SUBTRACT_PRESSURE_GRADIENT)
-    .setUniform('pressure', 'int', 0)
-    .setUniform('velocity', 'int', 1)
-    .setUniform('px', 'vec2', px)
-    .setUniform('scale', 'float', 1)
+    .setUniform('pressure', UNIFORM_TYPE_INT, 0)
+    .setUniform('velocity', UNIFORM_TYPE_INT, 1)
+    .setUniform('px', UNIFORM_TYPE_VEC2, px)
+    .setUniform('scale', UNIFORM_TYPE_FLOAT, 1)
 
     .useProgram(PROGRAM_VISUALISE)
-    .setUniform('pressure', 'int', 0)
-    .setUniform('velocity', 'int', 1)
-    .setUniform('sceneTexture', 'int', 2)
-    .setUniform('px', 'vec2', px)
+    .setUniform('pressure', UNIFORM_TYPE_INT, 0)
+    .setUniform('velocity', UNIFORM_TYPE_INT, 1)
+    .setUniform('sceneTexture', UNIFORM_TYPE_INT, 2)
+    .setUniform('px', UNIFORM_TYPE_VEC2, px)
 
     .createTexture(VELOCITY0, bgWidth, bgHeight, null, swapRenderFiltering)
     .createFramebuffer(VELOCITY0, bgWidth, bgHeight)

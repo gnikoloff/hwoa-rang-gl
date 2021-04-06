@@ -10,6 +10,9 @@ import {
   GeometryUtils,
   Mesh,
   Texture,
+  UNIFORM_TYPE_INT,
+  UNIFORM_TYPE_MATRIX4X4,
+  UNIFORM_TYPE_VEC4,
 } from '../../../../dist/esm'
 
 const UP_VECTOR = [0, 1, 0]
@@ -204,8 +207,12 @@ const updateTexMatrix = ({
   mat4.mul(textureMatrix, textureMatrix, textureProjectionMatrix)
   mat4.mul(textureMatrix, textureMatrix, textureWorldMatrixInv)
 
-  sphereMesh.use().setUniform('textureMatrix', 'mat4', textureMatrix)
-  planeMesh.use().setUniform('textureMatrix', 'mat4', textureMatrix)
+  sphereMesh
+    .use()
+    .setUniform('textureMatrix', UNIFORM_TYPE_MATRIX4X4, textureMatrix)
+  planeMesh
+    .use()
+    .setUniform('textureMatrix', UNIFORM_TYPE_MATRIX4X4, textureMatrix)
 
   const textureProjectionMatrixInv = mat4.create()
   mat4.invert(textureProjectionMatrixInv, textureProjectionMatrix)
@@ -215,7 +222,7 @@ const updateTexMatrix = ({
   cubeMesh
     .use()
     .setCamera(camera)
-    .setUniform('modelMatrix', 'mat4', cubeWorldMatrix)
+    .setUniform('modelMatrix', UNIFORM_TYPE_MATRIX4X4, cubeWorldMatrix)
 }
 
 gui
@@ -301,9 +308,9 @@ checkeredTexture
   .fromData(new Uint8Array(CHECKERBOARD_TEXTURE_DATA), 8, 8)
 
 const sharedUniforms = {
-  texture: { type: 'int', value: 0 },
-  projectedTexture: { type: 'int', value: 1 },
-  textureMatrix: { type: 'mat4', value: textureWorldMatrix },
+  texture: { type: UNIFORM_TYPE_INT, value: 0 },
+  projectedTexture: { type: UNIFORM_TYPE_INT, value: 1 },
+  textureMatrix: { type: UNIFORM_TYPE_MATRIX4X4, value: textureWorldMatrix },
 }
 
 /* ---- Sphere mesh ---- */
@@ -330,7 +337,7 @@ const sharedUniforms = {
     geometry,
     uniforms: {
       ...sharedUniforms,
-      colorMult: { type: 'vec4', value: [1, 0, 0, 1] },
+      colorMult: { type: UNIFORM_TYPE_VEC4, value: [1, 0, 0, 1] },
     },
     vertexShaderSource: CHECKERED_VERTEX_SHADER,
     fragmentShaderSource: CHECKERED_FRAGMENT_SHADER,
@@ -353,7 +360,7 @@ const sharedUniforms = {
     geometry,
     uniforms: {
       ...sharedUniforms,
-      colorMult: { type: 'vec4', value: [0, 0, 1, 1] },
+      colorMult: { type: UNIFORM_TYPE_VEC4, value: [0, 0, 1, 1] },
     },
     vertexShaderSource: CHECKERED_VERTEX_SHADER,
     fragmentShaderSource: CHECKERED_FRAGMENT_SHADER,
@@ -372,7 +379,7 @@ const sharedUniforms = {
   cubeMesh = new Mesh(gl, {
     geometry,
     uniforms: {
-      color: { type: 'vec4', value: [0, 0, 0, 0.8] },
+      color: { type: UNIFORM_TYPE_VEC4, value: [0, 0, 0, 0.8] },
     },
     vertexShaderSource: CUBE_VERTEX_SHADER,
     fragmentShaderSource: CUBE_FRAGMENT_SHADER,

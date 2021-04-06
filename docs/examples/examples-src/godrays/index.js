@@ -11,6 +11,9 @@ import {
   InstancedMesh,
   Framebuffer,
   OrthographicCamera,
+  UNIFORM_TYPE_FLOAT,
+  UNIFORM_TYPE_VEC2,
+  UNIFORM_TYPE_INT,
 } from '../../../../dist/esm'
 
 const BOXES_VERTEX_SHADER = `
@@ -216,11 +219,11 @@ let renderTargetBlurY = new Framebuffer(gl, {
   planeMesh = new Mesh(gl, {
     geometry,
     uniforms: {
-      diffuse: { type: 'int', value: 0 },
-      mask: { type: 'int', value: 1 },
-      blurDirection: { type: 'vec2', value: [0, 1] },
-      factor: { type: 'float', value: OPTS.factor },
-      resolution: { type: 'vec2', value: [innerWidth, innerHeight] },
+      diffuse: { type: UNIFORM_TYPE_INT, value: 0 },
+      mask: { type: UNIFORM_TYPE_INT, value: 1 },
+      blurDirection: { type: UNIFORM_TYPE_VEC2, value: [0, 1] },
+      factor: { type: UNIFORM_TYPE_FLOAT, value: OPTS.factor },
+      resolution: { type: UNIFORM_TYPE_VEC2, value: [innerWidth, innerHeight] },
     },
     vertexShaderSource: VERTEX_SHADER_BLUR,
     fragmentShaderSource: FRAGMENT_SHADER_BLUR,
@@ -250,7 +253,7 @@ for (let i = 0; i < BOXES_COUNT; i++) {
 }
 
 gui.add(OPTS, 'debugMode').onChange((val) => {
-  boxesMesh.use().setUniform('debugMode', 'float', val)
+  boxesMesh.use().setUniform('debugMode', UNIFORM_TYPE_FLOAT, val)
 })
 gui
   .add(OPTS, 'factor')
@@ -258,7 +261,7 @@ gui
   .max(1.15)
   .step(0.01)
   .onChange((val) => {
-    planeMesh.use().setUniform('factor', 'float', val)
+    planeMesh.use().setUniform('factor', UNIFORM_TYPE_FLOAT, val)
   })
 gui.add(OPTS, 'spread').min(1).max(5).step(0.5)
 
@@ -317,7 +320,7 @@ function updateFrame(ts) {
         .setCamera(orthoCamera)
         .setUniform(
           'blurDirection',
-          'vec2',
+          UNIFORM_TYPE_VEC2,
           i % 2 === 0 ? [radius, 0] : [0, radius],
         )
         .draw()
@@ -373,7 +376,10 @@ function resize() {
   //   width: innerWidth / SCALE_DOWN_POSTFX,
   //   height: innerHeight / SCALE_DOWN_POSTFX,
   // })
-  planeMesh.setUniform('resolution', 'vec2', [innerWidth, innerHeight])
+  planeMesh.setUniform('resolution', UNIFORM_TYPE_VEC2, [
+    innerWidth,
+    innerHeight,
+  ])
 
   sizeCanvas()
 }

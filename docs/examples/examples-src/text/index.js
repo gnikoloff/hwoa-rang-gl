@@ -9,6 +9,7 @@ import {
   GeometryUtils,
   Mesh,
   Texture,
+  UNIFORM_TYPE_INT,
 } from '../../../../dist/esm'
 
 const stats = new Stats()
@@ -121,7 +122,7 @@ geometry
 const mesh = new Mesh(gl, {
   geometry,
   uniforms: {
-    diffuse: { type: 'int', value: 0 },
+    diffuse: { type: UNIFORM_TYPE_INT, value: 0 },
   },
   vertexShaderSource: `
     attribute vec4 position;

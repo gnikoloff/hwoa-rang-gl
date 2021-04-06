@@ -10,7 +10,92 @@ import {
   GeometryUtils,
   Mesh,
   InstancedMesh,
+  UNIFORM_TYPE_FLOAT,
+  UNIFORM_TYPE_VEC3,
 } from '../../../../dist/esm'
+
+const VERTEX_SHADER_SPHERES = `
+  struct PointLightInfo {
+    float shininess;
+    vec3 lightColor;
+    vec3 specularColor;
+    float specularFactor;
+    vec3 worldPosition;
+  };
+
+  uniform PointLightInfo PointLight;
+
+  uniform vec3 eyePosition;
+
+  attribute vec4 position;
+  attribute vec3 normal;
+  attribute mat4 instanceModelMatrix;
+
+  varying vec3 v_normal;
+
+  varying vec3 v_surfaceToLight;
+  varying vec3 v_surfaceToView;
+
+  void main () {
+    gl_Position = projectionMatrix * viewMatrix * modelMatrix * instanceModelMatrix * position;
+    v_normal = mat3(modelMatrix * instanceModelMatrix) * normal;
+
+    vec3 surfaceWorldPosition = (modelMatrix * instanceModelMatrix * position).xyz;
+    v_surfaceToLight = PointLight.worldPosition - surfaceWorldPosition;
+    v_surfaceToView = eyePosition - surfaceWorldPosition;
+  }
+`
+
+const FRAGMENT_SHADER_SPHERES = `
+  struct PointLightInfo {
+    float shininess;
+    vec3 lightColor;
+    vec3 specularColor;
+    float specularFactor;
+    vec3 worldPosition;
+  };
+
+  uniform PointLightInfo PointLight;
+
+  uniform vec3 lightDirection;
+
+  varying vec3 v_normal;
+  varying vec3 v_surfaceToLight;
+  varying vec3 v_surfaceToView;
+
+  void main () {
+    vec3 normal = normalize(v_normal);
+    vec3 surfaceToLightDirection = normalize(v_surfaceToLight);
+    vec3 surfaceToViewDirection = normalize(v_surfaceToView);
+
+    vec3 halfVector = normalize(surfaceToLightDirection + surfaceToViewDirection);
+    float pointLight = dot(normal, surfaceToLightDirection);
+    float directionalLight = dot(normal, lightDirection);
+    float specular = 0.0;
+
+    if (pointLight > 0.0) {
+      specular = pow(dot(normal, halfVector), PointLight.shininess);
+    }
+    
+    gl_FragColor = vec4(1.0);
+    gl_FragColor.rgb *= pointLight * PointLight.lightColor + directionalLight * 0.05;
+    gl_FragColor.rgb += specular * PointLight.specularColor * PointLight.specularFactor;
+  }
+`
+
+const VERTEX_SHADER_LIGHT_HELPER = `
+  attribute vec4 position;
+
+  void main () {
+    gl_Position = projectionMatrix * viewMatrix * modelMatrix * position;
+  }
+`
+
+const FRAGMENT_SHADER_LIGHT_HELPER = `
+  void main () {
+    gl_FragColor = vec4(1.0);
+  }
+`
 
 const BALLS_COUNT_SIZE = 8
 const NUM_BALLS = BALLS_COUNT_SIZE * BALLS_COUNT_SIZE * BALLS_COUNT_SIZE
@@ -85,90 +170,31 @@ vec3.normalize(lightDirection, lightDirection)
     geometry,
     instanceCount: NUM_BALLS,
     uniforms: {
-      eyePosition: { type: 'vec3', value: camera.position },
-      lightDirection: { type: 'vec3', value: lightDirection },
-      'PointLight.worldPosition': { type: 'vec3', value: lightWorldPosition },
-      'PointLight.shininess': { type: 'float', value: OPTIONS.shininess },
+      eyePosition: { type: UNIFORM_TYPE_VEC3, value: camera.position },
+      lightDirection: { type: UNIFORM_TYPE_VEC3, value: lightDirection },
+      'PointLight.worldPosition': {
+        type: UNIFORM_TYPE_VEC3,
+        value: lightWorldPosition,
+      },
+      'PointLight.shininess': {
+        type: UNIFORM_TYPE_FLOAT,
+        value: OPTIONS.shininess,
+      },
       'PointLight.lightColor': {
-        type: 'vec3',
+        type: UNIFORM_TYPE_VEC3,
         value: normalizeColor(OPTIONS.lightColor),
       },
       'PointLight.specularColor': {
-        type: 'vec3',
+        type: UNIFORM_TYPE_VEC3,
         value: normalizeColor(OPTIONS.specularColor),
       },
       'PointLight.specularFactor': {
-        type: 'float',
+        type: UNIFORM_TYPE_FLOAT,
         value: OPTIONS.specularFactor,
       },
     },
-    vertexShaderSource: `
-        struct PointLightInfo {
-          float shininess;
-          vec3 lightColor;
-          vec3 specularColor;
-          float specularFactor;
-          vec3 worldPosition;
-        };
-
-        uniform PointLightInfo PointLight;
-
-        uniform vec3 eyePosition;
-
-        attribute vec4 position;
-        attribute vec3 normal;
-        attribute mat4 instanceModelMatrix;
-
-        varying vec3 v_normal;
-
-        varying vec3 v_surfaceToLight;
-        varying vec3 v_surfaceToView;
-
-        void main () {
-          gl_Position = projectionMatrix * viewMatrix * modelMatrix * instanceModelMatrix * position;
-          v_normal = mat3(modelMatrix * instanceModelMatrix) * normal;
-
-          vec3 surfaceWorldPosition = (modelMatrix * instanceModelMatrix * position).xyz;
-          v_surfaceToLight = PointLight.worldPosition - surfaceWorldPosition;
-          v_surfaceToView = eyePosition - surfaceWorldPosition;
-        }
-      `,
-    fragmentShaderSource: `
-        struct PointLightInfo {
-          float shininess;
-          vec3 lightColor;
-          vec3 specularColor;
-          float specularFactor;
-          vec3 worldPosition;
-        };
-
-        uniform PointLightInfo PointLight;
-
-        uniform vec3 lightDirection;
-
-        varying vec3 v_normal;
-        varying vec3 v_surfaceToLight;
-        varying vec3 v_surfaceToView;
-
-        void main () {
-          vec3 normal = normalize(v_normal);
-          vec3 surfaceToLightDirection = normalize(v_surfaceToLight);
-          vec3 surfaceToViewDirection = normalize(v_surfaceToView);
-
-          vec3 halfVector = normalize(surfaceToLightDirection + surfaceToViewDirection);
-          float pointLight = dot(normal, surfaceToLightDirection);
-          float directionalLight = dot(normal, lightDirection);
-          float specular = 0.0;
-
-          if (pointLight > 0.0) {
-            specular = pow(dot(normal, halfVector), PointLight.shininess);
-          }
-          
-          gl_FragColor = vec4(1.0);
-          gl_FragColor.rgb *= pointLight * PointLight.lightColor + directionalLight * 0.05;
-          gl_FragColor.rgb += specular * PointLight.specularColor * PointLight.specularFactor;
-        }
-      `,
+    vertexShaderSource: VERTEX_SHADER_SPHERES,
+    fragmentShaderSource: FRAGMENT_SHADER_SPHERES,
   })
 
   let idx = 0
@@ -200,18 +226,8 @@ vec3.normalize(lightDirection, lightDirection)
   })
   lightMesh = new Mesh(gl, {
     geometry,
-    vertexShaderSource: `
-      attribute vec4 position;
-
-      void main () {
-        gl_Position = projectionMatrix * viewMatrix * modelMatrix * position;
-      }
-    `,
-    fragmentShaderSource: `
-      void main () {
-        gl_FragColor = vec4(1.0);
-      }
-    `,
+    vertexShaderSource: VERTEX_SHADER_LIGHT_HELPER,
+    fragmentShaderSource: FRAGMENT_SHADER_LIGHT_HELPER,
   })
 }
 
@@ -221,7 +237,7 @@ gui
   .max(256)
   .step(1)
   .onChange((val) => {
-    sphereMesh.setUniform('PointLight.shininess', 'float', val)
+    sphereMesh.setUniform('PointLight.shininess', UNIFORM_TYPE_FLOAT, val)
   })
 gui
   .add(OPTIONS, 'specularFactor')
@@ -229,19 +245,19 @@ gui
   .max(1)
   .step(0.05)
   .onChange((val) => {
-    sphereMesh.setUniform('PointLight.specularFactor', 'float', val)
+    sphereMesh.setUniform('PointLight.specularFactor', UNIFORM_TYPE_FLOAT, val)
   })
 gui.addColor(OPTIONS, 'lightColor').onChange((newColor) => {
   sphereMesh.setUniform(
     'PointLight.lightColor',
-    'vec3',
+    UNIFORM_TYPE_VEC3,
     normalizeColor(newColor),
   )
 })
 gui.addColor(OPTIONS, 'specularColor').onChange((newColor) => {
   sphereMesh.setUniform(
     'PointLight.specularColor',
-    'vec3',
+    UNIFORM_TYPE_VEC3,
     normalizeColor(newColor),
   )
 })
@@ -280,8 +296,12 @@ function updateFrame(ts) {
 
   sphereMesh
     .use()
-    .setUniform('PointLight.worldPosition', 'vec3', lightWorldPosition)
-    .setUniform('eyePosition', 'vec3', camera.position)
+    .setUniform(
+      'PointLight.worldPosition',
+      UNIFORM_TYPE_VEC3,
+      lightWorldPosition,
+    )
+    .setUniform('eyePosition', UNIFORM_TYPE_VEC3, camera.position)
     .setCamera(camera)
     .draw()
 

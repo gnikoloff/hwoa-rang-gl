@@ -11,6 +11,9 @@ import {
   OrthographicCamera,
   Texture,
   Framebuffer,
+  UNIFORM_TYPE_INT,
+  UNIFORM_TYPE_FLOAT,
+  UNIFORM_TYPE_VEC2,
 } from '../../../../dist/esm'
 
 const VERTEX_SHADER_BASE = `
@@ -150,7 +153,7 @@ const swapRenderer = new SwapRenderer(gl)
   imageMesh = new Mesh(gl, {
     geometry,
     uniforms: {
-      texture: { type: 'int', value: 0 },
+      texture: { type: UNIFORM_TYPE_INT, value: 0 },
     },
     vertexShaderSource: VERTEX_SHADER_BASE,
     fragmentShaderSource: FRAGMENT_SHADER_IMAGE,
@@ -168,7 +171,7 @@ const swapRenderer = new SwapRenderer(gl)
   fullscreenQuadMesh = new Mesh(gl, {
     geometry,
     uniforms: {
-      texture: { type: 'int', value: 0 },
+      texture: { type: UNIFORM_TYPE_INT, value: 0 },
     },
     vertexShaderSource: VERTEX_SHADER_BASE,
     fragmentShaderSource: FRAGMENT_SHADER_POST_FX,
@@ -260,10 +263,10 @@ image.onload = () => {
 
     .createProgram('advect', VERTEX_SHADER_BASE, FRAGMENT_SHADER_ADVECT)
     .useProgram('advect')
-    .setUniform('velocity', 'int', 0)
-    .setUniform('dt', 'float', 0)
-    .setUniform('uWindow', 'vec2', [innerWidth, innerHeight])
-    .setUniform('rdx', 'float', 1)
+    .setUniform('velocity', UNIFORM_TYPE_INT, 0)
+    .setUniform('dt', UNIFORM_TYPE_FLOAT, 0)
+    .setUniform('uWindow', UNIFORM_TYPE_VEC2, [innerWidth, innerHeight])
+    .setUniform('rdx', UNIFORM_TYPE_FLOAT, 1)
 }
 // image.src = '/assets/textures/zhang-kaiyv-44yxPSPmtjg-unsplash.png'
 // image.src = '/assets/textures/zhang-kaiyv-mh2o8DuHaMM-unsplash.png'
@@ -338,7 +341,7 @@ function updateFrame(ts) {
     swapRenderer
       .setSize(innerWidth, innerHeight)
       .useProgram('advect')
-      .setUniform('dt', 'float', dt)
+      .setUniform('dt', UNIFORM_TYPE_FLOAT, dt)
       .run(['advect1'], 'advect2')
 
     gl.clearColor(1, 1, 1, 1)
@@ -367,7 +370,7 @@ function resize() {
 
   swapRenderer
     .useProgram('advect')
-    .setUniform('uWindow', 'vec2', [innerWidth, innerHeight])
+    .setUniform('uWindow', UNIFORM_TYPE_VEC2, [innerWidth, innerHeight])
 
   sizeCanvas()
 }
