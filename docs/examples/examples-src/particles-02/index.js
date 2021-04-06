@@ -6,8 +6,8 @@ import {
   CameraController,
   Mesh,
   Geometry,
+  UNIFORM_TYPE_FLOAT,
 } from '../../../../dist/esm'
-import { UNIFORM_TYPE_FLOAT } from '../../../../dist/esm/utils/gl-constants'
 
 const OPTIONS = {
   tweenFactor: 1,
