@@ -1,6 +1,7 @@
 import Stats from 'stats-js'
 import * as dat from 'dat.gui'
 import { vec3, mat4 } from 'gl-matrix'
+import throttle from 'lodash.throttle'
 
 import {
   PerspectiveCamera,
@@ -628,8 +629,8 @@ lightDirection = [-spotLightMat[8], -spotLightMat[9], -spotLightMat[10]]
 
 document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)
-resize()
-window.addEventListener('resize', resize)
+sizeCanvas()
+window.addEventListener('resize', throttle(resize, 100))
 
 function updateFrame(ts) {
   ts /= 1000
@@ -677,6 +678,13 @@ function updateFrame(ts) {
 }
 
 function resize() {
+  camera.aspect = innerWidth / innerHeight
+  camera.updateProjectionMatrix()
+
+  sizeCanvas()
+}
+
+function sizeCanvas() {
   canvas.width = innerWidth * dpr
   canvas.height = innerHeight * dpr
   canvas.style.setProperty('width', `${innerWidth}px`)

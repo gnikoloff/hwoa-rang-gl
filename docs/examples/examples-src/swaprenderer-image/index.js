@@ -1,5 +1,5 @@
 import Stats from 'stats-js'
-import { mat4 } from 'gl-matrix'
+import throttle from 'lodash.throttle'
 
 import {
   Geometry,
@@ -15,14 +15,14 @@ import {
 
 const VERTEX_SHADER_BASE = `
   attribute vec4 position;
-    attribute vec2 uv;
+  attribute vec2 uv;
 
-    varying vec2 v_uv;
+  varying vec2 v_uv;
 
-    void main () {
-      gl_Position = position;
-      v_uv = uv;
-    }
+  void main () {
+    gl_Position = projectionMatrix * viewMatrix * modelMatrix * position;
+    v_uv = uv;
+  }
 `
 
 const FRAGMENT_SHADER_IMAGE = `
@@ -80,6 +80,16 @@ const FRAGMENT_SHADER_ADVECT = `
   }
 `
 
+const FRAGMENT_SHADER_POST_FX = `
+  uniform sampler2D texture;
+
+  varying vec2 v_uv;
+
+  void main () {
+    gl_FragColor = texture2D(texture, v_uv);
+  }
+`
+
 const stats = new Stats()
 document.body.appendChild(stats.domElement)
 
@@ -110,14 +120,20 @@ const camera = new PerspectiveCamera(
 camera.position = [0, 0, 18]
 camera.lookAt([0, 0, 0])
 
-const orthoCamera = new OrthographicCamera({
-  left: -innerWidth / 2,
-  right: innerWidth / 2,
-  top: innerHeight / 2,
-  bottom: -innerHeight / 2,
-})
-orthoCamera.position = [0, 0, 500]
+const orthoCamera = new OrthographicCamera(
+  -innerWidth / 2,
+  innerWidth / 2,
+  innerHeight / 2,
+  -innerHeight / 2,
+  0.1,
+  2,
+)
+orthoCamera.position = [0, 0, 1]
 orthoCamera.lookAt([0, 0, 0])
+
+const orthoCamera2 = new OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0.1, 2)
+orthoCamera2.position = [0, 0, 1]
+orthoCamera2.lookAt([0, 0, 0])
 
 const swapRenderer = new SwapRenderer(gl)
 
@@ -136,48 +152,32 @@ const swapRenderer = new SwapRenderer(gl)
     uniforms: {
       texture: { type: 'int', value: 0 },
     },
-    vertexShaderSource: `
-      attribute vec4 position;
-      attribute vec2 uv;
-
-      varying vec2 v_uv;
-
-      void main () {
-        gl_Position = projectionMatrix * viewMatrix * modelMatrix * position;
-        v_uv = uv;
-      }
-    `,
+    vertexShaderSource: VERTEX_SHADER_BASE,
     fragmentShaderSource: FRAGMENT_SHADER_IMAGE,
   })
 }
 
 {
-  const { vertices, uv } = GeometryUtils.createFullscreenQuad()
+  const { indices, vertices, uv } = GeometryUtils.createPlane()
   const geometry = new Geometry(gl)
   geometry
-    .addAttribute('position', { typedArray: vertices, size: 2 })
+    .addIndex({ typedArray: indices })
+    .addAttribute('position', { typedArray: vertices, size: 3 })
     .addAttribute('uv', { typedArray: uv, size: 2 })
+
   fullscreenQuadMesh = new Mesh(gl, {
     geometry,
     uniforms: {
       texture: { type: 'int', value: 0 },
     },
     vertexShaderSource: VERTEX_SHADER_BASE,
-    fragmentShaderSource: `
-      uniform sampler2D texture;
-
-      varying vec2 v_uv;
-
-      void main () {
-        gl_FragColor = texture2D(texture, v_uv);
-      }
-    `,
+    fragmentShaderSource: FRAGMENT_SHADER_POST_FX,
   })
 }
 
 const imageTexture = new Texture(gl, {
-  minFilter: gl.NEAREST,
-  magFilter: gl.NEAREST,
+  minFilter: gl.LINEAR,
+  magFilter: gl.LINEAR,
 })
 
 imageTexture.bind().fromSize(1, 1).setIsFlip()
@@ -214,6 +214,8 @@ image.onload = () => {
   velocityTexture = new Texture(gl, {
     type: gl.FLOAT,
     format: gl.RGBA,
+    minFilter: gl.NEAREST,
+    magFilter: gl.NEAREST,
   })
   const velocityData = new Float32Array(scaledSize * 4)
   for (let i = 0; i < scaledSize * 4; i++) {
@@ -232,7 +234,7 @@ image.onload = () => {
   gl.clearColor(0, 0, 0, 1)
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
   velocityTexture.bind()
-  fullscreenQuadMesh.use().draw()
+  fullscreenQuadMesh.use().setCamera(orthoCamera2).draw()
   imageTexture.bind()
   imageMesh.use().setCamera(orthoCamera).draw()
   framebufferSource.unbind()
@@ -242,10 +244,12 @@ image.onload = () => {
   gl.clearColor(0, 0, 0, 1)
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
   velocityTexture.bind()
-  fullscreenQuadMesh.use().draw()
+  fullscreenQuadMesh.use().setCamera(orthoCamera2).draw()
   imageTexture.bind()
   imageMesh.use().setCamera(orthoCamera).draw()
   framebufferTarget.unbind()
+
+  // const ext = getExtension('GMAN_debug_helper')
 
   swapRenderer
     .addTexture('advect1', framebufferSource.texture)
@@ -257,8 +261,6 @@ image.onload = () => {
     .createProgram('advect', VERTEX_SHADER_BASE, FRAGMENT_SHADER_ADVECT)
     .useProgram('advect')
     .setUniform('velocity', 'int', 0)
-    // .setUniform('invresolution', 'vec2', [1 / innerWidth, 1 / innerHeight])
-    // .setUniform('aspectRatio', 'float', innerWidth / innerHeight)
     .setUniform('dt', 'float', 0)
     .setUniform('uWindow', 'vec2', [innerWidth, innerHeight])
     .setUniform('rdx', 'float', 1)
@@ -273,8 +275,8 @@ image.src = '/assets/textures/zhang-kaiyv-MheaLsLj1to-unsplash.jpeg'
 checkExtensionsSupport()
 document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)
-resize()
-window.addEventListener('resize', resize)
+sizeCanvas()
+window.addEventListener('resize', throttle(resize, 100))
 
 document.body.addEventListener('click', () => {
   gl.disable(gl.BLEND)
@@ -286,6 +288,8 @@ document.body.addEventListener('click', () => {
   velocityTexture = new Texture(gl, {
     type: gl.FLOAT,
     format: gl.RGBA,
+    minFilter: gl.NEAREST,
+    magFilter: gl.NEAREST,
   })
   const velocityData = new Float32Array(scaledSize * 4)
   for (let i = 0; i < scaledSize * 4; i++) {
@@ -304,7 +308,7 @@ document.body.addEventListener('click', () => {
   gl.clearColor(0, 0, 0, 1)
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
   velocityTexture.bind()
-  fullscreenQuadMesh.use().draw()
+  fullscreenQuadMesh.use().setCamera(orthoCamera2).draw()
   imageTexture.bind()
   imageMesh.use().setCamera(orthoCamera).draw()
   framebufferSource.unbind()
@@ -314,7 +318,7 @@ document.body.addEventListener('click', () => {
   gl.clearColor(1, 0, 0, 1)
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
   velocityTexture.bind()
-  fullscreenQuadMesh.use().draw()
+  fullscreenQuadMesh.use().setCamera(orthoCamera2).draw()
   imageTexture.bind()
   imageMesh.use().setCamera(orthoCamera).draw()
   framebufferTarget.unbind()
@@ -347,7 +351,7 @@ function updateFrame(ts) {
 
     gl.activeTexture(gl.TEXTURE0)
     tex.bind()
-    fullscreenQuadMesh.use().draw()
+    fullscreenQuadMesh.use().setCamera(orthoCamera2).draw()
 
     swapRenderer.swap('advect1', 'advect2')
   }
@@ -358,6 +362,17 @@ function updateFrame(ts) {
 }
 
 function resize() {
+  framebufferSource.updateWithSize(innerWidth, innerHeight)
+  framebufferTarget.updateWithSize(innerWidth, innerHeight)
+
+  swapRenderer
+    .useProgram('advect')
+    .setUniform('uWindow', 'vec2', [innerWidth, innerHeight])
+
+  sizeCanvas()
+}
+
+function sizeCanvas() {
   canvas.width = innerWidth * dpr
   canvas.height = innerHeight * dpr
   canvas.style.setProperty('width', `${innerWidth}px`)

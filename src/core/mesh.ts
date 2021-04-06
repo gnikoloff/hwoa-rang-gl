@@ -3,6 +3,7 @@ import { vec3, mat4, ReadonlyVec3 } from 'gl-matrix'
 import { Program } from './program'
 import { Geometry } from './geometry'
 import { PerspectiveCamera } from '../camera/perspective-camera'
+import { OrthographicCamera } from '../camera/orthographic-camera'
 import { getExtension } from '../utils/gl-utils'
 
 import {
@@ -206,10 +207,10 @@ export class Mesh {
 
   /**
    * Assign camera projection matrix and view matrix to model uniforms
-   * @param {PerspectiveCamera} camera
+   * @param {PerspectiveCamera|OrthographicCamera} camera
    * @returns {this}
    */
-  setCamera(camera): this {
+  setCamera(camera: PerspectiveCamera | OrthographicCamera): this {
     this.program.setUniform(
       PROJECTION_MATRIX_UNIFORM_NAME,
       UNIFORM_TYPE_MATRIX4X4,

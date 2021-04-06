@@ -479,18 +479,6 @@ export function createBox(params: BoxInterface = {}) {
 }
 
 /**
- * Generates geometry data for a fullscreen quad in normalized coordinates
- * @param {SphereInterface} params
- * @returns {{ vertices, uv }}
- */
-export function createFullscreenQuad() {
-  return {
-    vertices: new Float32Array([1, 1, -1, 1, -1, -1, -1, -1, 1, -1, 1, 1]),
-    uv: new Float32Array([1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1]),
-  }
-}
-
-/**
  * Generates geometry data for a sphere
  * @param {SphereInterface} params
  * @returns {{ vertices, normal, uv, indices }}

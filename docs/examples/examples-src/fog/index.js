@@ -1,6 +1,7 @@
 import Stats from 'stats-js'
 import * as dat from 'dat.gui'
 import { vec3, mat4 } from 'gl-matrix'
+import throttle from 'lodash.throttle'
 
 import {
   PerspectiveCamera,
@@ -98,8 +99,6 @@ const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
 const transformMatrix = mat4.create()
 const translateVec3 = vec3.create()
 
-const gltfInfo = document.getElementById('gltf-info')
-
 let oldTime = 0
 let gJson
 let gBin
@@ -166,8 +165,8 @@ const sharedUniforms = {
 
 document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)
-resize()
-window.addEventListener('resize', resize)
+sizeCanvas()
+window.addEventListener('resize', throttle(resize, 100))
 
 function loadModel(xhr) {
   if (xhr.responseType === 'json') {
@@ -294,6 +293,13 @@ function updateFrame(ts) {
 }
 
 function resize() {
+  camera.aspect = innerWidth / innerHeight
+  camera.updateProjectionMatrix()
+
+  sizeCanvas()
+}
+
+function sizeCanvas() {
   canvas.width = innerWidth * dpr
   canvas.height = innerHeight * dpr
   canvas.style.setProperty('width', `${innerWidth}px`)

@@ -1,4 +1,6 @@
 import Stats from 'stats-js'
+import throttle from 'lodash.throttle'
+
 import { PerspectiveCamera, Mesh, Geometry } from '../../../../dist/esm'
 
 const PARTICLE_COUNT = 500
@@ -58,7 +60,7 @@ const mesh = new Mesh(gl, {
       );
 
       float dist = distance(cameraPosition, gl_Position);
-      gl_PointSize = dist * 0.175;
+      gl_PointSize = dist * 0.225;
     }
   `,
   fragmentShaderSource: `
@@ -73,15 +75,13 @@ const mesh = new Mesh(gl, {
 mesh.use()
 mesh.drawMode = gl.POINTS
 
-mesh.setCamera(camera)
-
 document.body.appendChild(canvas)
 setInterval(() => {
   spacingTarget = Math.random() * 0.85 + 0.15
 }, 5000)
 requestAnimationFrame(updateFrame)
-resize()
-window.addEventListener('resize', resize)
+sizeCanvas()
+window.addEventListener('resize', throttle(resize, 100))
 
 function updateFrame(ts) {
   ts /= 1000
@@ -97,6 +97,7 @@ function updateFrame(ts) {
   spacing += (spacingTarget - spacing) * (dt * 20)
 
   mesh
+    .setCamera(camera)
     .setUniform('time', 'float', ts)
     .setUniform('spacing', 'float', spacing)
     .draw()
@@ -107,6 +108,13 @@ function updateFrame(ts) {
 }
 
 function resize() {
+  camera.aspect = innerWidth / innerHeight
+  camera.updateProjectionMatrix()
+
+  sizeCanvas()
+}
+
+function sizeCanvas() {
   canvas.width = innerWidth * dpr
   canvas.height = innerHeight * dpr
   canvas.style.setProperty('width', `${innerWidth}px`)

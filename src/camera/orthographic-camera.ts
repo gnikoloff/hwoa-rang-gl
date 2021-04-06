@@ -18,14 +18,14 @@ export class OrthographicCamera {
   public projectionMatrix: mat4 = mat4.create()
   public viewMatrix: mat4 = mat4.create()
 
-  constructor({
-    left = -1,
-    right = 1,
-    top = 1,
-    bottom = -1,
-    near = 0.1,
-    far = 2000,
-  } = {}) {
+  constructor(
+    left: number,
+    right: number,
+    top: number,
+    bottom: number,
+    near: number,
+    far: number,
+  ) {
     this.left = left
     this.right = right
     this.top = top
@@ -57,13 +57,6 @@ export class OrthographicCamera {
       this.near,
       this.far,
     )
-    // mat4.perspective(
-    //   this.projectionMatrix,
-    //   this.fieldOfView,
-    //   this.aspect,
-    //   this.near,
-    //   this.far,
-    // )
     return this
   }
 

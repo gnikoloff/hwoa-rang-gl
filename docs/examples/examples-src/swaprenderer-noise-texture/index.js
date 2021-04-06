@@ -1,13 +1,7 @@
 import Stats from 'stats-js'
-import { mat4 } from 'gl-matrix'
+import throttle from 'lodash.throttle'
 
-import {
-  Geometry,
-  Mesh,
-  getExtension,
-  SwapRenderer,
-  GeometryUtils,
-} from '../../../../dist/esm'
+import { getExtension, SwapRenderer } from '../../../../dist/esm'
 
 const VERTEX_SHADER_BASE = `
   attribute vec4 position;
@@ -16,7 +10,7 @@ const VERTEX_SHADER_BASE = `
   varying vec2 v_uv;
 
   void main () {
-    gl_Position = position;
+    gl_Position = projectionMatrix * viewMatrix * modelMatrix * position;
 
     v_uv = uv;
   }
@@ -79,8 +73,11 @@ const FRAGMENT_SHADER_DISPLAY = `
   }
 `
 
-const BLUR_PROGRAM_1 = 'blur1'
-const BLUR_PROGRAM_2 = 'blur2'
+const BLUR1 = 'blur1'
+const BLUR2 = 'blur2'
+const VIS_PROGRAM = 'visualise'
+
+const BLUR_PROGRAM = 'blur'
 
 const stats = new Stats()
 document.body.appendChild(stats.domElement)
@@ -95,63 +92,31 @@ getExtension(gl, 'GMAN_debug_helper')
 const swapRenderer = new SwapRenderer(gl)
 
 swapRenderer
-  .createProgram('blur', VERTEX_SHADER_BASE, FRAGMENT_SHADER_BLUR)
-  .useProgram('blur')
+  .createProgram(BLUR_PROGRAM, VERTEX_SHADER_BASE, FRAGMENT_SHADER_BLUR)
+  .useProgram(BLUR_PROGRAM)
   .setSize(innerWidth, innerHeight)
   .setUniform('texture', 'int', 0)
   .setUniform('uMouse', 'vec2', [-3000, -3000])
   .setUniform('uWindow', 'vec2', [innerWidth, innerHeight])
 
-const initData = new Float32Array(innerWidth * innerHeight * 4)
-for (var i = 0; i < initData.length; i++) {
-  initData[i] = (Math.random() - 0.5) * 255
-}
-
-swapRenderer
-  .createTexture(BLUR_PROGRAM_1, innerWidth, innerHeight, initData)
-  .createFramebuffer(BLUR_PROGRAM_1, innerWidth, innerHeight)
-
-swapRenderer
-  .createTexture(BLUR_PROGRAM_2, innerWidth, innerHeight)
-  .createFramebuffer(BLUR_PROGRAM_2, innerWidth, innerHeight)
+  .createProgram(VIS_PROGRAM, VERTEX_SHADER_BASE, FRAGMENT_SHADER_DISPLAY)
+  .useProgram(VIS_PROGRAM)
+  .setUniform('tDiffuse', 'int', 0)
 
 let oldTime = 0
-let drawMesh
 
 gl.enable(gl.BLEND)
 gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 gl.enable(gl.DEPTH_TEST)
 
-{
-  const { vertices, uv } = GeometryUtils.createFullscreenQuad()
-  const geometry = new Geometry(gl)
-  geometry
-    .addAttribute('position', {
-      typedArray: vertices,
-      size: 2,
-    })
-    .addAttribute('uv', {
-      typedArray: uv,
-      size: 2,
-    })
-  drawMesh = new Mesh(gl, {
-    geometry,
-    uniforms: {
-      tDiffuse: { type: 'int', value: 0 },
-    },
-    vertexShaderSource: VERTEX_SHADER_BASE,
-    fragmentShaderSource: FRAGMENT_SHADER_DISPLAY,
-  })
-}
-
 checkExtensionsSupport()
 document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)
 resize()
-window.addEventListener('resize', resize)
+window.addEventListener('resize', throttle(resize, 100))
 document.addEventListener('mousemove', (e) => {
   swapRenderer
-    .useProgram('blur')
+    .useProgram(BLUR_PROGRAM)
     .setUniform('uMouse', 'vec2', [e.pageX, innerHeight - e.pageY])
 })
 
@@ -164,21 +129,10 @@ function updateFrame(ts) {
 
   swapRenderer
     .setSize(innerWidth, innerHeight)
-    .useProgram('blur')
-    .run([BLUR_PROGRAM_1], BLUR_PROGRAM_2)
-
-  gl.clearColor(0.9, 0.9, 0.9, 1)
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
-
-  const texture = swapRenderer.getTexture(BLUR_PROGRAM_1)
-
-  gl.activeTexture(gl.TEXTURE0)
-  texture.bind()
-
-  drawMesh.draw()
-
-  swapRenderer.swap(BLUR_PROGRAM_1, BLUR_PROGRAM_2)
+    .useProgram(BLUR_PROGRAM)
+    .run([BLUR1], BLUR2)
+    .run([BLUR1], null)
+    .swap(BLUR1, BLUR2)
 
   stats.end()
 
@@ -190,6 +144,21 @@ function resize() {
   canvas.height = innerHeight * dpr
   canvas.style.setProperty('width', `${innerWidth}px`)
   canvas.style.setProperty('height', `${innerHeight}px`)
+
+  const initData = new Float32Array(innerWidth * innerHeight * 4)
+  for (var i = 0; i < initData.length; i++) {
+    initData[i] = (Math.random() - 0.5) * 255
+  }
+
+  swapRenderer
+    .createTexture(BLUR1, innerWidth, innerHeight, initData)
+    .createFramebuffer(BLUR1, innerWidth, innerHeight)
+
+    .createTexture(BLUR2, innerWidth, innerHeight)
+    .createFramebuffer(BLUR2, innerWidth, innerHeight)
+
+    .useProgram(BLUR_PROGRAM)
+    .setUniform('uWindow', 'vec2', [innerWidth, innerHeight])
 }
 
 function checkExtensionsSupport() {

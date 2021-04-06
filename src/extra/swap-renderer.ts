@@ -2,8 +2,9 @@ import { Framebuffer } from '../core/framebuffer'
 import { Geometry } from '../core/geometry'
 import { Mesh } from '../core/mesh'
 import { getExtension } from '../utils/gl-utils'
-import { createFullscreenQuad } from '../geometry-utils'
+import { createPlane } from '../geometry-utils'
 import { Texture } from '../core/texture'
+import { OrthographicCamera } from '../camera/orthographic-camera'
 
 export class SwapRenderer {
   #gl: WebGLRenderingContext
@@ -11,11 +12,16 @@ export class SwapRenderer {
   #framebuffers = new Map()
   #programs = new Map()
   #textures = new Map()
+  #camera: OrthographicCamera
 
   #activeProgram: Mesh
 
   constructor(gl) {
     this.#gl = gl
+
+    this.#camera = new OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0.1, 2)
+    this.#camera.position = [0, 0, 1]
+    this.#camera.lookAt([0, 0, 0])
 
     const ext1 = getExtension(gl, 'OES_texture_float')
     if (!ext1) {
@@ -82,10 +88,11 @@ export class SwapRenderer {
     vertexShaderSource: string,
     fragmentShaderSource: string,
   ) {
-    const { vertices, uv } = createFullscreenQuad()
+    const { indices, vertices, uv } = createPlane()
     const geometry = new Geometry(this.#gl)
     geometry
-      .addAttribute('position', { typedArray: vertices, size: 2 })
+      .addIndex({ typedArray: indices })
+      .addAttribute('position', { typedArray: vertices, size: 3 })
       .addAttribute('uv', { typedArray: uv, size: 2 })
 
     const mesh = new Mesh(this.#gl, {
@@ -121,19 +128,14 @@ export class SwapRenderer {
     } else {
       this.#gl.bindFramebuffer(this.#gl.FRAMEBUFFER, null)
     }
-    // const ext = this.#gl.getExtension('GMAN_debug_helper')
-    // ext.setConfiguration({
-    //   failUnsetUniforms: false,
-    // })
 
     for (let i = 0; i < inputNameArr.length; i++) {
       const inputName = inputNameArr[i]
       const inputTexture = this.#textures.get(inputName)
-      // console.log(ext.getTagForObject(inputTexture))
       this.#gl.activeTexture(this.#gl.TEXTURE0 + i)
       inputTexture.bind()
     }
-    this.#activeProgram.draw()
+    this.#activeProgram.setCamera(this.#camera).draw()
     if (framebuffer) {
       framebuffer.unbind()
     }

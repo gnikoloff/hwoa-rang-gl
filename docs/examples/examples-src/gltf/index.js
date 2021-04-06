@@ -1,5 +1,6 @@
 import Stats from 'stats-js'
 import { vec3 } from 'gl-matrix'
+import throttle from 'lodash.throttle'
 
 import {
   PerspectiveCamera,
@@ -54,8 +55,8 @@ downloadFile('/assets/models/Suzanne.bin', 'arraybuffer', loadModel)
 
 document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)
-resize()
-window.addEventListener('resize', resize)
+sizeCanvas()
+window.addEventListener('resize', throttle(resize, 100))
 
 function loadModel(xhr) {
   if (xhr.responseType === 'json') {
@@ -160,6 +161,13 @@ function updateFrame(ts) {
 }
 
 function resize() {
+  camera.aspect = innerWidth / innerHeight
+  camera.updateProjectionMatrix()
+
+  sizeCanvas()
+}
+
+function sizeCanvas() {
   canvas.width = innerWidth * dpr
   canvas.height = innerHeight * dpr
   canvas.style.setProperty('width', `${innerWidth}px`)

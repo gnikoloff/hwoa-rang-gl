@@ -1,5 +1,6 @@
 import Stats from 'stats-js'
 import * as dat from 'dat.gui'
+import throttle from 'lodash.throttle'
 
 import {
   PerspectiveCamera,
@@ -152,8 +153,8 @@ gui.add(OPTIONS, 'debugMode').onChange((debugMode) => {
 
 document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)
-resize()
-window.addEventListener('resize', resize)
+sizeCanvas()
+window.addEventListener('resize', throttle(resize, 100))
 
 function updateFrame(ts) {
   ts /= 1000
@@ -176,6 +177,13 @@ function updateFrame(ts) {
 }
 
 function resize() {
+  camera.aspect = innerWidth / innerHeight
+  camera.updateProjectionMatrix()
+
+  sizeCanvas()
+}
+
+function sizeCanvas() {
   canvas.width = innerWidth * dpr
   canvas.height = innerHeight * dpr
   canvas.style.setProperty('width', `${innerWidth}px`)

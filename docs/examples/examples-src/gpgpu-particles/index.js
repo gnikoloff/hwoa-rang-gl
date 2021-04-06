@@ -1,11 +1,11 @@
 import Stats from 'stats-js'
-import { mat4 } from 'gl-matrix'
 
 import {
   Geometry,
   Mesh,
   getExtension,
   SwapRenderer,
+  OrthographicCamera,
 } from '../../../../dist/esm'
 
 const VERTEX_SHADER_UPDATE_POSITIONS = `
@@ -158,16 +158,20 @@ getExtension(gl, 'GMAN_debug_helper')
 
 checkExtensionsSupport()
 
-const orthoProjectionMatrix = mat4.create()
-{
-  const left = 0
-  const right = innerWidth
-  const bottom = 0
-  const top = innerHeight
-  const near = -1
-  const far = 1
-  mat4.ortho(orthoProjectionMatrix, left, right, bottom, top, near, far)
-}
+const orthoCamera = new OrthographicCamera(0, innerWidth, innerHeight, 0, -1, 1)
+orthoCamera.position = [0, 0, 1]
+orthoCamera.lookAt([0, 0, 0])
+
+// const orthoProjectionMatrix = mat4.create()
+// {
+//   const left = 0
+//   const right = innerWidth
+//   const bottom = 0
+//   const top = innerHeight
+//   const near = -1
+//   const far = 1
+//   mat4.ortho(orthoProjectionMatrix, left, right, bottom, top, near, far)
+// }
 
 const swapRenderer = new SwapRenderer(gl)
 
@@ -238,7 +242,6 @@ gl.enable(gl.DEPTH_TEST)
     uniforms: {
       positionsTexture: { type: 'int', value: 0 },
       textureDimensions: { type: 'vec2', value: textureDimensions },
-      projectionMatrix: { type: 'mat4', value: orthoProjectionMatrix },
     },
     vertexShaderSource: VERTEX_SHADER_PARTICLES,
     fragmentShaderSource: FRAGMENT_SHADER_PARTICLES,
@@ -289,7 +292,7 @@ function updateFrame(ts) {
   gl.activeTexture(gl.TEXTURE0)
   posTexture.bind()
 
-  drawMesh.use().draw()
+  drawMesh.use().setCamera(orthoCamera).draw()
 
   swapRenderer.swap(POSITIONS1_PROGRAM, POSITIONS2_PROGRAM)
 

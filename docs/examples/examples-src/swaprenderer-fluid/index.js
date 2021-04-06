@@ -1,5 +1,6 @@
 import Stats from 'stats-js'
 import * as dat from 'dat.gui'
+import throttle from 'lodash.throttle'
 
 import {
   getExtension,
@@ -31,12 +32,11 @@ const divergenceFrag = `
   precision mediump sampler2D;
   uniform sampler2D velocity;
   
-  varying highp vec2 vUv;
+  varying highp vec2 uv;
   varying highp vec2 vL;
   varying highp vec2 vR;
   varying highp vec2 vT;
   varying highp vec2 vB;
-  varying highp vec2 uv;
 
   void main () {
     float L = texture2D(velocity, vL).x;
@@ -179,7 +179,7 @@ const visFrag = `
 `
 
 const baseVert = `
-  attribute vec3 position;
+  attribute vec4 position;
 
   uniform vec2 px;
   varying vec2 uv;
@@ -189,12 +189,13 @@ const baseVert = `
   varying vec2 vB;
   
   void main(){
-    uv = vec2(0.5)+(position.xy)*0.5;
+    gl_Position = projectionMatrix * viewMatrix * modelMatrix * position;
+
+    uv = vec2(0.5)+(gl_Position.xy)*0.5;
     vL = uv - vec2(px.x, 0.0);
     vR = uv + vec2(px.x, 0.0);
     vT = uv + vec2(0.0, px.y);
     vB = uv - vec2(0.0, px.y);
-    gl_Position = vec4(position, 1.0);
   }
 `
 
@@ -202,7 +203,7 @@ const resetVelocityShader = `
   varying vec2 uv;
 
   void main() {
-      gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
   }
 `
 
@@ -210,15 +211,15 @@ const cursorVert = `
   uniform vec2 cursor;
   uniform vec2 px;
 
-  attribute vec3 position;
+  attribute vec4 position;
   
   varying vec2 vPosition;
   varying vec2 uv;
   
   void main(){
-    uv = vec2(0.5) + (position.xy) * 0.5;
-    vPosition = position.xy;
-    gl_Position = vec4(position.xy, 0.0, 1.0);
+    gl_Position = projectionMatrix * viewMatrix * modelMatrix * position;
+    vPosition = gl_Position.xy;
+    uv = vec2(0.5) + (gl_Position.xy) * 0.5;
   }
 `
 
@@ -449,7 +450,7 @@ checkExtensionsSupport()
 document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)
 resize()
-window.addEventListener('resize', resize)
+window.addEventListener('resize', throttle(resize, 100))
 
 document.body.addEventListener('mousemove', onMouseMove)
 document.body.addEventListener('mouseenter', onMouseEnter)
@@ -483,8 +484,8 @@ function updateFrame(ts) {
   lastMouse[0] = mouse[0]
   lastMouse[1] = mouse[1]
 
-  mouse[0] = (targetMouse[0] - mouse[0]) * 0.1 + mouse[0]
-  mouse[1] = (targetMouse[1] - mouse[1]) * 0.1 + mouse[1]
+  mouse[0] += (targetMouse[0] - mouse[0]) * 0.1
+  mouse[1] += (targetMouse[1] - mouse[1]) * 0.1
 
   const dX = mouse[0] - lastMouse[0]
   const dY = mouse[1] - lastMouse[1]
@@ -556,25 +557,27 @@ function updateFluid() {
 }
 
 function resize() {
-  const scale = 0.3
-
-  bgWidth = innerWidth * scale
-  bgHeight = innerHeight * scale
+  camera.aspect = innerWidth / innerHeight
+  camera.updateProjectionMatrix()
 
   canvas.width = innerWidth * dpr
   canvas.height = innerHeight * dpr
   canvas.style.setProperty('width', `${innerWidth}px`)
   canvas.style.setProperty('height', `${innerHeight}px`)
 
+  const scale = 0.3
+  bgWidth = innerWidth * scale
+  bgHeight = innerHeight * scale
   const px_x = 1 / bgWidth
   const px_y = 1 / bgHeight
-
   px = [px_x, px_y]
   px1 = [1, innerWidth / innerHeight]
 
   const swapRenderFiltering = hasFloatPointLinearFiltering
     ? gl.LINEAR
     : gl.NEAREST
+
+  sceneFramebuffer.updateWithSize(innerWidth, innerHeight, true)
 
   swapRenderer
 

@@ -1,5 +1,6 @@
 import Stats from 'stats-js'
 import { mat4 } from 'gl-matrix'
+import throttle from 'lodash.throttle'
 
 import {
   PerspectiveCamera,
@@ -170,8 +171,8 @@ for (let i = 0; i < SHAPE_COUNT; ++i) {
 document.body.appendChild(canvas)
 document.body.addEventListener('mousemove', onMouseMove)
 requestAnimationFrame(updateFrame)
-resize()
-window.addEventListener('resize', resize)
+sizeCanvas()
+window.addEventListener('resize', throttle(resize))
 
 function onMouseMove(e) {
   const rect = canvas.getBoundingClientRect()
@@ -267,6 +268,13 @@ function updateFrame(ts) {
 }
 
 function resize() {
+  camera.aspect = innerWidth / innerHeight
+  camera.updateProjectionMatrix()
+
+  sizeCanvas()
+}
+
+function sizeCanvas() {
   canvas.width = innerWidth * dpr
   canvas.height = innerHeight * dpr
   canvas.style.setProperty('width', `${innerWidth}px`)

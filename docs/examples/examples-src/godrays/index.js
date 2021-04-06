@@ -1,6 +1,7 @@
 import Stats from 'stats-js'
 import * as dat from 'dat.gui'
 import { vec3, vec4, mat4 } from 'gl-matrix'
+import throttle from 'lodash.throttle'
 
 import {
   PerspectiveCamera,
@@ -9,7 +10,95 @@ import {
   Mesh,
   InstancedMesh,
   Framebuffer,
+  OrthographicCamera,
 } from '../../../../dist/esm'
+
+const BOXES_VERTEX_SHADER = `
+  attribute vec4 position;
+  attribute vec2 uv;
+  attribute mat4 instanceModelMatrix;
+
+  varying vec2 v_uv;
+
+  void main () {
+    gl_Position = projectionMatrix *
+                  viewMatrix *
+                  modelMatrix *
+                  instanceModelMatrix *
+                  position;
+    v_uv = uv;
+  }
+`
+
+const BOXES_FRAGMENT_SHADER = `
+  uniform bool debugMode;
+  varying vec2 v_uv;
+  void main () {
+    if (debugMode) {
+      gl_FragColor = vec4(v_uv.x, 0.1, v_uv.y, 1.0);
+    } else {
+      gl_FragColor = vec4(0.02, 0.02, 0.02, 1);
+    }
+  }
+`
+
+const VERTEX_SHADER_SPHERE = `
+  attribute vec4 position;
+
+  void main () {
+    gl_Position = projectionMatrix * viewMatrix * modelMatrix * position;
+  }
+`
+
+const FRAGMENT_SHADER_SPHERE = `
+  void main () {
+    gl_FragColor = vec4(1.0);
+  }
+`
+
+const VERTEX_SHADER_BLUR = `
+  attribute vec4 position;
+  attribute vec2 uv;
+
+  varying vec2 v_uv;
+
+  void main () {
+    gl_Position = projectionMatrix * viewMatrix * modelMatrix * position;
+
+    v_uv = uv;
+  }
+`
+
+const FRAGMENT_SHADER_BLUR = `
+  uniform sampler2D diffuse;
+  uniform sampler2D mask;
+  uniform vec2 blurDirection;
+  uniform float factor;
+  uniform vec2 resolution;
+
+  varying vec2 v_uv;
+
+  vec4 blur9(sampler2D image, vec2 uv, vec2 resolution, vec2 direction) {
+    vec4 color = vec4(0.0);
+    vec2 off1 = vec2(1.3846153846) * direction;
+    vec2 off2 = vec2(3.2307692308) * direction;
+    color += texture2D(image, uv) * 0.2270270270;
+    color += texture2D(image, uv + (off1 / resolution)) * 0.3162162162;
+    color += texture2D(image, uv - (off1 / resolution)) * 0.3162162162;
+    color += texture2D(image, uv + (off2 / resolution)) * 0.0702702703;
+    color += texture2D(image, uv - (off2 / resolution)) * 0.0702702703;
+    return color;
+  }
+
+  void main () {
+    vec4 maskColor = texture2D(mask, v_uv);
+    gl_FragColor = mix(
+      blur9(diffuse, v_uv, resolution, blurDirection) * factor,
+      vec4(0.1, 0.1, 0.1, 1.0),
+      maskColor.r
+    );
+  }
+`
 
 const COUNT_SIDE = 12
 const BOXES_COUNT = COUNT_SIDE * COUNT_SIDE
@@ -44,20 +133,24 @@ gl.enable(gl.DEPTH_TEST)
 gl.enable(gl.CULL_FACE)
 gl.depthFunc(gl.LEQUAL)
 
-const camera = new PerspectiveCamera(
+const perspCamera = new PerspectiveCamera(
   (45 * Math.PI) / 180,
   innerWidth / innerHeight,
   0.1,
   100,
 )
-camera.position = [0, 0, 10]
-camera.lookAt([0, 0, 0])
+perspCamera.position = [0, 0, 10]
+perspCamera.lookAt([0, 0, 0])
 
-const renderTargetBlurX = new Framebuffer(gl, {
+const orthoCamera = new OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0.1, 2)
+orthoCamera.position = [0, 0, 1]
+orthoCamera.lookAt([0, 0, 0])
+
+let renderTargetBlurX = new Framebuffer(gl, {
   width: innerWidth / SCALE_DOWN_POSTFX,
   height: innerHeight / SCALE_DOWN_POSTFX,
 })
-const renderTargetBlurY = new Framebuffer(gl, {
+let renderTargetBlurY = new Framebuffer(gl, {
   width: innerWidth / SCALE_DOWN_POSTFX,
   height: innerHeight / SCALE_DOWN_POSTFX,
 })
@@ -79,35 +172,8 @@ const renderTargetBlurY = new Framebuffer(gl, {
   boxesMesh = new InstancedMesh(gl, {
     geometry,
     instanceCount: BOXES_COUNT,
-    vertexShaderSource: `
-    attribute vec4 position;
-    attribute vec2 uv;
-    attribute mat4 instanceModelMatrix;
-
-    varying vec2 v_uv;
-
-    void main () {
-      gl_Position = projectionMatrix *
-                    viewMatrix *
-                    modelMatrix *
-                    instanceModelMatrix *
-                    position;
-      v_uv = uv;
-    }
-  `,
-    fragmentShaderSource: `
-      uniform bool debugMode;
-      varying vec2 v_uv;
-      void main () {
-        if (debugMode) {
-          gl_FragColor = vec4(v_uv.x, 0.1, v_uv.y, 1.0);
-        } else {
-          gl_FragColor = vec4(${BACKGROUND_COLOR.map(
-            (color) => `${color}`,
-          ).join(', ')});
-        }
-      }
-    `,
+    vertexShaderSource: BOXES_VERTEX_SHADER,
+    fragmentShaderSource: BOXES_FRAGMENT_SHADER,
   })
 }
 
@@ -125,84 +191,41 @@ const renderTargetBlurY = new Framebuffer(gl, {
   })
   sphereMesh = new Mesh(gl, {
     geometry,
-    vertexShaderSource: `
-      attribute vec4 position;
-
-      void main () {
-        gl_Position = projectionMatrix * viewMatrix * modelMatrix * position;
-      }
-    `,
-    fragmentShaderSource: `
-      void main () {
-        gl_FragColor = vec4(1.0);
-      }
-    `,
+    vertexShaderSource: VERTEX_SHADER_SPHERE,
+    fragmentShaderSource: FRAGMENT_SHADER_SPHERE,
   })
 }
 
 /* ----- Fullscreen Quad ------ */
-const { vertices, uv } = GeometryUtils.createFullscreenQuad()
-const geometry = new Geometry(gl)
-geometry
-  .addAttribute('position', {
-    typedArray: vertices,
-    size: 2,
+{
+  const { indices, vertices, uv } = GeometryUtils.createPlane({
+    width: 1,
+    height: 1,
   })
-  .addAttribute('uv', {
-    typedArray: uv,
-    size: 2,
+  const geometry = new Geometry(gl)
+  geometry
+    .addIndex({ typedArray: indices })
+    .addAttribute('position', {
+      typedArray: vertices,
+      size: 3,
+    })
+    .addAttribute('uv', {
+      typedArray: uv,
+      size: 2,
+    })
+  planeMesh = new Mesh(gl, {
+    geometry,
+    uniforms: {
+      diffuse: { type: 'int', value: 0 },
+      mask: { type: 'int', value: 1 },
+      blurDirection: { type: 'vec2', value: [0, 1] },
+      factor: { type: 'float', value: OPTS.factor },
+      resolution: { type: 'vec2', value: [innerWidth, innerHeight] },
+    },
+    vertexShaderSource: VERTEX_SHADER_BLUR,
+    fragmentShaderSource: FRAGMENT_SHADER_BLUR,
   })
-planeMesh = new Mesh(gl, {
-  geometry,
-  uniforms: {
-    diffuse: { type: 'int', value: 0 },
-    mask: { type: 'int', value: 1 },
-    blurDirection: { type: 'vec2', value: [0, 1] },
-    factor: { type: 'float', value: OPTS.factor },
-  },
-  vertexShaderSource: `
-    attribute vec4 position;
-    attribute vec2 uv;
-
-    varying vec2 v_uv;
-
-    void main () {
-      gl_Position = position;
-
-      v_uv = uv;
-    }
-  `,
-  fragmentShaderSource: `
-    uniform sampler2D diffuse;
-    uniform sampler2D mask;
-    uniform vec2 blurDirection;
-    uniform float factor;
-
-    varying vec2 v_uv;
-
-    vec4 blur9(sampler2D image, vec2 uv, vec2 resolution, vec2 direction) {
-      vec4 color = vec4(0.0);
-      vec2 off1 = vec2(1.3846153846) * direction;
-      vec2 off2 = vec2(3.2307692308) * direction;
-      color += texture2D(image, uv) * 0.2270270270;
-      color += texture2D(image, uv + (off1 / resolution)) * 0.3162162162;
-      color += texture2D(image, uv - (off1 / resolution)) * 0.3162162162;
-      color += texture2D(image, uv + (off2 / resolution)) * 0.0702702703;
-      color += texture2D(image, uv - (off2 / resolution)) * 0.0702702703;
-      return color;
-    }
-
-    void main () {
-      vec2 resolution = vec2(${innerWidth}.0, ${innerHeight}.0);
-      vec4 maskColor = texture2D(mask, v_uv);
-      gl_FragColor = mix(
-        blur9(diffuse, v_uv, resolution, blurDirection) * factor,
-        vec4(0.1, 0.1, 0.1, 1.0),
-        maskColor.r
-      );
-    }
-  `,
-})
+}
 
 const matrix = mat4.create()
 const translateVec = vec3.create()
@@ -241,8 +264,8 @@ gui.add(OPTS, 'spread').min(1).max(5).step(0.5)
 
 document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)
-resize()
-window.addEventListener('resize', resize)
+sizeCanvas()
+window.addEventListener('resize', throttle(resize, 100))
 
 function updateFrame(ts) {
   ts /= 1000
@@ -272,7 +295,7 @@ function updateFrame(ts) {
 
   sphereMesh
     .use()
-    .setCamera(camera)
+    .setCamera(perspCamera)
     .setPosition({
       x: Math.sin(ts) * 4,
       y: Math.cos(ts) * 3,
@@ -280,7 +303,7 @@ function updateFrame(ts) {
     })
     .draw()
 
-  boxesMesh.use().setCamera(camera).draw()
+  boxesMesh.use().setCamera(perspCamera).draw()
 
   if (!OPTS.debugMode) {
     renderTargetBlurX.unbind()
@@ -291,6 +314,7 @@ function updateFrame(ts) {
       const radius = BLUR_ITERATIONS - i * OPTS.spread - 1
       planeMesh
         .use()
+        .setCamera(orthoCamera)
         .setUniform(
           'blurDirection',
           'vec2',
@@ -323,6 +347,38 @@ function updateFrame(ts) {
 }
 
 function resize() {
+  const aspect = innerWidth / innerHeight
+
+  perspCamera.aspect = aspect
+  perspCamera.updateProjectionMatrix()
+
+  renderTargetBlurX.updateWithSize(
+    innerWidth / SCALE_DOWN_POSTFX,
+    innerHeight / SCALE_DOWN_POSTFX,
+    true,
+  )
+  renderTargetBlurY.updateWithSize(
+    innerWidth / SCALE_DOWN_POSTFX,
+    innerHeight / SCALE_DOWN_POSTFX,
+    true,
+  )
+  // renderTargetBlurX.delete()
+  // renderTargetBlurY.delete()
+
+  // renderTargetBlurX = new Framebuffer(gl, {
+  //   width: innerWidth / SCALE_DOWN_POSTFX,
+  //   height: innerHeight / SCALE_DOWN_POSTFX,
+  // })
+  // renderTargetBlurY = new Framebuffer(gl, {
+  //   width: innerWidth / SCALE_DOWN_POSTFX,
+  //   height: innerHeight / SCALE_DOWN_POSTFX,
+  // })
+  planeMesh.setUniform('resolution', 'vec2', [innerWidth, innerHeight])
+
+  sizeCanvas()
+}
+
+function sizeCanvas() {
   canvas.width = innerWidth * dpr
   canvas.height = innerHeight * dpr
   canvas.style.setProperty('width', `${innerWidth}px`)
