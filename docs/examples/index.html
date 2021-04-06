@@ -104,6 +104,9 @@
     #toggle-mobile-nav:focus { outline: 0; }
 
     @media (min-width: 720px) {
+      #toggle-mobile-nav {
+        display: none;
+      }
       .app-aside {
         position: static;
         transform: translateX(0);
@@ -164,7 +167,7 @@
   <div id="app">
     <aside class="app-aside">
       <h1>hwoa-rang-gl</h1>
-      <h2>minimal webgl library</h2>
+      <h2>webgl library</h2>
       <h4>By <a href="https://github.com/gnikoloff" target="_blank">Georgi Nikolov</a></h4>
       <nav id="app-nav">
         <!-- <h3>Particles</h3>
