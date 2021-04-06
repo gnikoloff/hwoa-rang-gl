@@ -5,9 +5,11 @@
     "@typescript-eslint",
     "eslint-plugin-tsdoc"
   ],
+  "parserOptions": {
+    "ecmaVersion": 2020
+  },
   "extends": [
-    "plugin:@typescript-eslint/recommended",
-    "plugin:prettier/recommended",
-    "prettier/@typescript-eslint"
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended"
   ]
 }
