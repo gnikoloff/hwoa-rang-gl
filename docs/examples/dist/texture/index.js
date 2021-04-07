@@ -4966,8 +4966,9 @@
 	image.onload = () => {
 	  texture.fromImage(image).generateMipmap().setAnisotropy(1);
 	};
-	image.src =
-	  '/examples/dist/assets/textures/zhang-kaiyv-mh2o8DuHaMM-unsplash.png';
+	image.src = window.location.href.includes('github')
+	  ? '/hwoa-rang-gl/examples/examples/dist/assets/textures/zhang-kaiyv-mh2o8DuHaMM-unsplash.png'
+	  : '/examples/dist/assets/textures/zhang-kaiyv-mh2o8DuHaMM-unsplash.png';
 
 	document.body.appendChild(canvas);
 	requestAnimationFrame(updateFrame);

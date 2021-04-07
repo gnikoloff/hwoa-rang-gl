@@ -2440,9 +2440,17 @@
 
 	new CameraController(camera, canvas);
 
-	downloadFile('/examples/dist/assets/models/Suzanne.gltf', 'json', loadModel);
 	downloadFile(
-	  '/examples/dist/assets/models/Suzanne.bin',
+	  window.location.href.includes('github')
+	    ? '/hwoa-rang-gl/examples/dist/assets/models/Suzanne.gltf'
+	    : '/examples/dist/assets/models/Suzanne.gltf',
+	  'json',
+	  loadModel,
+	);
+	downloadFile(
+	  window.location.href.includes('github')
+	    ? '/hwoa-rang-gl/examples/dist/assets/models/Suzanne.bin'
+	    : '/examples/dist/assets/models/Suzanne.bin',
 	  'arraybuffer',
 	  loadModel,
 	);
@@ -2528,7 +2536,9 @@
 	  image.onload = () => {
 	    texture.fromImage(image);
 	  };
-	  image.src = '/assets/textures/Suzanne_BaseColor.png';
+	  image.src = window.location.href.includes('github')
+	    ? '/hwoa-rang-gl/examples/dist/assets/textures/Suzanne_BaseColor.png'
+	    : '/examples/dist/assets/textures/Suzanne_BaseColor.png';
 	}
 
 	function updateFrame() {
