@@ -173,14 +173,14 @@
 
       sourceLinkBtn.setAttribute(
         'href',
-        `https://github.com/gnikoloff/hwoa-rang-gl/tree/main/docs/examples/${exampleName}/index.js`,
+        `https://github.com/gnikoloff/hwoa-rang-gl/tree/main/docs/examples/examples-src/${exampleName}/index.js`,
       );
     } else {
       const exampleName = 'particles-01';
       location.hash = exampleName;
       sourceLinkBtn.setAttribute(
         'href',
-        `https://github.com/gnikoloff/hwoa-rang-gl/tree/main/docs/examples/${exampleName}/index.js`,
+        `https://github.com/gnikoloff/hwoa-rang-gl/tree/main/docs/examples/examples-src/${exampleName}/index.js`,
       );
     }
     if (appAside.classList.contains('visible')) {
