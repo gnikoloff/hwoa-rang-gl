@@ -115,7 +115,7 @@ image.onload = () => {
     .setMinFilter(gl.LINEAR_MIPMAP_LINEAR)
     .setMagFilter(gl.LINEAR)
 }
-image.src = '/examples/dist/assets/textures/webgl-logo.png'
+image.src = 'examples/dist/assets/textures/webgl-logo.png'
 
 // Floor helper
 {
