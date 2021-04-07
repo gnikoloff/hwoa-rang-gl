@@ -8,11 +8,11 @@ import { TextureInterface } from '../types'
  * @public
  */
 export class Texture {
-  #gl: WebGLRenderingContext
-  #texture: WebGLTexture
+  #gl!: WebGLRenderingContext
+  #texture!: WebGLTexture
 
-  #width: number
-  #height: number
+  #width!: number
+  #height!: number
   #format: number
   #internalFormat: number
   #type: number
@@ -23,6 +23,7 @@ export class Texture {
 
   constructor(
     gl: WebGLRenderingContext,
+
     {
       format = gl.RGB,
       internalFormat = format,
@@ -39,7 +40,7 @@ export class Texture {
     this.#internalFormat = internalFormat
     this.#type = type
 
-    this.#texture = gl.createTexture()
+    this.#texture = gl.createTexture()!
 
     this.bind()
       .setPixelStore(gl.UNPACK_ALIGNMENT, unpackAlignment)
@@ -186,7 +187,7 @@ export class Texture {
    * @returns {this}
    */
   setIsFlip(): this {
-    this.setPixelStore(this.#gl.UNPACK_FLIP_Y_WEBGL, true)
+    this.setPixelStore(this.#gl.UNPACK_FLIP_Y_WEBGL, 1)
     return this
   }
 
@@ -248,7 +249,7 @@ export class Texture {
    */
   setAnisotropy(anisotropyLevel: number): this {
     if (!anisotropyLevel) {
-      return
+      return this
     }
     if (this.#anisotropyExtension) {
       const maxAnisotropySupported = this.#gl.getParameter(

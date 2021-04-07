@@ -71,7 +71,7 @@ export interface TextureInterface {
 
 export interface OES_vertex_array_objectInterface {
   // TS's lib.dom (as of v3.1.3) does not specify the nulls
-  createVertexArrayOES(): WebGLVertexArrayObjectOES | null
+  createVertexArrayOES(): WebGLVertexArrayObjectOES
   deleteVertexArrayOES(arrayObject: WebGLVertexArrayObjectOES | null): void
   isVertexArrayOES(arrayObject: WebGLVertexArrayObjectOES | null): boolean
   bindVertexArrayOES(arrayObject: WebGLVertexArrayObjectOES | null): void

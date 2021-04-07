@@ -61,15 +61,14 @@ export class Program {
   setUniform(
     uniformName: string,
     uniformType: UniformType,
-    uniformValue: any,
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    uniformValue,
   ): this {
     let uniformLocation
     if (this.#uniformLocations.has(uniformName)) {
       uniformLocation = this.#uniformLocations.get(uniformName)
     } else {
       uniformLocation = this.#gl.getUniformLocation(this.#program, uniformName)
-      if (uniformLocation === -1) {
-      }
       this.#uniformLocations.set(uniformName, uniformLocation)
     }
     switch (uniformType) {
@@ -104,7 +103,7 @@ export class Program {
         break
       default:
         console.error(`Unrecognised uniform type: ${uniformType}`)
-        return
+        return this
     }
     return this
   }

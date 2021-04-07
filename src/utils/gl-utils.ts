@@ -1,3 +1,5 @@
+import { OES_vertex_array_objectInterface } from '../types'
+
 import { STATIC_DRAW } from './gl-constants'
 
 /**
@@ -12,7 +14,7 @@ export function compileShader(
   shaderType: GLenum,
   shaderSource: string,
 ): WebGLShader {
-  const shader: WebGLShader = gl.createShader(shaderType)
+  const shader: WebGLShader = gl.createShader(shaderType)!
   gl.shaderSource(shader, shaderSource)
   gl.compileShader(shader)
   if (gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
@@ -23,7 +25,7 @@ export function compileShader(
     ${gl.getShaderInfoLog(shader)}
   `)
   gl.deleteShader(shader)
-  return
+  return shader
 }
 
 /**
@@ -49,7 +51,7 @@ export function createProgram(
     fragmentShaderSource,
   )
 
-  const program: WebGLProgram = gl.createProgram()
+  const program: WebGLProgram = gl.createProgram()!
   gl.attachShader(program, vertexShader)
   gl.attachShader(program, fragmentShader)
   gl.linkProgram(program)
@@ -65,6 +67,7 @@ export function createProgram(
   }
   console.error(gl.getProgramInfoLog(program))
   gl.deleteProgram(program)
+  return program
 }
 
 /**
@@ -79,7 +82,7 @@ export function createBuffer(
   data: Float32Array | Float64Array,
   usage: GLenum = STATIC_DRAW,
 ): WebGLBuffer {
-  const buffer = gl.createBuffer()
+  const buffer = gl.createBuffer()!
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
   gl.bufferData(gl.ARRAY_BUFFER, data, usage)
 
@@ -98,7 +101,7 @@ export function createIndexBuffer(
   indices: Uint16Array | Uint32Array,
   usage: GLenum = gl.STATIC_DRAW,
 ): WebGLBuffer {
-  const buffer = gl.createBuffer()
+  const buffer = gl.createBuffer()!
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer)
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, usage)
   return buffer
@@ -110,10 +113,7 @@ const cachedExtensions = new Map()
  * @param {(WebGL1RenderingContext|WebGL2RenderingContext)} gl
  * @param {string} extensionName
  */
-export function getExtension(
-  gl: WebGLRenderingContext,
-  extensionName: string,
-): any {
+export function getExtension(gl: WebGLRenderingContext, extensionName: string) {
   if (cachedExtensions.has(extensionName)) {
     return cachedExtensions.get(extensionName)
   }

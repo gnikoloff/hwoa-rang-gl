@@ -10,7 +10,6 @@ export default class GLTF {
    * @public @return {Array.{name,mode,position,vertices,normal,uv,weights,joints}}
    */
   static getMesh(name, json, bin) {
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Find Mesh to parse out.
     var i,
       nn,

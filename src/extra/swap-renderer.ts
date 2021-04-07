@@ -5,6 +5,7 @@ import { getExtension } from '../utils/gl-utils'
 import { createPlane } from '../geometry-utils'
 import { Texture } from '../core/texture'
 import { OrthographicCamera } from '../camera/orthographic-camera'
+import { UniformType } from '../types'
 
 export class SwapRenderer {
   #gl: WebGLRenderingContext
@@ -14,7 +15,7 @@ export class SwapRenderer {
   #textures = new Map()
   #camera: OrthographicCamera
 
-  #activeProgram: Mesh
+  #activeProgram!: Mesh
 
   constructor(gl: WebGLRenderingContext) {
     this.#gl = gl
@@ -105,14 +106,14 @@ export class SwapRenderer {
   }
 
   useProgram(programName: string): this {
-    this.#activeProgram = this.#programs.get(programName)
+    this.#activeProgram = this.#programs.get(programName)!
     this.#activeProgram.use()
     return this
   }
 
   setUniform(
     uniformName: string,
-    uniformType: string,
+    uniformType: UniformType,
     uniformValue: string,
   ): this {
     this.#activeProgram.setUniform(uniformName, uniformType, uniformValue)

@@ -3,21 +3,22 @@ import type { FramebufferInterface } from '../types'
 import { Texture } from './texture'
 
 export class Framebuffer {
-  #gl: WebGLRenderingContext
-  #buffer: WebGLFramebuffer
-  #depthBuffer: WebGLRenderbuffer
+  #gl!: WebGLRenderingContext
+  #buffer!: WebGLFramebuffer
+  #depthBuffer!: WebGLRenderbuffer
 
   #width: number
   #height: number
+  #depth: boolean
 
   texture: Texture
 
   constructor(
     gl: WebGLRenderingContext,
     {
+      inputTexture,
       width = gl.canvas.width,
       height = gl.canvas.height,
-      target = gl.FRAMEBUFFER,
       wrapS = gl.CLAMP_TO_EDGE,
       wrapT = gl.CLAMP_TO_EDGE,
       minFilter = gl.NEAREST,
@@ -31,51 +32,27 @@ export class Framebuffer {
     this.#gl = gl
     this.#width = width
     this.#height = height
+    this.#depth = depth
 
-    this.texture = new Texture(gl, {
-      type,
-      format,
-      internalFormat,
-      wrapS,
-      wrapT,
-      minFilter,
-      magFilter,
-    })
-
-    this.texture.bind().fromSize(width, height).unbind()
-
-    this.#buffer = gl.createFramebuffer()
-
-    gl.bindFramebuffer(target, this.#buffer)
-
-    const level = 0
-    const texture = this.texture.getTexture()
-    gl.framebufferTexture2D(
-      target,
-      gl.COLOR_ATTACHMENT0,
-      gl.TEXTURE_2D,
-      texture,
-      level,
-    )
-
-    if (depth) {
-      this.#depthBuffer = this.#gl.createRenderbuffer()
-      this.#gl.bindRenderbuffer(this.#gl.RENDERBUFFER, this.#depthBuffer)
-      this.#gl.renderbufferStorage(
-        this.#gl.RENDERBUFFER,
-        this.#gl.DEPTH_COMPONENT16,
-        this.#width,
-        this.#height,
-      )
-      this.#gl.framebufferRenderbuffer(
-        target,
-        this.#gl.DEPTH_ATTACHMENT,
-        this.#gl.RENDERBUFFER,
-        this.#depthBuffer,
-      )
+    if (inputTexture) {
+      this.texture = inputTexture
+    } else {
+      this.texture = new Texture(gl, {
+        type,
+        format,
+        internalFormat,
+        wrapS,
+        wrapT,
+        minFilter,
+        magFilter,
+      })
+        .bind()
+        .fromSize(width, height)
     }
 
-    gl.bindFramebuffer(target, null)
+    this.#buffer = gl.createFramebuffer()!
+
+    this.updateWithSize(this.#width, this.#height)
   }
 
   bind(): this {
@@ -85,6 +62,46 @@ export class Framebuffer {
 
   unbind(): this {
     this.#gl.bindFramebuffer(this.#gl.FRAMEBUFFER, null)
+    return this
+  }
+
+  updateWithSize(width: number, height: number, updateTexture = false): this {
+    this.bind()
+    const level = 0
+    const texture = this.texture.getTexture()
+    this.#gl.framebufferTexture2D(
+      this.#gl.FRAMEBUFFER,
+      this.#gl.COLOR_ATTACHMENT0,
+      this.#gl.TEXTURE_2D,
+      texture,
+      level,
+    )
+    this.unbind()
+
+    if (this.#depth) {
+      this.#depthBuffer = this.#gl.createRenderbuffer()!
+      this.#gl.bindRenderbuffer(this.#gl.RENDERBUFFER, this.#depthBuffer)
+      this.#gl.renderbufferStorage(
+        this.#gl.RENDERBUFFER,
+        this.#gl.DEPTH_COMPONENT16,
+        width,
+        height,
+      )
+      this.#gl.framebufferRenderbuffer(
+        this.#gl.FRAMEBUFFER,
+        this.#gl.DEPTH_ATTACHMENT,
+        this.#gl.RENDERBUFFER,
+        this.#depthBuffer,
+      )
+      this.#gl.bindRenderbuffer(this.#gl.RENDERBUFFER, null)
+    }
+
+    if (updateTexture) {
+      this.texture.bind().fromSize(width, height)
+    }
+
+    this.#width = width
+    this.#height = height
     return this
   }
 

@@ -5,6 +5,7 @@
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "scripts": {
+    "lint": "eslint src",
     "watch": "rollup -c -w",
     "build": "rollup -c",
     "serve:examples": "cd docs/examples && npm run serve",
@@ -12,6 +13,7 @@
     "build:examples": "cd docs/examples && npm run start",
     "start:examples:dev": "run-p watch watch:examples serve:examples",
     "start:examples": "run-s build build:examples serve:examples",
+    "lint:examples": "eslint docs/examples",
     "build:docs": "typedoc --out docs/docs src/ --readme docs/README.md",
     "serve:docs": "http-serve docs/docs -p 8081",
     "start:docs": "run-p build:docs serve:docs"
@@ -43,6 +45,7 @@
     "typescript": "^4.1.3"
   },
   "dependencies": {
+    "@types/webgl-ext": "0.0.32",
     "dat.gui": "^0.7.7",
     "gl-matrix": "^3.3.0",
     "http-serve": "^1.0.1",
