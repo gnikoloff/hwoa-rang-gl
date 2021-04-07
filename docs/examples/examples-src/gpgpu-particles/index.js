@@ -155,7 +155,11 @@ const infoLogWrapper = document.getElementById('info-log')
 const particleTexWidth = 500
 const particleTexHeight = 500
 const numParticles = particleTexWidth * particleTexHeight
-const ids = new Array(numParticles).fill().map((_, i) => i)
+const ids = new Array(numParticles)
+
+for (let i = 0; i < numParticles; i++) {
+  ids[i] = i
+}
 
 getExtension(gl, 'GMAN_debug_helper')
 
@@ -197,10 +201,10 @@ swapRenderer
   .setUniform('positionFactor', UNIFORM_TYPE_FLOAT, 0.005)
 
 const positions = new Float32Array(
-  ids.map((_) => [rand(innerWidth), rand(innerHeight), 0, 0]).flat(),
+  ids.map(() => [rand(innerWidth), rand(innerHeight), 0, 0]).flat(),
 )
 const velocities = new Float32Array(
-  ids.map((_) => [rand(-300, 300), rand(-300, 300), 0, 0]).flat(),
+  ids.map(() => [rand(-300, 300), rand(-300, 300), 0, 0]).flat(),
 )
 
 swapRenderer
@@ -255,9 +259,9 @@ document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)
 resize()
 window.addEventListener('resize', resize)
-document.addEventListener('click', (e) => {
+document.addEventListener('click', () => {
   const positions = new Float32Array(
-    ids.map((_) => [rand(innerWidth), rand(innerHeight), 0, 0]).flat(),
+    ids.map(() => [rand(innerWidth), rand(innerHeight), 0, 0]).flat(),
   )
   swapRenderer
     .createTexture(

@@ -121,8 +121,6 @@ const translateVector = vec3.create()
 
 let sphereMesh
 let lightMesh
-let texture
-let oldTime = 0
 
 gl.enable(gl.BLEND)
 gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
@@ -273,8 +271,6 @@ function normalizeColor(color) {
 
 function updateFrame(ts) {
   ts /= 1000
-  const dt = ts - oldTime
-  oldTime = ts
 
   stats.begin()
 

@@ -108,8 +108,6 @@ swapRenderer
   .useProgram(VIS_PROGRAM)
   .setUniform('tDiffuse', UNIFORM_TYPE_INT, 0)
 
-let oldTime = 0
-
 gl.enable(gl.BLEND)
 gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 gl.enable(gl.DEPTH_TEST)
@@ -125,11 +123,7 @@ document.addEventListener('mousemove', (e) => {
     .setUniform('uMouse', UNIFORM_TYPE_VEC2, [e.pageX, innerHeight - e.pageY])
 })
 
-function updateFrame(ts) {
-  ts /= 4000
-  const dt = ts - oldTime
-  oldTime = ts
-
+function updateFrame() {
   stats.begin()
 
   swapRenderer

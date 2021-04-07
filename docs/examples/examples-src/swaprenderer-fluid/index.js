@@ -202,14 +202,6 @@ const baseVert = `
   }
 `
 
-const resetVelocityShader = `
-  varying vec2 uv;
-
-  void main() {
-    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
-  }
-`
-
 const cursorVert = `
   uniform vec2 cursor;
   uniform vec2 px;
@@ -325,7 +317,6 @@ let bgWidth
 let bgHeight
 let px
 let px1
-let oldTime = 0
 let mouse = [0, 0]
 let lastMouse = [0, 0]
 let targetMouse = [0, 0]
@@ -341,7 +332,7 @@ gui
   .min(0.1)
   .max(1)
   .step(0.1)
-  .onChange((val) => {
+  .onChange(() => {
     swapRenderer
       .useProgram(PROGRAM_ADVECT)
       .setUniform('scale', UNIFORM_TYPE_FLOAT, config.scale)
@@ -478,11 +469,7 @@ function onMouseMove(e) {
   targetMouse[1] = (ptY / innerHeight) * -2 + 1
 }
 
-function updateFrame(ts) {
-  ts /= 1000
-  const dt = ts - oldTime
-  oldTime = ts
-
+function updateFrame() {
   lastMouse[0] = mouse[0]
   lastMouse[1] = mouse[1]
 
@@ -675,5 +662,6 @@ function checkExtensionsSupport() {
   }
   hasFloatPointLinearFiltering = getExtension(gl, 'OES_texture_float_linear')
   if (!hasFloatPointLinearFiltering) {
+    // ...
   }
 }

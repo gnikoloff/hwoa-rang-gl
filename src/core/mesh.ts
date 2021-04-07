@@ -15,7 +15,11 @@ import {
   VIEW_MATRIX_UNIFORM_NAME,
 } from '../utils/gl-constants'
 
-import { MeshInterface, OES_vertex_array_objectInterface } from '../types'
+import {
+  MeshInterface,
+  OES_vertex_array_objectInterface,
+  UniformType,
+} from '../types'
 
 /**
  * Mesh class for holding the geometry, program and shaders for an object.
@@ -126,7 +130,11 @@ export class Mesh {
    * @param uniformValue
    * @returns {this}
    */
-  setUniform(uniformName, uniformType, uniformValue): this {
+  setUniform(
+    uniformName: string,
+    uniformType: UniformType,
+    uniformValue: unknown,
+  ): this {
     this.program.setUniform(uniformName, uniformType, uniformValue)
     return this
   }

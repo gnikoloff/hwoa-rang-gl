@@ -183,9 +183,7 @@ function onMouseMove(e) {
   mouseY = e.clientY - rect.top
 }
 
-function updateFrame(ts) {
-  ts /= 1000
-
+function updateFrame() {
   stats.begin()
 
   gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)

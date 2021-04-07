@@ -24,8 +24,6 @@ const OPTIONS = {
 }
 const gui = new dat.GUI()
 
-let oldTime = 0
-
 const texCanvas = document.createElement('canvas')
 {
   texCanvas.setAttribute(
@@ -157,11 +155,7 @@ requestAnimationFrame(updateFrame)
 sizeCanvas()
 window.addEventListener('resize', throttle(resize, 100))
 
-function updateFrame(ts) {
-  ts /= 1000
-  const dt = ts - oldTime
-  oldTime = ts
-
+function updateFrame() {
   stats.begin()
 
   gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)

@@ -14,16 +14,15 @@ import {
 } from '../../../../dist/esm'
 
 const stats = new Stats()
-document.body.appendChild(stats.domElement)
+window.document.body.appendChild(stats.domElement)
 
-const dpr = Math.min(devicePixelRatio, 2)
-const canvas = document.createElement('canvas')
+const dpr = Math.min(window.devicePixelRatio, 2)
+const canvas = window.document.createElement('canvas')
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
 
 let boxMesh
 let floorHelperMesh
 let texture
-let oldTime = 0
 
 gl.enable(gl.BLEND)
 gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
@@ -189,8 +188,6 @@ window.addEventListener('resize', throttle(resize, 100))
 
 function updateFrame(ts) {
   ts /= 1000
-  const dt = ts - oldTime
-  oldTime = ts
 
   stats.begin()
 

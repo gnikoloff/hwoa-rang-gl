@@ -29,8 +29,6 @@ const colors = [
 const textures = []
 const meshes = []
 
-let oldTime = 0
-
 gl.enable(gl.BLEND)
 gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 gl.enable(gl.DEPTH_TEST)
@@ -115,11 +113,7 @@ requestAnimationFrame(updateFrame)
 sizeCanvas()
 window.addEventListener('resize', throttle(resize, 100))
 
-function updateFrame(ts) {
-  ts /= 1000
-  const dt = ts - oldTime
-  oldTime = ts
-
+function updateFrame() {
   stats.begin()
 
   gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)

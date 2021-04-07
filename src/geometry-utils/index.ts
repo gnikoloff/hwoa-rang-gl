@@ -28,9 +28,9 @@ function buildPlane(
   const segH = height / hSegs
 
   for (let iy = 0; iy <= hSegs; iy++) {
-    let y = iy * segH - height / 2
+    const y = iy * segH - height / 2
     for (let ix = 0; ix <= wSegs; ix++, i++) {
-      let x = ix * segW - width / 2
+      const x = ix * segW - width / 2
 
       vertices[i * 3 + u] = x * uDir
       vertices[i * 3 + v] = y * vDir
@@ -44,10 +44,10 @@ function buildPlane(
       uv[i * 2 + 1] = 1 - iy / hSegs
 
       if (iy === hSegs || ix === wSegs) continue
-      let a = io + ix + iy * (wSegs + 1)
-      let b = io + ix + (iy + 1) * (wSegs + 1)
-      let c = io + ix + (iy + 1) * (wSegs + 1) + 1
-      let d = io + ix + iy * (wSegs + 1) + 1
+      const a = io + ix + iy * (wSegs + 1)
+      const b = io + ix + (iy + 1) * (wSegs + 1)
+      const c = io + ix + (iy + 1) * (wSegs + 1) + 1
+      const d = io + ix + iy * (wSegs + 1) + 1
 
       indices[ii * 6] = a
       indices[ii * 6 + 1] = b
@@ -513,22 +513,22 @@ export function createSphere(params: SphereInterface = {}) {
   let i = 0
   let iv = 0
   let ii = 0
-  let te = tStart + tLength
+  const te = tStart + tLength
   const grid = []
 
-  let n = vec3.create()
+  const n = vec3.create()
 
   for (let iy = 0; iy <= hSegs; iy++) {
-    let vRow = []
-    let v = iy / hSegs
+    const vRow = []
+    const v = iy / hSegs
     for (let ix = 0; ix <= wSegs; ix++, i++) {
-      let u = ix / wSegs
-      let x =
+      const u = ix / wSegs
+      const x =
         -radius *
         Math.cos(pStart + u * pLength) *
         Math.sin(tStart + v * tLength)
-      let y = radius * Math.cos(tStart + v * tLength)
-      let z =
+      const y = radius * Math.cos(tStart + v * tLength)
+      const z =
         radius * Math.sin(pStart + u * pLength) * Math.sin(tStart + v * tLength)
 
       position[i * 3] = x
@@ -553,10 +553,10 @@ export function createSphere(params: SphereInterface = {}) {
 
   for (let iy = 0; iy < hSegs; iy++) {
     for (let ix = 0; ix < wSegs; ix++) {
-      let a = grid[iy][ix + 1]
-      let b = grid[iy][ix]
-      let c = grid[iy + 1][ix]
-      let d = grid[iy + 1][ix + 1]
+      const a = grid[iy][ix + 1]
+      const b = grid[iy][ix]
+      const c = grid[iy + 1][ix]
+      const d = grid[iy + 1][ix + 1]
 
       if (iy !== 0 || tStart > 0) {
         index[ii * 3] = a
