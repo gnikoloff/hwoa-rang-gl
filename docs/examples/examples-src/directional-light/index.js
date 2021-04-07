@@ -115,7 +115,9 @@ image.onload = () => {
     .setMinFilter(gl.LINEAR_MIPMAP_NEAREST)
     .setMagFilter(gl.LINEAR_MIPMAP_NEAREST)
 }
-image.src = '/examples/dist/assets/textures/webgl-logo.png'
+image.src = window.location.href.includes('github')
+  ? '/hwoa-rang-gl/examples/dist/assets/textures/webgl-logo.png'
+  : '/examples/dist/assets/textures/webgl-logo.png'
 
 // Floor helper
 {

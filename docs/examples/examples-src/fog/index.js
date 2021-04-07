@@ -129,9 +129,17 @@ vec3.normalize(lightDirection, lightDirection)
 
 new CameraController(camera, canvas)
 
-downloadFile('/examples/dist/assets/models/Suzanne.gltf', 'json', loadModel)
 downloadFile(
-  '/examples/dist/assets/models/Suzanne.bin',
+  window.location.href.includes('github')
+    ? '/hwoa-rang-gl/examples/dist/assets/models/Suzanne.gltf'
+    : '/examples/dist/assets/models/Suzanne.gltf',
+  'json',
+  loadModel,
+)
+downloadFile(
+  window.location.href.includes('github')
+    ? '/hwoa-rang-gl/examples/dist/assets/models/Suzanne.bin'
+    : '/examples/dist/assets/models/Suzanne.bin',
   'arraybuffer',
   loadModel,
 )
