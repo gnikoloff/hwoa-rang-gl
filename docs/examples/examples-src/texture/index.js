@@ -95,7 +95,8 @@ const image = new Image()
 image.onload = () => {
   texture.fromImage(image).generateMipmap().setAnisotropy(1)
 }
-image.src = '/assets/textures/zhang-kaiyv-mh2o8DuHaMM-unsplash.png'
+image.src =
+  '/examples/dist/assets/textures/zhang-kaiyv-mh2o8DuHaMM-unsplash.png'
 
 document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)

@@ -12,7 +12,7 @@ import {
   UNIFORM_TYPE_VEC3,
 } from '../../../../dist/esm'
 
-import GLTF from './GLTFLoader'
+import GLTF from './GLTFLoader.js'
 
 const stats = new Stats()
 document.body.appendChild(stats.domElement)
@@ -50,8 +50,12 @@ vec3.normalize(lightDirection, lightDirection)
 
 new CameraController(camera, canvas)
 
-downloadFile('/assets/models/Suzanne.gltf', 'json', loadModel)
-downloadFile('/assets/models/Suzanne.bin', 'arraybuffer', loadModel)
+downloadFile('/examples/dist/assets/models/Suzanne.gltf', 'json', loadModel)
+downloadFile(
+  '/examples/dist/assets/models/Suzanne.bin',
+  'arraybuffer',
+  loadModel,
+)
 
 document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)

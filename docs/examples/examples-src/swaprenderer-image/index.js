@@ -272,7 +272,8 @@ image.onload = () => {
 // image.src = '/assets/textures/zhang-kaiyv-mh2o8DuHaMM-unsplash.png'
 // image.src = '/assets/textures/zhang-kaiyv-Jt5a-wTJR1Q-unsplash.jpeg'
 // image.src = '/assets/textures/zhang-kaiyv-G7oFLe-OW74-unsplash.jpeg'
-image.src = '/assets/textures/zhang-kaiyv-MheaLsLj1to-unsplash.jpeg'
+image.src =
+  '/examples/dist/assets/textures/zhang-kaiyv-MheaLsLj1to-unsplash.jpeg'
 // image.src = '/assets/textures/texture04.jpeg'
 
 checkExtensionsSupport()

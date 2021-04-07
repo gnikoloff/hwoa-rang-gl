@@ -115,7 +115,7 @@ image.onload = () => {
     .setMinFilter(gl.LINEAR_MIPMAP_NEAREST)
     .setMagFilter(gl.LINEAR_MIPMAP_NEAREST)
 }
-image.src = '/assets/textures/webgl-logo.png'
+image.src = '/examples/dist/assets/textures/webgl-logo.png'
 
 // Floor helper
 {

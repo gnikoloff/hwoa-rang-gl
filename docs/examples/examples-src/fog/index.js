@@ -129,8 +129,12 @@ vec3.normalize(lightDirection, lightDirection)
 
 new CameraController(camera, canvas)
 
-downloadFile('/assets/models/Suzanne.gltf', 'json', loadModel)
-downloadFile('/assets/models/Suzanne.bin', 'arraybuffer', loadModel)
+downloadFile('/examples/dist/assets/models/Suzanne.gltf', 'json', loadModel)
+downloadFile(
+  '/examples/dist/assets/models/Suzanne.bin',
+  'arraybuffer',
+  loadModel,
+)
 
 const linearFolder = gui.addFolder('linear fog')
 linearFolder.open()
