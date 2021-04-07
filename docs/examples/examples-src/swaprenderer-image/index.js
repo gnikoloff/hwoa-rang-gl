@@ -268,13 +268,9 @@ image.onload = () => {
     .setUniform('uWindow', UNIFORM_TYPE_VEC2, [innerWidth, innerHeight])
     .setUniform('rdx', UNIFORM_TYPE_FLOAT, 1)
 }
-// image.src = '/assets/textures/zhang-kaiyv-44yxPSPmtjg-unsplash.png'
-// image.src = '/assets/textures/zhang-kaiyv-mh2o8DuHaMM-unsplash.png'
-// image.src = '/assets/textures/zhang-kaiyv-Jt5a-wTJR1Q-unsplash.jpeg'
-// image.src = '/assets/textures/zhang-kaiyv-G7oFLe-OW74-unsplash.jpeg'
-image.src =
-  '/examples/dist/assets/textures/zhang-kaiyv-MheaLsLj1to-unsplash.jpeg'
-// image.src = '/assets/textures/texture04.jpeg'
+image.src = window.location.href.includes('github')
+  ? '/hwoa-rang-gl/examples/dist/assets/textures/zhang-kaiyv-MheaLsLj1to-unsplash.jpeg'
+  : '/examples/dist/assets/textures/zhang-kaiyv-MheaLsLj1to-unsplash.jpeg'
 
 checkExtensionsSupport()
 document.body.appendChild(canvas)
