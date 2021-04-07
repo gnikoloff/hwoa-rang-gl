@@ -9,7 +9,7 @@ export default class GLTF {
    * @param {ArrayBuffer} bin - Array buffer of a bin file
    * @public @return {Array.{name,mode,position,vertices,normal,uv,weights,joints}}
    */
-  static getMesh(name: string, json: Object, bin: ArrayBuffer): Object} {
+  static getMesh(name, json, bin) {
     // Find Mesh to parse out.
     var i,
       nn,

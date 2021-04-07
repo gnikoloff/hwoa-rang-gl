@@ -99,6 +99,7 @@ export class Mesh {
 
     this.program.bind()
     for (const [key, uniform] of Object.entries(uniforms)) {
+      // @ts-ignore
       this.program.setUniform(key, uniform['type'], uniform['value'])
     }
     this.program.setUniform(

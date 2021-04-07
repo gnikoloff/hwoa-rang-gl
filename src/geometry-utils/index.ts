@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { vec3 } from 'gl-matrix'
 
 import { BoxInterface, PlaneInterface, SphereInterface } from '../types'

@@ -88,7 +88,7 @@ export class CameraController {
   private _panEnd = { x: 0, y: 0 }
   private _paused = false
   private _isDebug = false
-  private _outputEl: HTMLDivElement
+  private _outputEl!: HTMLDivElement
 
   constructor(
     camera: PerspectiveCamera,

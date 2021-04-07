@@ -4,16 +4,18 @@
     "target": "ES6",
     "allowJs": true,
     "outDir": "dist",
-    "strict": false,
+    "strict": true,
     // "inlineSourceMap": true,
     "allowSyntheticDefaultImports": true,
-    "strictNullChecks": false,
+    "strictNullChecks": true,
     "lib": ["ES2016", "ES2017", "DOM"],
     "noImplicitAny": false,
     "declaration": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "skipLibCheck": true
   },
   "include": [
-    "src"
-  ]
+    "src",
+    "node_modules/webgl-strict-types/index.d.ts"
+  ],
 }
