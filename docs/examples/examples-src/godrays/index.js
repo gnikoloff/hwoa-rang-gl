@@ -124,8 +124,6 @@ const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
 const stats = new Stats()
 document.body.appendChild(stats.domElement)
 
-let oldTime = 0
-
 let boxesMesh
 let sphereMesh
 let planeMesh
@@ -272,8 +270,6 @@ window.addEventListener('resize', throttle(resize, 100))
 
 function updateFrame(ts) {
   ts /= 1000
-  const dt = ts - oldTime
-  oldTime = ts
 
   stats.begin()
 

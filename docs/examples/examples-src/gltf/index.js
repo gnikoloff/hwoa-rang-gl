@@ -23,10 +23,8 @@ const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
 
 const gltfInfo = document.getElementById('gltf-info')
 
-const texture = new Texture(gl)
-texture.bind().fromSize(1, 1).unbind()
+const texture = new Texture(gl).bind().fromSize(1, 1).unbind()
 
-let oldTime = 0
 let gJson
 let gBin
 let gltfMesh
@@ -139,11 +137,7 @@ function loadModel(xhr) {
   image.src = '/assets/textures/Suzanne_BaseColor.png'
 }
 
-function updateFrame(ts) {
-  ts /= 1000
-  const dt = ts - oldTime
-  oldTime = ts
-
+function updateFrame() {
   stats.begin()
 
   gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)
@@ -180,7 +174,7 @@ function downloadFile(url, type, callback) {
   const xhr = new XMLHttpRequest()
   xhr.addEventListener(
     'load',
-    (e) => {
+    () => {
       if (xhr.status !== 200) {
         // ...
       }
@@ -190,21 +184,21 @@ function downloadFile(url, type, callback) {
   )
   xhr.addEventListener(
     'error',
-    (e) => {
+    () => {
       // ...
     },
     false,
   )
   xhr.addEventListener(
     'abort',
-    (e) => {
+    () => {
       // ...
     },
     false,
   )
   xhr.addEventListener(
     'timeout',
-    (e) => {
+    () => {
       // ...
     },
     false,

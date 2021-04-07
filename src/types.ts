@@ -1,4 +1,5 @@
 import { Geometry } from './core/geometry'
+import { Texture } from './core/texture'
 
 import {
   UNIFORM_TYPE_INT,
@@ -28,7 +29,7 @@ export interface MeshInterface {
    * ```
    * @defaultValue {}
    */
-  uniforms?: object
+  uniforms?: Record<string, unknown>
   /**
    * Vertex shader program as string
    */
@@ -46,7 +47,6 @@ export interface InstancedMeshInterface extends MeshInterface {
 export interface FramebufferInterface {
   width?: number
   height?: number
-  target?: GLenum
   wrapS?: GLenum
   wrapT?: GLenum
   minFilter?: GLenum
@@ -55,6 +55,7 @@ export interface FramebufferInterface {
   type?: GLenum
   internalFormat?: GLenum
   depth?: boolean
+  inputTexture?: Texture
 }
 
 export interface TextureInterface {
@@ -119,7 +120,7 @@ export interface WebGLArrayBufferInterface {
    * @defaultValue 1
    */
   offset?: number
-  instancedDivisor: number | null
+  instancedDivisor?: number
 }
 
 export interface PlaneInterface {

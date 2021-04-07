@@ -90,7 +90,11 @@ export class CameraController {
   private _isDebug = false
   private _outputEl: HTMLDivElement
 
-  constructor(camera, domElement = document.body, isDebug = false) {
+  constructor(
+    camera: PerspectiveCamera,
+    domElement = document.body,
+    isDebug = false,
+  ) {
     if (!camera) {
       console.error('camera is undefined')
     }
@@ -171,7 +175,7 @@ export class CameraController {
       document.body.appendChild(this._outputEl)
     }
   }
-  setEventHandler() {
+  setEventHandler(): void {
     this.domElement.addEventListener(
       'contextmenu',
       this._contextMenuHandler,
@@ -190,7 +194,7 @@ export class CameraController {
     window.addEventListener('keydown', this._onKeyDownHandler, false)
     window.addEventListener('keyup', this._onKeyUpHandler, false)
   }
-  removeEventHandler() {
+  removeEventHandler(): void {
     this.domElement.removeEventListener(
       'contextmenu',
       this._contextMenuHandler,
@@ -436,6 +440,7 @@ export class CameraController {
         dDis = this._zoomDistanceEnd - this._zoomDistance
         dDis *= 1.5
 
+        // eslint-disable-next-line no-case-declarations
         let targetRadius = this._spherical.radius - dDis
         targetRadius = clamp(targetRadius, this.minDistance, this.maxDistance)
         this._zoomDistance = this._zoomDistanceEnd

@@ -104,7 +104,6 @@ const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
 const transformMatrix = mat4.create()
 const translateVec3 = vec3.create()
 
-let oldTime = 0
 let gJson
 let gBin
 let gltfMesh
@@ -270,8 +269,6 @@ function loadModel(xhr) {
 
 function updateFrame(ts) {
   ts /= 1000
-  const dt = ts - oldTime
-  oldTime = ts
 
   stats.begin()
 
@@ -340,7 +337,7 @@ function downloadFile(url, type, callback) {
   const xhr = new XMLHttpRequest()
   xhr.addEventListener(
     'load',
-    (e) => {
+    () => {
       if (xhr.status !== 200) {
         // ...
       }
@@ -350,21 +347,21 @@ function downloadFile(url, type, callback) {
   )
   xhr.addEventListener(
     'error',
-    (e) => {
+    () => {
       // ...
     },
     false,
   )
   xhr.addEventListener(
     'abort',
-    (e) => {
+    () => {
       // ...
     },
     false,
   )
   xhr.addEventListener(
     'timeout',
-    (e) => {
+    () => {
       // ...
     },
     false,

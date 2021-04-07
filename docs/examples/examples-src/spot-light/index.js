@@ -215,14 +215,12 @@ vec3.set(target, 0, 0, 0)
 const up = vec3.create()
 vec3.set(up, 0, 1, 0)
 
-let lightDirection
 let boxMesh
 let sphereMesh
 let floorHelperMesh
 // let lightHelperMesh
 let lightPointerHelperMeshInner
 let lightPointerHelperMeshOuter
-let oldTime = 0
 
 gl.enable(gl.BLEND)
 gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
@@ -487,10 +485,6 @@ gui
   .max(360)
   .step(5)
   .onChange((val) => {
-    const cameraUpdateX =
-      Math.sin((val * Math.PI) / 180) * MOVEMENT_LIGHT_RADIUS * 2
-    const cameraUpdateZ =
-      Math.cos((val * Math.PI) / 180) * MOVEMENT_LIGHT_RADIUS * 2
     const cameraPointerUpdateX =
       Math.sin((val * Math.PI) / 180) * MOVEMENT_LIGHT_RADIUS
     const cameraPointerUpdateZ =
@@ -674,7 +668,6 @@ gui.add(OPTIONS, 'lightsDebug')
 const position = vec3.create()
 vec3.set(position, ...lightPointerHelperMeshOuter.position)
 mat4.lookAt(spotLightMat, position, target, up)
-lightDirection = [-spotLightMat[8], -spotLightMat[9], -spotLightMat[10]]
 
 document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)
@@ -683,8 +676,6 @@ window.addEventListener('resize', throttle(resize, 100))
 
 function updateFrame(ts) {
   ts /= 1000
-  const dt = ts - oldTime
-  oldTime = ts
 
   stats.begin()
 

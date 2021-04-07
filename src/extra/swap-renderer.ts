@@ -16,7 +16,7 @@ export class SwapRenderer {
 
   #activeProgram: Mesh
 
-  constructor(gl) {
+  constructor(gl: WebGLRenderingContext) {
     this.#gl = gl
 
     this.#camera = new OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0.1, 2)
@@ -29,7 +29,7 @@ export class SwapRenderer {
     }
   }
 
-  getTexture(name: string) {
+  getTexture(name: string): Texture {
     const texture = this.#textures.get(name)
     if (!texture) {
       // ...
@@ -37,7 +37,7 @@ export class SwapRenderer {
     return texture
   }
 
-  addTexture(name: string, texture: Texture) {
+  addTexture(name: string, texture: Texture): this {
     this.#textures.set(name, texture)
     return this
   }
@@ -48,7 +48,7 @@ export class SwapRenderer {
     height: number,
     data: Float32Array | null,
     filtering = this.#gl.NEAREST,
-  ) {
+  ): this {
     const texture = new Texture(this.#gl, {
       type: this.#gl.FLOAT,
       format: this.#gl.RGBA,
@@ -66,12 +66,12 @@ export class SwapRenderer {
     return this
   }
 
-  addFramebuffer(name: string, framebuffer: Framebuffer) {
+  addFramebuffer(name: string, framebuffer: Framebuffer): this {
     this.#framebuffers.set(name, framebuffer)
     return this
   }
 
-  createFramebuffer(name: string, width: number, height: number) {
+  createFramebuffer(name: string, width: number, height: number): this {
     const inputTexture = this.#textures.get(name)
     const framebuffer = new Framebuffer(this.#gl, {
       width,
@@ -87,7 +87,7 @@ export class SwapRenderer {
     programName: string,
     vertexShaderSource: string,
     fragmentShaderSource: string,
-  ) {
+  ): this {
     const { indices, vertices, uv } = createPlane()
     const geometry = new Geometry(this.#gl)
     geometry
@@ -104,23 +104,27 @@ export class SwapRenderer {
     return this
   }
 
-  useProgram(programName: string) {
+  useProgram(programName: string): this {
     this.#activeProgram = this.#programs.get(programName)
     this.#activeProgram.use()
     return this
   }
 
-  setUniform(uniformName: string, uniformType: string, uniformValue: string) {
+  setUniform(
+    uniformName: string,
+    uniformType: string,
+    uniformValue: string,
+  ): this {
     this.#activeProgram.setUniform(uniformName, uniformType, uniformValue)
     return this
   }
 
-  setSize(width: number, height: number) {
+  setSize(width: number, height: number): this {
     this.#gl.viewport(0, 0, width, height)
     return this
   }
 
-  run(inputNameArr: string[], outputName: string) {
+  run(inputNameArr: string[], outputName: string): this {
     let framebuffer
     if (outputName) {
       framebuffer = this.#framebuffers.get(outputName)
@@ -142,7 +146,7 @@ export class SwapRenderer {
     return this
   }
 
-  swap(name1: string, name2: string) {
+  swap(name1: string, name2: string): this {
     const tex1 = this.#textures.get(name1)
     const tex2 = this.#textures.get(name2)
     this.#textures.set(name1, tex2)
@@ -156,8 +160,9 @@ export class SwapRenderer {
     return this
   }
 
-  reset() {
+  reset(): this {
     this.#framebuffers.clear()
     this.#programs.clear()
+    return this
   }
 }

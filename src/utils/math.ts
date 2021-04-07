@@ -5,7 +5,7 @@
  * @param {max}
  * @returns {number}
  */
-export const clamp = (num: number, min: number, max: number) =>
+export const clamp = (num: number, min: number, max: number): number =>
   Math.min(Math.max(num, min), max)
 
 /**
@@ -13,4 +13,5 @@ export const clamp = (num: number, min: number, max: number) =>
  * @param {number} value
  * @returns {number}
  */
-export const isPowerOf2 = (value: number) => (value & (value - 1)) === 0
+export const isPowerOf2 = (value: number): boolean =>
+  (value & (value - 1)) === 0

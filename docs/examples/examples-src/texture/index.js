@@ -29,8 +29,6 @@ const OPTIONS = {
   // anisotropy: 0,
 }
 
-let oldTime = 0
-
 gl.enable(gl.BLEND)
 gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 gl.enable(gl.DEPTH_TEST)
@@ -120,19 +118,13 @@ gui.add(OPTIONS, 'magFilter', ['NEAREST', 'LINEAR']).onChange((val) => {
   texture.setMinFilter(gl[val])
 })
 
-const anisotropyExtension =
+{
   getExtension(gl, 'EXT_texture_filter_anisotropic') ||
-  getExtension(gl, 'MOZ_EXT_texture_filter_anisotropic') ||
-  getExtension(gl, 'WEBKIT_EXT_texture_filter_anisotropic')
-const maxAnisotropySupported = gl.getParameter(
-  anisotropyExtension.MAX_TEXTURE_MAX_ANISOTROPY_EXT,
-)
+    getExtension(gl, 'MOZ_EXT_texture_filter_anisotropic') ||
+    getExtension(gl, 'WEBKIT_EXT_texture_filter_anisotropic')
+}
 
-function updateFrame(ts) {
-  ts /= 1000
-  const dt = ts - oldTime
-  oldTime = ts
-
+function updateFrame() {
   stats.begin()
 
   gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)

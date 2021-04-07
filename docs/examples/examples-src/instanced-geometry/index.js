@@ -19,7 +19,6 @@ const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
 const stats = new Stats()
 document.body.appendChild(stats.domElement)
 
-let oldTime = 0
 let mouseX = 0
 let mouseY = 0
 
@@ -97,11 +96,7 @@ requestAnimationFrame(updateFrame)
 sizeCanvas()
 window.addEventListener('resize', throttle(resize, 100))
 
-function updateFrame(ts) {
-  ts /= 1000
-  const dt = ts - oldTime
-  oldTime = ts
-
+function updateFrame() {
   stats.begin()
 
   gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)

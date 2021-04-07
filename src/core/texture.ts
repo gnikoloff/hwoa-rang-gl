@@ -18,7 +18,7 @@ export class Texture {
   #type: number
   #anisotropyExtension: EXT_texture_filter_anisotropic
 
-  static isPowerOf2 = (width: number, height: number) =>
+  static isPowerOf2 = (width: number, height: number): boolean =>
     isPowerOf2(width) && isPowerOf2(height)
 
   constructor(
@@ -65,7 +65,7 @@ export class Texture {
    * Binds the texture to gl.TEXTURE_2D
    * @returns {this}
    */
-  bind() {
+  bind(): this {
     this.#gl.bindTexture(this.#gl.TEXTURE_2D, this.#texture)
     return this
   }
@@ -74,7 +74,7 @@ export class Texture {
    * Unbinds the texture
    * @returns {this}
    */
-  unbind() {
+  unbind(): this {
     this.#gl.bindTexture(this.#gl.TEXTURE_2D, null)
     return this
   }
@@ -85,7 +85,11 @@ export class Texture {
    * @param {number} [height
    * @returns {this}
    */
-  fromImage(image, width = image.width, height = image.height): this {
+  fromImage(
+    image: HTMLImageElement | HTMLVideoElement | HTMLCanvasElement,
+    width = image.width,
+    height = image.height,
+  ): this {
     this.#width = width
     this.#height = height
 
@@ -105,7 +109,7 @@ export class Texture {
    * @param {number} height
    * @returns {this}
    */
-  fromSize(width, height): this {
+  fromSize(width: number, height: number): this {
     if (!width || !height) {
       console.warn('Incomplete dimensions for creating empty texture')
     }
@@ -132,7 +136,7 @@ export class Texture {
    * @param {number} [height]
    * @returns {this}
    */
-  fromData(dataArray, width, height): this {
+  fromData(dataArray, width: number, height: number): this {
     if (!width || !height) {
       console.warn('Incomplete dimensions for creating texture from data array')
     }
@@ -191,7 +195,7 @@ export class Texture {
    * @param params
    * @returns {this}
    */
-  setPixelStore(name, params): this {
+  setPixelStore(name: GLenum, params: GLenum): this {
     this.#gl.pixelStorei(name, params)
     return this
   }
@@ -242,7 +246,7 @@ export class Texture {
    * @param {number} anisotropyLevel
    * @returns {this}
    */
-  setAnisotropy(anisotropyLevel): this {
+  setAnisotropy(anisotropyLevel: number): this {
     if (!anisotropyLevel) {
       return
     }

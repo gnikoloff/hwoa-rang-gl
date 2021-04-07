@@ -37,8 +37,6 @@ const dpr = Math.min(devicePixelRatio, 2)
 const canvas = document.createElement('canvas')
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
 
-let oldTime = 0
-
 let boxMesh
 let lineMesh
 let sphereMesh
@@ -186,11 +184,7 @@ requestAnimationFrame(updateFrame)
 sizeCanvas()
 window.addEventListener('resize', throttle(resize, 100))
 
-function updateFrame(ts) {
-  ts /= 1000
-  const dt = ts - oldTime
-  oldTime = ts
-
+function updateFrame() {
   stats.begin()
 
   gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)
