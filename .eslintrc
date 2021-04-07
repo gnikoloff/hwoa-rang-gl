@@ -14,5 +14,6 @@
   ],
   "env": {
     "browser": true
-  }
+  },
+  "ignorePatterns": ["GLTFLoader.ts"]
 }

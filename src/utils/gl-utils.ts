@@ -113,7 +113,7 @@ const cachedExtensions = new Map()
 export function getExtension(
   gl: WebGLRenderingContext,
   extensionName: string,
-): any {
+): WebGL1Extensions {
   if (cachedExtensions.has(extensionName)) {
     return cachedExtensions.get(extensionName)
   }
