@@ -1,6 +1,8 @@
 import { mat4, ReadonlyVec3 } from 'gl-matrix';
 import { Program } from './program';
-import { MeshInterface, OES_vertex_array_objectInterface } from '../types';
+import { PerspectiveCamera } from '../camera/perspective-camera';
+import { OrthographicCamera } from '../camera/orthographic-camera';
+import { MeshInterface, OES_vertex_array_objectInterface, UniformType } from '../types';
 /**
  * Mesh class for holding the geometry, program and shaders for an object.
  *
@@ -22,6 +24,7 @@ export declare class Mesh {
     constructor(gl: WebGLRenderingContext, params: MeshInterface);
     get position(): ReadonlyVec3;
     get scale(): ReadonlyVec3;
+    use(): this;
     /**
      * Set uniform value. Query the uniform location if necessary and cache it in-memory for future use
      * @param {string} uniformName
@@ -29,7 +32,7 @@ export declare class Mesh {
      * @param uniformValue
      * @returns {this}
      */
-    setUniform(uniformName: any, uniformType: any, uniformValue: any): this;
+    setUniform(uniformName: string, uniformType: UniformType, uniformValue: unknown): this;
     /**
      * Sets position
      * @returns {this}
@@ -64,10 +67,10 @@ export declare class Mesh {
     updateModelMatrix(): this;
     /**
      * Assign camera projection matrix and view matrix to model uniforms
-     * @param {PerspectiveCamera} camera
+     * @param {PerspectiveCamera|OrthographicCamera} camera
      * @returns {this}
      */
-    setCamera(camera: any): this;
+    setCamera(camera: PerspectiveCamera | OrthographicCamera): this;
     /**
      * Renders the mesh
      * @returns {this}

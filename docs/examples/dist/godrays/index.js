@@ -2913,6 +2913,446 @@
 	  };
 	}());
 
+	/**
+	 * lodash (Custom Build) <https://lodash.com/>
+	 * Build: `lodash modularize exports="npm" -o ./`
+	 * Copyright jQuery Foundation and other contributors <https://jquery.org/>
+	 * Released under MIT license <https://lodash.com/license>
+	 * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
+	 * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 */
+
+	/** Used as the `TypeError` message for "Functions" methods. */
+	var FUNC_ERROR_TEXT = 'Expected a function';
+
+	/** Used as references for various `Number` constants. */
+	var NAN = 0 / 0;
+
+	/** `Object#toString` result references. */
+	var symbolTag = '[object Symbol]';
+
+	/** Used to match leading and trailing whitespace. */
+	var reTrim = /^\s+|\s+$/g;
+
+	/** Used to detect bad signed hexadecimal string values. */
+	var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
+
+	/** Used to detect binary string values. */
+	var reIsBinary = /^0b[01]+$/i;
+
+	/** Used to detect octal string values. */
+	var reIsOctal = /^0o[0-7]+$/i;
+
+	/** Built-in method references without a dependency on `root`. */
+	var freeParseInt = parseInt;
+
+	/** Detect free variable `global` from Node.js. */
+	var freeGlobal = typeof commonjsGlobal == 'object' && commonjsGlobal && commonjsGlobal.Object === Object && commonjsGlobal;
+
+	/** Detect free variable `self`. */
+	var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
+
+	/** Used as a reference to the global object. */
+	var root = freeGlobal || freeSelf || Function('return this')();
+
+	/** Used for built-in method references. */
+	var objectProto = Object.prototype;
+
+	/**
+	 * Used to resolve the
+	 * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+	 * of values.
+	 */
+	var objectToString = objectProto.toString;
+
+	/* Built-in method references for those with the same name as other `lodash` methods. */
+	var nativeMax = Math.max,
+	    nativeMin = Math.min;
+
+	/**
+	 * Gets the timestamp of the number of milliseconds that have elapsed since
+	 * the Unix epoch (1 January 1970 00:00:00 UTC).
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 2.4.0
+	 * @category Date
+	 * @returns {number} Returns the timestamp.
+	 * @example
+	 *
+	 * _.defer(function(stamp) {
+	 *   console.log(_.now() - stamp);
+	 * }, _.now());
+	 * // => Logs the number of milliseconds it took for the deferred invocation.
+	 */
+	var now = function() {
+	  return root.Date.now();
+	};
+
+	/**
+	 * Creates a debounced function that delays invoking `func` until after `wait`
+	 * milliseconds have elapsed since the last time the debounced function was
+	 * invoked. The debounced function comes with a `cancel` method to cancel
+	 * delayed `func` invocations and a `flush` method to immediately invoke them.
+	 * Provide `options` to indicate whether `func` should be invoked on the
+	 * leading and/or trailing edge of the `wait` timeout. The `func` is invoked
+	 * with the last arguments provided to the debounced function. Subsequent
+	 * calls to the debounced function return the result of the last `func`
+	 * invocation.
+	 *
+	 * **Note:** If `leading` and `trailing` options are `true`, `func` is
+	 * invoked on the trailing edge of the timeout only if the debounced function
+	 * is invoked more than once during the `wait` timeout.
+	 *
+	 * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
+	 * until to the next tick, similar to `setTimeout` with a timeout of `0`.
+	 *
+	 * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
+	 * for details over the differences between `_.debounce` and `_.throttle`.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 0.1.0
+	 * @category Function
+	 * @param {Function} func The function to debounce.
+	 * @param {number} [wait=0] The number of milliseconds to delay.
+	 * @param {Object} [options={}] The options object.
+	 * @param {boolean} [options.leading=false]
+	 *  Specify invoking on the leading edge of the timeout.
+	 * @param {number} [options.maxWait]
+	 *  The maximum time `func` is allowed to be delayed before it's invoked.
+	 * @param {boolean} [options.trailing=true]
+	 *  Specify invoking on the trailing edge of the timeout.
+	 * @returns {Function} Returns the new debounced function.
+	 * @example
+	 *
+	 * // Avoid costly calculations while the window size is in flux.
+	 * jQuery(window).on('resize', _.debounce(calculateLayout, 150));
+	 *
+	 * // Invoke `sendMail` when clicked, debouncing subsequent calls.
+	 * jQuery(element).on('click', _.debounce(sendMail, 300, {
+	 *   'leading': true,
+	 *   'trailing': false
+	 * }));
+	 *
+	 * // Ensure `batchLog` is invoked once after 1 second of debounced calls.
+	 * var debounced = _.debounce(batchLog, 250, { 'maxWait': 1000 });
+	 * var source = new EventSource('/stream');
+	 * jQuery(source).on('message', debounced);
+	 *
+	 * // Cancel the trailing debounced invocation.
+	 * jQuery(window).on('popstate', debounced.cancel);
+	 */
+	function debounce(func, wait, options) {
+	  var lastArgs,
+	      lastThis,
+	      maxWait,
+	      result,
+	      timerId,
+	      lastCallTime,
+	      lastInvokeTime = 0,
+	      leading = false,
+	      maxing = false,
+	      trailing = true;
+
+	  if (typeof func != 'function') {
+	    throw new TypeError(FUNC_ERROR_TEXT);
+	  }
+	  wait = toNumber(wait) || 0;
+	  if (isObject(options)) {
+	    leading = !!options.leading;
+	    maxing = 'maxWait' in options;
+	    maxWait = maxing ? nativeMax(toNumber(options.maxWait) || 0, wait) : maxWait;
+	    trailing = 'trailing' in options ? !!options.trailing : trailing;
+	  }
+
+	  function invokeFunc(time) {
+	    var args = lastArgs,
+	        thisArg = lastThis;
+
+	    lastArgs = lastThis = undefined;
+	    lastInvokeTime = time;
+	    result = func.apply(thisArg, args);
+	    return result;
+	  }
+
+	  function leadingEdge(time) {
+	    // Reset any `maxWait` timer.
+	    lastInvokeTime = time;
+	    // Start the timer for the trailing edge.
+	    timerId = setTimeout(timerExpired, wait);
+	    // Invoke the leading edge.
+	    return leading ? invokeFunc(time) : result;
+	  }
+
+	  function remainingWait(time) {
+	    var timeSinceLastCall = time - lastCallTime,
+	        timeSinceLastInvoke = time - lastInvokeTime,
+	        result = wait - timeSinceLastCall;
+
+	    return maxing ? nativeMin(result, maxWait - timeSinceLastInvoke) : result;
+	  }
+
+	  function shouldInvoke(time) {
+	    var timeSinceLastCall = time - lastCallTime,
+	        timeSinceLastInvoke = time - lastInvokeTime;
+
+	    // Either this is the first call, activity has stopped and we're at the
+	    // trailing edge, the system time has gone backwards and we're treating
+	    // it as the trailing edge, or we've hit the `maxWait` limit.
+	    return (lastCallTime === undefined || (timeSinceLastCall >= wait) ||
+	      (timeSinceLastCall < 0) || (maxing && timeSinceLastInvoke >= maxWait));
+	  }
+
+	  function timerExpired() {
+	    var time = now();
+	    if (shouldInvoke(time)) {
+	      return trailingEdge(time);
+	    }
+	    // Restart the timer.
+	    timerId = setTimeout(timerExpired, remainingWait(time));
+	  }
+
+	  function trailingEdge(time) {
+	    timerId = undefined;
+
+	    // Only invoke if we have `lastArgs` which means `func` has been
+	    // debounced at least once.
+	    if (trailing && lastArgs) {
+	      return invokeFunc(time);
+	    }
+	    lastArgs = lastThis = undefined;
+	    return result;
+	  }
+
+	  function cancel() {
+	    if (timerId !== undefined) {
+	      clearTimeout(timerId);
+	    }
+	    lastInvokeTime = 0;
+	    lastArgs = lastCallTime = lastThis = timerId = undefined;
+	  }
+
+	  function flush() {
+	    return timerId === undefined ? result : trailingEdge(now());
+	  }
+
+	  function debounced() {
+	    var time = now(),
+	        isInvoking = shouldInvoke(time);
+
+	    lastArgs = arguments;
+	    lastThis = this;
+	    lastCallTime = time;
+
+	    if (isInvoking) {
+	      if (timerId === undefined) {
+	        return leadingEdge(lastCallTime);
+	      }
+	      if (maxing) {
+	        // Handle invocations in a tight loop.
+	        timerId = setTimeout(timerExpired, wait);
+	        return invokeFunc(lastCallTime);
+	      }
+	    }
+	    if (timerId === undefined) {
+	      timerId = setTimeout(timerExpired, wait);
+	    }
+	    return result;
+	  }
+	  debounced.cancel = cancel;
+	  debounced.flush = flush;
+	  return debounced;
+	}
+
+	/**
+	 * Creates a throttled function that only invokes `func` at most once per
+	 * every `wait` milliseconds. The throttled function comes with a `cancel`
+	 * method to cancel delayed `func` invocations and a `flush` method to
+	 * immediately invoke them. Provide `options` to indicate whether `func`
+	 * should be invoked on the leading and/or trailing edge of the `wait`
+	 * timeout. The `func` is invoked with the last arguments provided to the
+	 * throttled function. Subsequent calls to the throttled function return the
+	 * result of the last `func` invocation.
+	 *
+	 * **Note:** If `leading` and `trailing` options are `true`, `func` is
+	 * invoked on the trailing edge of the timeout only if the throttled function
+	 * is invoked more than once during the `wait` timeout.
+	 *
+	 * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
+	 * until to the next tick, similar to `setTimeout` with a timeout of `0`.
+	 *
+	 * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
+	 * for details over the differences between `_.throttle` and `_.debounce`.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 0.1.0
+	 * @category Function
+	 * @param {Function} func The function to throttle.
+	 * @param {number} [wait=0] The number of milliseconds to throttle invocations to.
+	 * @param {Object} [options={}] The options object.
+	 * @param {boolean} [options.leading=true]
+	 *  Specify invoking on the leading edge of the timeout.
+	 * @param {boolean} [options.trailing=true]
+	 *  Specify invoking on the trailing edge of the timeout.
+	 * @returns {Function} Returns the new throttled function.
+	 * @example
+	 *
+	 * // Avoid excessively updating the position while scrolling.
+	 * jQuery(window).on('scroll', _.throttle(updatePosition, 100));
+	 *
+	 * // Invoke `renewToken` when the click event is fired, but not more than once every 5 minutes.
+	 * var throttled = _.throttle(renewToken, 300000, { 'trailing': false });
+	 * jQuery(element).on('click', throttled);
+	 *
+	 * // Cancel the trailing throttled invocation.
+	 * jQuery(window).on('popstate', throttled.cancel);
+	 */
+	function throttle(func, wait, options) {
+	  var leading = true,
+	      trailing = true;
+
+	  if (typeof func != 'function') {
+	    throw new TypeError(FUNC_ERROR_TEXT);
+	  }
+	  if (isObject(options)) {
+	    leading = 'leading' in options ? !!options.leading : leading;
+	    trailing = 'trailing' in options ? !!options.trailing : trailing;
+	  }
+	  return debounce(func, wait, {
+	    'leading': leading,
+	    'maxWait': wait,
+	    'trailing': trailing
+	  });
+	}
+
+	/**
+	 * Checks if `value` is the
+	 * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
+	 * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 0.1.0
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is an object, else `false`.
+	 * @example
+	 *
+	 * _.isObject({});
+	 * // => true
+	 *
+	 * _.isObject([1, 2, 3]);
+	 * // => true
+	 *
+	 * _.isObject(_.noop);
+	 * // => true
+	 *
+	 * _.isObject(null);
+	 * // => false
+	 */
+	function isObject(value) {
+	  var type = typeof value;
+	  return !!value && (type == 'object' || type == 'function');
+	}
+
+	/**
+	 * Checks if `value` is object-like. A value is object-like if it's not `null`
+	 * and has a `typeof` result of "object".
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.0.0
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
+	 * @example
+	 *
+	 * _.isObjectLike({});
+	 * // => true
+	 *
+	 * _.isObjectLike([1, 2, 3]);
+	 * // => true
+	 *
+	 * _.isObjectLike(_.noop);
+	 * // => false
+	 *
+	 * _.isObjectLike(null);
+	 * // => false
+	 */
+	function isObjectLike(value) {
+	  return !!value && typeof value == 'object';
+	}
+
+	/**
+	 * Checks if `value` is classified as a `Symbol` primitive or object.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.0.0
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is a symbol, else `false`.
+	 * @example
+	 *
+	 * _.isSymbol(Symbol.iterator);
+	 * // => true
+	 *
+	 * _.isSymbol('abc');
+	 * // => false
+	 */
+	function isSymbol(value) {
+	  return typeof value == 'symbol' ||
+	    (isObjectLike(value) && objectToString.call(value) == symbolTag);
+	}
+
+	/**
+	 * Converts `value` to a number.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.0.0
+	 * @category Lang
+	 * @param {*} value The value to process.
+	 * @returns {number} Returns the number.
+	 * @example
+	 *
+	 * _.toNumber(3.2);
+	 * // => 3.2
+	 *
+	 * _.toNumber(Number.MIN_VALUE);
+	 * // => 5e-324
+	 *
+	 * _.toNumber(Infinity);
+	 * // => Infinity
+	 *
+	 * _.toNumber('3.2');
+	 * // => 3.2
+	 */
+	function toNumber(value) {
+	  if (typeof value == 'number') {
+	    return value;
+	  }
+	  if (isSymbol(value)) {
+	    return NAN;
+	  }
+	  if (isObject(value)) {
+	    var other = typeof value.valueOf == 'function' ? value.valueOf() : value;
+	    value = isObject(other) ? (other + '') : other;
+	  }
+	  if (typeof value != 'string') {
+	    return value === 0 ? value : +value;
+	  }
+	  value = value.replace(reTrim, '');
+	  var isBinary = reIsBinary.test(value);
+	  return (isBinary || reIsOctal.test(value))
+	    ? freeParseInt(value.slice(2), isBinary ? 2 : 8)
+	    : (reIsBadHex.test(value) ? NAN : +value);
+	}
+
+	var lodash_throttle = throttle;
+
 	/*! *****************************************************************************
 	Copyright (c) Microsoft Corporation.
 
@@ -2980,7 +3420,7 @@
     ${gl.getShaderInfoLog(shader)}
   `);
 	    gl.deleteShader(shader);
-	    return;
+	    return shader;
 	}
 	/**
 	 * Create and link WebGLProgram with provided shader strings
@@ -3006,6 +3446,7 @@
 	    }
 	    console.error(gl.getProgramInfoLog(program));
 	    gl.deleteProgram(program);
+	    return program;
 	}
 	/**
 	 * Create a ARRAY_BUFFER buffer
@@ -3091,7 +3532,9 @@
 	     * @param uniformValue
 	     * @returns {this}
 	     */
-	    setUniform(uniformName, uniformType, uniformValue) {
+	    setUniform(uniformName, uniformType, 
+	    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+	    uniformValue) {
 	        let uniformLocation;
 	        if (__classPrivateFieldGet(this, _uniformLocations).has(uniformName)) {
 	            uniformLocation = __classPrivateFieldGet(this, _uniformLocations).get(uniformName);
@@ -3121,7 +3564,7 @@
 	                break;
 	            default:
 	                console.error(`Unrecognised uniform type: ${uniformType}`);
-	                return;
+	                return this;
 	        }
 	        return this;
 	    }
@@ -3515,6 +3958,41 @@
 	  return out;
 	}
 	/**
+	 * Generates a orthogonal projection matrix with the given bounds
+	 *
+	 * @param {mat4} out mat4 frustum matrix will be written into
+	 * @param {number} left Left bound of the frustum
+	 * @param {number} right Right bound of the frustum
+	 * @param {number} bottom Bottom bound of the frustum
+	 * @param {number} top Top bound of the frustum
+	 * @param {number} near Near bound of the frustum
+	 * @param {number} far Far bound of the frustum
+	 * @returns {mat4} out
+	 */
+
+	function ortho(out, left, right, bottom, top, near, far) {
+	  var lr = 1 / (left - right);
+	  var bt = 1 / (bottom - top);
+	  var nf = 1 / (near - far);
+	  out[0] = -2 * lr;
+	  out[1] = 0;
+	  out[2] = 0;
+	  out[3] = 0;
+	  out[4] = 0;
+	  out[5] = -2 * bt;
+	  out[6] = 0;
+	  out[7] = 0;
+	  out[8] = 0;
+	  out[9] = 0;
+	  out[10] = 2 * nf;
+	  out[11] = 0;
+	  out[12] = (left + right) * lr;
+	  out[13] = (top + bottom) * bt;
+	  out[14] = (far + near) * nf;
+	  out[15] = 1;
+	  return out;
+	}
+	/**
 	 * Generates a look-at matrix with the given eye position, focal point, and up axis.
 	 * If you want a matrix that actually makes an object look at another object, you should use targetTo instead.
 	 *
@@ -3756,6 +4234,7 @@
 	        this.vaoExtension.bindVertexArrayOES(null);
 	        this.program.bind();
 	        for (const [key, uniform] of Object.entries(uniforms)) {
+	            // @ts-ignore
 	            this.program.setUniform(key, uniform['type'], uniform['value']);
 	        }
 	        this.program.setUniform(MODEL_MATRIX_UNIFORM_NAME, UNIFORM_TYPE_MATRIX4X4, this.modelMatrix);
@@ -3768,6 +4247,10 @@
 	    get scale() {
 	        return __classPrivateFieldGet(this, _scale);
 	    }
+	    use() {
+	        this.program.bind();
+	        return this;
+	    }
 	    /**
 	     * Set uniform value. Query the uniform location if necessary and cache it in-memory for future use
 	     * @param {string} uniformName
@@ -3776,9 +4259,7 @@
 	     * @returns {this}
 	     */
 	    setUniform(uniformName, uniformType, uniformValue) {
-	        this.program.bind();
 	        this.program.setUniform(uniformName, uniformType, uniformValue);
-	        this.program.unbind();
 	        return this;
 	    }
 	    /**
@@ -3824,21 +4305,17 @@
 	        translate$1(this.modelMatrix, this.modelMatrix, __classPrivateFieldGet(this, _positionVec3));
 	        rotate(this.modelMatrix, this.modelMatrix, __classPrivateFieldGet(this, _rotationAngle), __classPrivateFieldGet(this, _rotationAxisVec3));
 	        scale$1(this.modelMatrix, this.modelMatrix, __classPrivateFieldGet(this, _scaleVec3));
-	        this.program.bind();
 	        this.program.setUniform(MODEL_MATRIX_UNIFORM_NAME, UNIFORM_TYPE_MATRIX4X4, this.modelMatrix);
-	        this.program.unbind();
 	        return this;
 	    }
 	    /**
 	     * Assign camera projection matrix and view matrix to model uniforms
-	     * @param {PerspectiveCamera} camera
+	     * @param {PerspectiveCamera|OrthographicCamera} camera
 	     * @returns {this}
 	     */
 	    setCamera(camera) {
-	        this.program.bind();
 	        this.program.setUniform(PROJECTION_MATRIX_UNIFORM_NAME, UNIFORM_TYPE_MATRIX4X4, camera.projectionMatrix);
 	        this.program.setUniform(VIEW_MATRIX_UNIFORM_NAME, UNIFORM_TYPE_MATRIX4X4, camera.viewMatrix);
-	        this.program.unbind();
 	        return this;
 	    }
 	    /**
@@ -3850,7 +4327,6 @@
 	            this.updateModelMatrix();
 	            this.modelMatrixNeedsUpdate = false;
 	        }
-	        this.program.bind();
 	        this.vaoExtension.bindVertexArrayOES(this.vao);
 	        if (this.hasIndices) {
 	            __classPrivateFieldGet(this, _gl$2).drawElements(this.drawMode, __classPrivateFieldGet(this, _geometry).vertexCount, __classPrivateFieldGet(this, _gl$2).UNSIGNED_SHORT, 0);
@@ -3859,7 +4335,6 @@
 	            __classPrivateFieldGet(this, _gl$2).drawArrays(this.drawMode, 0, __classPrivateFieldGet(this, _geometry).vertexCount);
 	        }
 	        this.vaoExtension.bindVertexArrayOES(null);
-	        this.program.unbind();
 	        return this;
 	    }
 	    /**
@@ -3956,7 +4431,6 @@
 	        else {
 	            __classPrivateFieldGet(this, _instanceExtension).drawArraysInstancedANGLE(this.drawMode, 0, __classPrivateFieldGet(this, _geometry$1).vertexCount, this.instanceCount);
 	        }
-	        this.program.unbind();
 	        this.vaoExtension.bindVertexArrayOES(null);
 	        return this;
 	    }
@@ -3975,7 +4449,7 @@
 	 * @public
 	 */
 	class Texture {
-	    constructor(gl, { format = gl.RGB, internalFormat = format, type = gl.UNSIGNED_BYTE, unpackAlignment = 1, wrapS = gl.CLAMP_TO_EDGE, wrapT = gl.CLAMP_TO_EDGE, minFilter = gl.NEAREST, magFilter = gl.NEAREST, } = {}) {
+	    constructor(gl, { format = gl.RGB, internalFormat = format, type = gl.UNSIGNED_BYTE, unpackAlignment = 1, wrapS = gl.CLAMP_TO_EDGE, wrapT = gl.CLAMP_TO_EDGE, minFilter = gl.LINEAR, magFilter = gl.LINEAR, } = {}) {
 	        _gl$4.set(this, void 0);
 	        _texture.set(this, void 0);
 	        _width.set(this, void 0);
@@ -4085,7 +4559,7 @@
 	     * @returns {this}
 	     */
 	    setIsFlip() {
-	        this.setPixelStore(__classPrivateFieldGet(this, _gl$4).UNPACK_FLIP_Y_WEBGL, true);
+	        this.setPixelStore(__classPrivateFieldGet(this, _gl$4).UNPACK_FLIP_Y_WEBGL, 1);
 	        return this;
 	    }
 	    /**
@@ -4131,7 +4605,7 @@
 	     */
 	    setAnisotropy(anisotropyLevel) {
 	        if (!anisotropyLevel) {
-	            return;
+	            return this;
 	        }
 	        if (__classPrivateFieldGet(this, _anisotropyExtension)) {
 	            const maxAnisotropySupported = __classPrivateFieldGet(this, _gl$4).getParameter(__classPrivateFieldGet(this, _anisotropyExtension).MAX_TEXTURE_MAX_ANISOTROPY_EXT);
@@ -4149,39 +4623,37 @@
 	_gl$4 = new WeakMap(), _texture = new WeakMap(), _width = new WeakMap(), _height = new WeakMap(), _format = new WeakMap(), _internalFormat = new WeakMap(), _type = new WeakMap(), _anisotropyExtension = new WeakMap();
 	Texture.isPowerOf2 = (width, height) => isPowerOf2(width) && isPowerOf2(height);
 
-	var _gl$5, _buffer, _depthBuffer, _width$1, _height$1;
+	var _gl$5, _buffer, _depthBuffer, _width$1, _height$1, _depth;
 	class Framebuffer {
-	    constructor(gl, { width = gl.canvas.width, height = gl.canvas.height, target = gl.FRAMEBUFFER, wrapS = gl.CLAMP_TO_EDGE, wrapT = gl.CLAMP_TO_EDGE, minFilter = gl.NEAREST, magFilter = gl.NEAREST, format = gl.RGBA, internalFormat = format, type = gl.UNSIGNED_BYTE, depth = true, } = {}) {
+	    constructor(gl, { inputTexture, width = gl.canvas.width, height = gl.canvas.height, wrapS = gl.CLAMP_TO_EDGE, wrapT = gl.CLAMP_TO_EDGE, minFilter = gl.NEAREST, magFilter = gl.NEAREST, format = gl.RGBA, internalFormat = format, type = gl.UNSIGNED_BYTE, depth = true, } = {}) {
 	        _gl$5.set(this, void 0);
 	        _buffer.set(this, void 0);
 	        _depthBuffer.set(this, void 0);
 	        _width$1.set(this, void 0);
 	        _height$1.set(this, void 0);
+	        _depth.set(this, void 0);
 	        __classPrivateFieldSet(this, _gl$5, gl);
 	        __classPrivateFieldSet(this, _width$1, width);
 	        __classPrivateFieldSet(this, _height$1, height);
-	        this.texture = new Texture(gl, {
-	            type,
-	            format,
-	            internalFormat,
-	            wrapS,
-	            wrapT,
-	            minFilter,
-	            magFilter,
-	        });
-	        this.texture.bind().fromSize(width, height).unbind();
-	        __classPrivateFieldSet(this, _buffer, gl.createFramebuffer());
-	        gl.bindFramebuffer(target, __classPrivateFieldGet(this, _buffer));
-	        const level = 0;
-	        const texture = this.texture.getTexture();
-	        gl.framebufferTexture2D(target, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, level);
-	        if (depth) {
-	            __classPrivateFieldSet(this, _depthBuffer, __classPrivateFieldGet(this, _gl$5).createRenderbuffer());
-	            __classPrivateFieldGet(this, _gl$5).bindRenderbuffer(__classPrivateFieldGet(this, _gl$5).RENDERBUFFER, __classPrivateFieldGet(this, _depthBuffer));
-	            __classPrivateFieldGet(this, _gl$5).renderbufferStorage(__classPrivateFieldGet(this, _gl$5).RENDERBUFFER, __classPrivateFieldGet(this, _gl$5).DEPTH_COMPONENT16, __classPrivateFieldGet(this, _width$1), __classPrivateFieldGet(this, _height$1));
-	            __classPrivateFieldGet(this, _gl$5).framebufferRenderbuffer(target, __classPrivateFieldGet(this, _gl$5).DEPTH_ATTACHMENT, __classPrivateFieldGet(this, _gl$5).RENDERBUFFER, __classPrivateFieldGet(this, _depthBuffer));
+	        __classPrivateFieldSet(this, _depth, depth);
+	        if (inputTexture) {
+	            this.texture = inputTexture;
 	        }
-	        gl.bindFramebuffer(target, null);
+	        else {
+	            this.texture = new Texture(gl, {
+	                type,
+	                format,
+	                internalFormat,
+	                wrapS,
+	                wrapT,
+	                minFilter,
+	                magFilter,
+	            })
+	                .bind()
+	                .fromSize(width, height);
+	        }
+	        __classPrivateFieldSet(this, _buffer, gl.createFramebuffer());
+	        this.updateWithSize(__classPrivateFieldGet(this, _width$1), __classPrivateFieldGet(this, _height$1));
 	    }
 	    bind() {
 	        __classPrivateFieldGet(this, _gl$5).bindFramebuffer(__classPrivateFieldGet(this, _gl$5).FRAMEBUFFER, __classPrivateFieldGet(this, _buffer));
@@ -4189,6 +4661,26 @@
 	    }
 	    unbind() {
 	        __classPrivateFieldGet(this, _gl$5).bindFramebuffer(__classPrivateFieldGet(this, _gl$5).FRAMEBUFFER, null);
+	        return this;
+	    }
+	    updateWithSize(width, height, updateTexture = false) {
+	        this.bind();
+	        const level = 0;
+	        const texture = this.texture.getTexture();
+	        __classPrivateFieldGet(this, _gl$5).framebufferTexture2D(__classPrivateFieldGet(this, _gl$5).FRAMEBUFFER, __classPrivateFieldGet(this, _gl$5).COLOR_ATTACHMENT0, __classPrivateFieldGet(this, _gl$5).TEXTURE_2D, texture, level);
+	        this.unbind();
+	        if (__classPrivateFieldGet(this, _depth)) {
+	            __classPrivateFieldSet(this, _depthBuffer, __classPrivateFieldGet(this, _gl$5).createRenderbuffer());
+	            __classPrivateFieldGet(this, _gl$5).bindRenderbuffer(__classPrivateFieldGet(this, _gl$5).RENDERBUFFER, __classPrivateFieldGet(this, _depthBuffer));
+	            __classPrivateFieldGet(this, _gl$5).renderbufferStorage(__classPrivateFieldGet(this, _gl$5).RENDERBUFFER, __classPrivateFieldGet(this, _gl$5).DEPTH_COMPONENT16, width, height);
+	            __classPrivateFieldGet(this, _gl$5).framebufferRenderbuffer(__classPrivateFieldGet(this, _gl$5).FRAMEBUFFER, __classPrivateFieldGet(this, _gl$5).DEPTH_ATTACHMENT, __classPrivateFieldGet(this, _gl$5).RENDERBUFFER, __classPrivateFieldGet(this, _depthBuffer));
+	            __classPrivateFieldGet(this, _gl$5).bindRenderbuffer(__classPrivateFieldGet(this, _gl$5).RENDERBUFFER, null);
+	        }
+	        if (updateTexture) {
+	            this.texture.bind().fromSize(width, height);
+	        }
+	        __classPrivateFieldSet(this, _width$1, width);
+	        __classPrivateFieldSet(this, _height$1, height);
 	        return this;
 	    }
 	    reset() {
@@ -4203,7 +4695,7 @@
 	        __classPrivateFieldGet(this, _gl$5).deleteFramebuffer(__classPrivateFieldGet(this, _buffer));
 	    }
 	}
-	_gl$5 = new WeakMap(), _buffer = new WeakMap(), _depthBuffer = new WeakMap(), _width$1 = new WeakMap(), _height$1 = new WeakMap();
+	_gl$5 = new WeakMap(), _buffer = new WeakMap(), _depthBuffer = new WeakMap(), _width$1 = new WeakMap(), _height$1 = new WeakMap(), _depth = new WeakMap();
 
 	class PerspectiveCamera {
 	    constructor(fieldOfView, aspect, near, far) {
@@ -4234,6 +4726,44 @@
 	}
 	PerspectiveCamera.UP_VECTOR = [0, 1, 0];
 
+	class OrthographicCamera {
+	    constructor(left, right, top, bottom, near, far) {
+	        this.left = -1;
+	        this.right = 1;
+	        this.top = 1;
+	        this.bottom = -1;
+	        this.near = 0.1;
+	        this.far = 2000;
+	        this.zoom = 1;
+	        this.position = [0, 0, 0];
+	        this.lookAtPosition = [0, 0, 0];
+	        this.projectionMatrix = create$3();
+	        this.viewMatrix = create$3();
+	        this.left = left;
+	        this.right = right;
+	        this.top = top;
+	        this.bottom = bottom;
+	        this.near = near;
+	        this.far = far;
+	        this.updateProjectionMatrix();
+	    }
+	    updateViewMatrix() {
+	        lookAt(this.viewMatrix, this.position, this.lookAtPosition, OrthographicCamera.UP_VECTOR);
+	        return this;
+	    }
+	    updateProjectionMatrix() {
+	        ortho(this.projectionMatrix, this.left, this.right, this.bottom, this.top, this.near, this.far);
+	        return this;
+	    }
+	    lookAt(target) {
+	        this.lookAtPosition = target;
+	        this.updateViewMatrix();
+	        return this;
+	    }
+	}
+	OrthographicCamera.UP_VECTOR = [0, 1, 0];
+
+	// @ts-nocheck
 	/**
 	 * @private
 	 */
@@ -4242,9 +4772,9 @@
 	    const segW = width / wSegs;
 	    const segH = height / hSegs;
 	    for (let iy = 0; iy <= hSegs; iy++) {
-	        let y = iy * segH - height / 2;
+	        const y = iy * segH - height / 2;
 	        for (let ix = 0; ix <= wSegs; ix++, i++) {
-	            let x = ix * segW - width / 2;
+	            const x = ix * segW - width / 2;
 	            vertices[i * 3 + u] = x * uDir;
 	            vertices[i * 3 + v] = y * vDir;
 	            vertices[i * 3 + w] = depth / 2;
@@ -4255,10 +4785,10 @@
 	            uv[i * 2 + 1] = 1 - iy / hSegs;
 	            if (iy === hSegs || ix === wSegs)
 	                continue;
-	            let a = io + ix + iy * (wSegs + 1);
-	            let b = io + ix + (iy + 1) * (wSegs + 1);
-	            let c = io + ix + (iy + 1) * (wSegs + 1) + 1;
-	            let d = io + ix + iy * (wSegs + 1) + 1;
+	            const a = io + ix + iy * (wSegs + 1);
+	            const b = io + ix + (iy + 1) * (wSegs + 1);
+	            const c = io + ix + (iy + 1) * (wSegs + 1) + 1;
+	            const d = io + ix + iy * (wSegs + 1) + 1;
 	            indices[ii * 6] = a;
 	            indices[ii * 6 + 1] = b;
 	            indices[ii * 6 + 2] = d;
@@ -4455,17 +4985,6 @@
 	    }
 	}
 	/**
-	 * Generates geometry data for a fullscreen quad in normalized coordinates
-	 * @param {SphereInterface} params
-	 * @returns {{ vertices, uv }}
-	 */
-	function createFullscreenQuad() {
-	    return {
-	        vertices: new Float32Array([1, 1, -1, 1, -1, -1, -1, -1, 1, -1, 1, 1]),
-	        uv: new Float32Array([1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1]),
-	    };
-	}
-	/**
 	 * Generates geometry data for a sphere
 	 * @param {SphereInterface} params
 	 * @returns {{ vertices, normal, uv, indices }}
@@ -4487,19 +5006,19 @@
 	    let i = 0;
 	    let iv = 0;
 	    let ii = 0;
-	    let te = tStart + tLength;
+	    const te = tStart + tLength;
 	    const grid = [];
-	    let n = create$1$1();
+	    const n = create$1$1();
 	    for (let iy = 0; iy <= hSegs; iy++) {
-	        let vRow = [];
-	        let v = iy / hSegs;
+	        const vRow = [];
+	        const v = iy / hSegs;
 	        for (let ix = 0; ix <= wSegs; ix++, i++) {
-	            let u = ix / wSegs;
-	            let x = -radius *
+	            const u = ix / wSegs;
+	            const x = -radius *
 	                Math.cos(pStart + u * pLength) *
 	                Math.sin(tStart + v * tLength);
-	            let y = radius * Math.cos(tStart + v * tLength);
-	            let z = radius * Math.sin(pStart + u * pLength) * Math.sin(tStart + v * tLength);
+	            const y = radius * Math.cos(tStart + v * tLength);
+	            const z = radius * Math.sin(pStart + u * pLength) * Math.sin(tStart + v * tLength);
 	            position[i * 3] = x;
 	            position[i * 3 + 1] = y;
 	            position[i * 3 + 2] = z;
@@ -4516,10 +5035,10 @@
 	    }
 	    for (let iy = 0; iy < hSegs; iy++) {
 	        for (let ix = 0; ix < wSegs; ix++) {
-	            let a = grid[iy][ix + 1];
-	            let b = grid[iy][ix];
-	            let c = grid[iy + 1][ix];
-	            let d = grid[iy + 1][ix + 1];
+	            const a = grid[iy][ix + 1];
+	            const b = grid[iy][ix];
+	            const c = grid[iy + 1][ix];
+	            const d = grid[iy + 1][ix + 1];
 	            if (iy !== 0 || tStart > 0) {
 	                index[ii * 3] = a;
 	                index[ii * 3 + 1] = b;
@@ -4546,9 +5065,95 @@
 	    __proto__: null,
 	    createPlane: createPlane,
 	    createBox: createBox,
-	    createFullscreenQuad: createFullscreenQuad,
 	    createSphere: createSphere
 	});
+
+	const BOXES_VERTEX_SHADER = `
+  attribute vec4 position;
+  attribute vec2 uv;
+  attribute mat4 instanceModelMatrix;
+
+  varying vec2 v_uv;
+
+  void main () {
+    gl_Position = projectionMatrix *
+                  viewMatrix *
+                  modelMatrix *
+                  instanceModelMatrix *
+                  position;
+    v_uv = uv;
+  }
+`;
+
+	const BOXES_FRAGMENT_SHADER = `
+  uniform bool debugMode;
+  varying vec2 v_uv;
+  void main () {
+    if (debugMode) {
+      gl_FragColor = vec4(v_uv.x, 0.1, v_uv.y, 1.0);
+    } else {
+      gl_FragColor = vec4(0.02, 0.02, 0.02, 1);
+    }
+  }
+`;
+
+	const VERTEX_SHADER_SPHERE = `
+  attribute vec4 position;
+
+  void main () {
+    gl_Position = projectionMatrix * viewMatrix * modelMatrix * position;
+  }
+`;
+
+	const FRAGMENT_SHADER_SPHERE = `
+  void main () {
+    gl_FragColor = vec4(1.0);
+  }
+`;
+
+	const VERTEX_SHADER_BLUR = `
+  attribute vec4 position;
+  attribute vec2 uv;
+
+  varying vec2 v_uv;
+
+  void main () {
+    gl_Position = projectionMatrix * viewMatrix * modelMatrix * position;
+
+    v_uv = uv;
+  }
+`;
+
+	const FRAGMENT_SHADER_BLUR = `
+  uniform sampler2D diffuse;
+  uniform sampler2D mask;
+  uniform vec2 blurDirection;
+  uniform float factor;
+  uniform vec2 resolution;
+
+  varying vec2 v_uv;
+
+  vec4 blur9(sampler2D image, vec2 uv, vec2 resolution, vec2 direction) {
+    vec4 color = vec4(0.0);
+    vec2 off1 = vec2(1.3846153846) * direction;
+    vec2 off2 = vec2(3.2307692308) * direction;
+    color += texture2D(image, uv) * 0.2270270270;
+    color += texture2D(image, uv + (off1 / resolution)) * 0.3162162162;
+    color += texture2D(image, uv - (off1 / resolution)) * 0.3162162162;
+    color += texture2D(image, uv + (off2 / resolution)) * 0.0702702703;
+    color += texture2D(image, uv - (off2 / resolution)) * 0.0702702703;
+    return color;
+  }
+
+  void main () {
+    vec4 maskColor = texture2D(mask, v_uv);
+    gl_FragColor = mix(
+      blur9(diffuse, v_uv, resolution, blurDirection) * factor,
+      vec4(0.1, 0.1, 0.1, 1.0),
+      maskColor.r
+    );
+  }
+`;
 
 	const COUNT_SIDE = 12;
 	const BOXES_COUNT = COUNT_SIDE * COUNT_SIDE;
@@ -4564,7 +5169,7 @@
 
 	const gui = new GUI$1();
 
-	const dpr = devicePixelRatio;
+	const dpr = Math.min(devicePixelRatio, 2);
 	const canvas = document.createElement('canvas');
 	const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
 
@@ -4581,20 +5186,24 @@
 	gl.enable(gl.CULL_FACE);
 	gl.depthFunc(gl.LEQUAL);
 
-	const camera = new PerspectiveCamera(
+	const perspCamera = new PerspectiveCamera(
 	  (45 * Math.PI) / 180,
 	  innerWidth / innerHeight,
 	  0.1,
 	  100,
 	);
-	camera.position = [0, 0, 10];
-	camera.lookAt([0, 0, 0]);
+	perspCamera.position = [0, 0, 10];
+	perspCamera.lookAt([0, 0, 0]);
 
-	const renderTargetBlurX = new Framebuffer(gl, {
+	const orthoCamera = new OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0.1, 2);
+	orthoCamera.position = [0, 0, 1];
+	orthoCamera.lookAt([0, 0, 0]);
+
+	let renderTargetBlurX = new Framebuffer(gl, {
 	  width: innerWidth / SCALE_DOWN_POSTFX,
 	  height: innerHeight / SCALE_DOWN_POSTFX,
 	});
-	const renderTargetBlurY = new Framebuffer(gl, {
+	let renderTargetBlurY = new Framebuffer(gl, {
 	  width: innerWidth / SCALE_DOWN_POSTFX,
 	  height: innerHeight / SCALE_DOWN_POSTFX,
 	});
@@ -4616,35 +5225,8 @@
 	  boxesMesh = new InstancedMesh(gl, {
 	    geometry,
 	    instanceCount: BOXES_COUNT,
-	    vertexShaderSource: `
-    attribute vec4 position;
-    attribute vec2 uv;
-    attribute mat4 instanceModelMatrix;
-
-    varying vec2 v_uv;
-
-    void main () {
-      gl_Position = projectionMatrix *
-                    viewMatrix *
-                    modelMatrix *
-                    instanceModelMatrix *
-                    position;
-      v_uv = uv;
-    }
-  `,
-	    fragmentShaderSource: `
-      uniform bool debugMode;
-      varying vec2 v_uv;
-      void main () {
-        if (debugMode) {
-          gl_FragColor = vec4(v_uv.x, 0.1, v_uv.y, 1.0);
-        } else {
-          gl_FragColor = vec4(${BACKGROUND_COLOR.map(
-            (color) => `${color}`,
-          ).join(', ')});
-        }
-      }
-    `,
+	    vertexShaderSource: BOXES_VERTEX_SHADER,
+	    fragmentShaderSource: BOXES_FRAGMENT_SHADER,
 	  });
 	}
 
@@ -4662,84 +5244,41 @@
 	  });
 	  sphereMesh = new Mesh(gl, {
 	    geometry,
-	    vertexShaderSource: `
-      attribute vec4 position;
-
-      void main () {
-        gl_Position = projectionMatrix * viewMatrix * modelMatrix * position;
-      }
-    `,
-	    fragmentShaderSource: `
-      void main () {
-        gl_FragColor = vec4(1.0);
-      }
-    `,
+	    vertexShaderSource: VERTEX_SHADER_SPHERE,
+	    fragmentShaderSource: FRAGMENT_SHADER_SPHERE,
 	  });
 	}
 
 	/* ----- Fullscreen Quad ------ */
-	const { vertices, uv } = index.createFullscreenQuad();
-	const geometry = new Geometry(gl);
-	geometry
-	  .addAttribute('position', {
-	    typedArray: vertices,
-	    size: 2,
-	  })
-	  .addAttribute('uv', {
-	    typedArray: uv,
-	    size: 2,
+	{
+	  const { indices, vertices, uv } = index.createPlane({
+	    width: 1,
+	    height: 1,
 	  });
-	planeMesh = new Mesh(gl, {
-	  geometry,
-	  uniforms: {
-	    diffuse: { type: 'int', value: 0 },
-	    mask: { type: 'int', value: 1 },
-	    blurDirection: { type: 'vec2', value: [0, 1] },
-	    factor: { type: 'float', value: OPTS.factor },
-	  },
-	  vertexShaderSource: `
-    attribute vec4 position;
-    attribute vec2 uv;
-
-    varying vec2 v_uv;
-
-    void main () {
-      gl_Position = position;
-
-      v_uv = uv;
-    }
-  `,
-	  fragmentShaderSource: `
-    uniform sampler2D diffuse;
-    uniform sampler2D mask;
-    uniform vec2 blurDirection;
-    uniform float factor;
-
-    varying vec2 v_uv;
-
-    vec4 blur9(sampler2D image, vec2 uv, vec2 resolution, vec2 direction) {
-      vec4 color = vec4(0.0);
-      vec2 off1 = vec2(1.3846153846) * direction;
-      vec2 off2 = vec2(3.2307692308) * direction;
-      color += texture2D(image, uv) * 0.2270270270;
-      color += texture2D(image, uv + (off1 / resolution)) * 0.3162162162;
-      color += texture2D(image, uv - (off1 / resolution)) * 0.3162162162;
-      color += texture2D(image, uv + (off2 / resolution)) * 0.0702702703;
-      color += texture2D(image, uv - (off2 / resolution)) * 0.0702702703;
-      return color;
-    }
-
-    void main () {
-      vec2 resolution = vec2(${innerWidth}.0, ${innerHeight}.0);
-      vec4 maskColor = texture2D(mask, v_uv);
-      gl_FragColor = mix(
-        blur9(diffuse, v_uv, resolution, blurDirection) * factor,
-        vec4(0.1, 0.1, 0.1, 1.0),
-        maskColor.r
-      );
-    }
-  `,
-	});
+	  const geometry = new Geometry(gl);
+	  geometry
+	    .addIndex({ typedArray: indices })
+	    .addAttribute('position', {
+	      typedArray: vertices,
+	      size: 3,
+	    })
+	    .addAttribute('uv', {
+	      typedArray: uv,
+	      size: 2,
+	    });
+	  planeMesh = new Mesh(gl, {
+	    geometry,
+	    uniforms: {
+	      diffuse: { type: UNIFORM_TYPE_INT, value: 0 },
+	      mask: { type: UNIFORM_TYPE_INT, value: 1 },
+	      blurDirection: { type: UNIFORM_TYPE_VEC2, value: [0, 1] },
+	      factor: { type: UNIFORM_TYPE_FLOAT, value: OPTS.factor },
+	      resolution: { type: UNIFORM_TYPE_VEC2, value: [innerWidth, innerHeight] },
+	    },
+	    vertexShaderSource: VERTEX_SHADER_BLUR,
+	    fragmentShaderSource: FRAGMENT_SHADER_BLUR,
+	  });
+	}
 
 	const matrix = create();
 	const translateVec = create$1();
@@ -4764,7 +5303,7 @@
 	}
 
 	gui.add(OPTS, 'debugMode').onChange((val) => {
-	  boxesMesh.setUniform('debugMode', 'float', val);
+	  boxesMesh.use().setUniform('debugMode', UNIFORM_TYPE_FLOAT, val);
 	});
 	gui
 	  .add(OPTS, 'factor')
@@ -4772,14 +5311,14 @@
 	  .max(1.15)
 	  .step(0.01)
 	  .onChange((val) => {
-	    planeMesh.setUniform('factor', 'float', val);
+	    planeMesh.use().setUniform('factor', UNIFORM_TYPE_FLOAT, val);
 	  });
 	gui.add(OPTS, 'spread').min(1).max(5).step(0.5);
 
 	document.body.appendChild(canvas);
 	requestAnimationFrame(updateFrame);
-	resize();
-	window.addEventListener('resize', resize);
+	sizeCanvas();
+	window.addEventListener('resize', lodash_throttle(resize, 100));
 
 	function updateFrame(ts) {
 	  ts /= 1000;
@@ -4806,7 +5345,8 @@
 	  }
 
 	  sphereMesh
-	    .setCamera(camera)
+	    .use()
+	    .setCamera(perspCamera)
 	    .setPosition({
 	      x: Math.sin(ts) * 4,
 	      y: Math.cos(ts) * 3,
@@ -4814,7 +5354,7 @@
 	    })
 	    .draw();
 
-	  boxesMesh.setCamera(camera).draw();
+	  boxesMesh.use().setCamera(perspCamera).draw();
 
 	  if (!OPTS.debugMode) {
 	    renderTargetBlurX.unbind();
@@ -4824,9 +5364,11 @@
 	      writeBuffer.texture.bind();
 	      const radius = BLUR_ITERATIONS - i * OPTS.spread - 1;
 	      planeMesh
+	        .use()
+	        .setCamera(orthoCamera)
 	        .setUniform(
 	          'blurDirection',
-	          'vec2',
+	          UNIFORM_TYPE_VEC2,
 	          i % 2 === 0 ? [radius, 0] : [0, radius],
 	        )
 	        .draw();
@@ -4845,7 +5387,7 @@
 
 	    readBuffer.texture.bind();
 
-	    planeMesh.draw();
+	    planeMesh.use().draw();
 	  }
 
 	  // readBuffer.unbindTexture()
@@ -4856,6 +5398,41 @@
 	}
 
 	function resize() {
+	  const aspect = innerWidth / innerHeight;
+
+	  perspCamera.aspect = aspect;
+	  perspCamera.updateProjectionMatrix();
+
+	  renderTargetBlurX.updateWithSize(
+	    innerWidth / SCALE_DOWN_POSTFX,
+	    innerHeight / SCALE_DOWN_POSTFX,
+	    true,
+	  );
+	  renderTargetBlurY.updateWithSize(
+	    innerWidth / SCALE_DOWN_POSTFX,
+	    innerHeight / SCALE_DOWN_POSTFX,
+	    true,
+	  );
+	  // renderTargetBlurX.delete()
+	  // renderTargetBlurY.delete()
+
+	  // renderTargetBlurX = new Framebuffer(gl, {
+	  //   width: innerWidth / SCALE_DOWN_POSTFX,
+	  //   height: innerHeight / SCALE_DOWN_POSTFX,
+	  // })
+	  // renderTargetBlurY = new Framebuffer(gl, {
+	  //   width: innerWidth / SCALE_DOWN_POSTFX,
+	  //   height: innerHeight / SCALE_DOWN_POSTFX,
+	  // })
+	  planeMesh.setUniform('resolution', UNIFORM_TYPE_VEC2, [
+	    innerWidth,
+	    innerHeight,
+	  ]);
+
+	  sizeCanvas();
+	}
+
+	function sizeCanvas() {
 	  canvas.width = innerWidth * dpr;
 	  canvas.height = innerHeight * dpr;
 	  canvas.style.setProperty('width', `${innerWidth}px`);

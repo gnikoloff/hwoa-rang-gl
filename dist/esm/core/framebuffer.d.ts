@@ -3,9 +3,10 @@ import { Texture } from './texture';
 export declare class Framebuffer {
     #private;
     texture: Texture;
-    constructor(gl: WebGLRenderingContext, { width, height, target, wrapS, wrapT, minFilter, magFilter, format, internalFormat, type, depth, }?: FramebufferInterface);
+    constructor(gl: WebGLRenderingContext, { inputTexture, width, height, wrapS, wrapT, minFilter, magFilter, format, internalFormat, type, depth, }?: FramebufferInterface);
     bind(): this;
     unbind(): this;
+    updateWithSize(width: number, height: number, updateTexture?: boolean): this;
     reset(): this;
     delete(): void;
 }

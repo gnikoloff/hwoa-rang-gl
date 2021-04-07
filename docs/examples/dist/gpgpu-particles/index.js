@@ -11,93 +11,6 @@
 	!function(e,t){module.exports=t();}(commonjsGlobal,function(){var c=function(){var n=0,l=document.createElement("div");function e(e){return l.appendChild(e.dom),e}function t(e){for(var t=0;t<l.children.length;t++)l.children[t].style.display=t===e?"block":"none";n=e;}l.style.cssText="position:fixed;top:0;left:0;cursor:pointer;opacity:0.9;z-index:10000",l.addEventListener("click",function(e){e.preventDefault(),t(++n%l.children.length);},!1);var i=(performance||Date).now(),a=i,o=0,f=e(new c.Panel("FPS","#0ff","#002")),r=e(new c.Panel("MS","#0f0","#020"));if(self.performance&&self.performance.memory)var d=e(new c.Panel("MB","#f08","#201"));return t(0),{REVISION:16,dom:l,addPanel:e,showPanel:t,begin:function(){i=(performance||Date).now();},end:function(){o++;var e=(performance||Date).now();if(r.update(e-i,200),a+1e3<=e&&(f.update(1e3*o/(e-a),100),a=e,o=0,d)){var t=performance.memory;d.update(t.usedJSHeapSize/1048576,t.jsHeapSizeLimit/1048576);}return e},update:function(){i=this.end();},domElement:l,setMode:t}};return c.Panel=function(n,l,i){var a=1/0,o=0,f=Math.round,r=f(window.devicePixelRatio||1),d=80*r,e=48*r,c=3*r,p=2*r,u=3*r,s=15*r,m=74*r,h=30*r,y=document.createElement("canvas");y.width=d,y.height=e,y.style.cssText="width:80px;height:48px";var v=y.getContext("2d");return v.font="bold "+9*r+"px Helvetica,Arial,sans-serif",v.textBaseline="top",v.fillStyle=i,v.fillRect(0,0,d,e),v.fillStyle=l,v.fillText(n,c,p),v.fillRect(u,s,m,h),v.fillStyle=i,v.globalAlpha=.9,v.fillRect(u,s,m,h),{dom:y,update:function(e,t){a=Math.min(a,e),o=Math.max(o,e),v.fillStyle=i,v.globalAlpha=1,v.fillRect(0,0,d,s),v.fillStyle=l,v.fillText(f(e)+" "+n+" ("+f(a)+"-"+f(o)+")",c,p),v.drawImage(y,u+r,s,m-r,h,u,s,m-r,h),v.fillRect(u+m-r,s,r,h),v.fillStyle=i,v.globalAlpha=.9,v.fillRect(u+m-r,s,r,f((1-e/t)*h));}}},c});
 	});
 
-	/**
-	 * Common utilities
-	 * @module glMatrix
-	 */
-	var ARRAY_TYPE = typeof Float32Array !== 'undefined' ? Float32Array : Array;
-	if (!Math.hypot) Math.hypot = function () {
-	  var y = 0,
-	      i = arguments.length;
-
-	  while (i--) {
-	    y += arguments[i] * arguments[i];
-	  }
-
-	  return Math.sqrt(y);
-	};
-
-	/**
-	 * 4x4 Matrix<br>Format: column-major, when typed out it looks like row-major<br>The matrices are being post multiplied.
-	 * @module mat4
-	 */
-
-	/**
-	 * Creates a new identity mat4
-	 *
-	 * @returns {mat4} a new 4x4 matrix
-	 */
-
-	function create() {
-	  var out = new ARRAY_TYPE(16);
-
-	  if (ARRAY_TYPE != Float32Array) {
-	    out[1] = 0;
-	    out[2] = 0;
-	    out[3] = 0;
-	    out[4] = 0;
-	    out[6] = 0;
-	    out[7] = 0;
-	    out[8] = 0;
-	    out[9] = 0;
-	    out[11] = 0;
-	    out[12] = 0;
-	    out[13] = 0;
-	    out[14] = 0;
-	  }
-
-	  out[0] = 1;
-	  out[5] = 1;
-	  out[10] = 1;
-	  out[15] = 1;
-	  return out;
-	}
-	/**
-	 * Generates a orthogonal projection matrix with the given bounds
-	 *
-	 * @param {mat4} out mat4 frustum matrix will be written into
-	 * @param {number} left Left bound of the frustum
-	 * @param {number} right Right bound of the frustum
-	 * @param {number} bottom Bottom bound of the frustum
-	 * @param {number} top Top bound of the frustum
-	 * @param {number} near Near bound of the frustum
-	 * @param {number} far Far bound of the frustum
-	 * @returns {mat4} out
-	 */
-
-	function ortho(out, left, right, bottom, top, near, far) {
-	  var lr = 1 / (left - right);
-	  var bt = 1 / (bottom - top);
-	  var nf = 1 / (near - far);
-	  out[0] = -2 * lr;
-	  out[1] = 0;
-	  out[2] = 0;
-	  out[3] = 0;
-	  out[4] = 0;
-	  out[5] = -2 * bt;
-	  out[6] = 0;
-	  out[7] = 0;
-	  out[8] = 0;
-	  out[9] = 0;
-	  out[10] = 2 * nf;
-	  out[11] = 0;
-	  out[12] = (left + right) * lr;
-	  out[13] = (top + bottom) * bt;
-	  out[14] = (far + near) * nf;
-	  out[15] = 1;
-	  return out;
-	}
-
 	/*! *****************************************************************************
 	Copyright (c) Microsoft Corporation.
 
@@ -164,7 +77,7 @@
     ${gl.getShaderInfoLog(shader)}
   `);
 	    gl.deleteShader(shader);
-	    return;
+	    return shader;
 	}
 	/**
 	 * Create and link WebGLProgram with provided shader strings
@@ -190,6 +103,7 @@
 	    }
 	    console.error(gl.getProgramInfoLog(program));
 	    gl.deleteProgram(program);
+	    return program;
 	}
 	/**
 	 * Create a ARRAY_BUFFER buffer
@@ -275,7 +189,9 @@
 	     * @param uniformValue
 	     * @returns {this}
 	     */
-	    setUniform(uniformName, uniformType, uniformValue) {
+	    setUniform(uniformName, uniformType, 
+	    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+	    uniformValue) {
 	        let uniformLocation;
 	        if (__classPrivateFieldGet(this, _uniformLocations).has(uniformName)) {
 	            uniformLocation = __classPrivateFieldGet(this, _uniformLocations).get(uniformName);
@@ -305,7 +221,7 @@
 	                break;
 	            default:
 	                console.error(`Unrecognised uniform type: ${uniformType}`);
-	                return;
+	                return this;
 	        }
 	        return this;
 	    }
@@ -418,7 +334,7 @@
 	 */
 	// Configuration Constants
 	var EPSILON = 0.000001;
-	var ARRAY_TYPE$1 = typeof Float32Array !== 'undefined' ? Float32Array : Array;
+	var ARRAY_TYPE = typeof Float32Array !== 'undefined' ? Float32Array : Array;
 	if (!Math.hypot) Math.hypot = function () {
 	  var y = 0,
 	      i = arguments.length;
@@ -441,10 +357,10 @@
 	 * @returns {mat4} a new 4x4 matrix
 	 */
 
-	function create$1() {
-	  var out = new ARRAY_TYPE$1(16);
+	function create() {
+	  var out = new ARRAY_TYPE(16);
 
-	  if (ARRAY_TYPE$1 != Float32Array) {
+	  if (ARRAY_TYPE != Float32Array) {
 	    out[1] = 0;
 	    out[2] = 0;
 	    out[3] = 0;
@@ -657,6 +573,125 @@
 
 	  return out;
 	}
+	/**
+	 * Generates a orthogonal projection matrix with the given bounds
+	 *
+	 * @param {mat4} out mat4 frustum matrix will be written into
+	 * @param {number} left Left bound of the frustum
+	 * @param {number} right Right bound of the frustum
+	 * @param {number} bottom Bottom bound of the frustum
+	 * @param {number} top Top bound of the frustum
+	 * @param {number} near Near bound of the frustum
+	 * @param {number} far Far bound of the frustum
+	 * @returns {mat4} out
+	 */
+
+	function ortho(out, left, right, bottom, top, near, far) {
+	  var lr = 1 / (left - right);
+	  var bt = 1 / (bottom - top);
+	  var nf = 1 / (near - far);
+	  out[0] = -2 * lr;
+	  out[1] = 0;
+	  out[2] = 0;
+	  out[3] = 0;
+	  out[4] = 0;
+	  out[5] = -2 * bt;
+	  out[6] = 0;
+	  out[7] = 0;
+	  out[8] = 0;
+	  out[9] = 0;
+	  out[10] = 2 * nf;
+	  out[11] = 0;
+	  out[12] = (left + right) * lr;
+	  out[13] = (top + bottom) * bt;
+	  out[14] = (far + near) * nf;
+	  out[15] = 1;
+	  return out;
+	}
+	/**
+	 * Generates a look-at matrix with the given eye position, focal point, and up axis.
+	 * If you want a matrix that actually makes an object look at another object, you should use targetTo instead.
+	 *
+	 * @param {mat4} out mat4 frustum matrix will be written into
+	 * @param {ReadonlyVec3} eye Position of the viewer
+	 * @param {ReadonlyVec3} center Point the viewer is looking at
+	 * @param {ReadonlyVec3} up vec3 pointing up
+	 * @returns {mat4} out
+	 */
+
+	function lookAt(out, eye, center, up) {
+	  var x0, x1, x2, y0, y1, y2, z0, z1, z2, len;
+	  var eyex = eye[0];
+	  var eyey = eye[1];
+	  var eyez = eye[2];
+	  var upx = up[0];
+	  var upy = up[1];
+	  var upz = up[2];
+	  var centerx = center[0];
+	  var centery = center[1];
+	  var centerz = center[2];
+
+	  if (Math.abs(eyex - centerx) < EPSILON && Math.abs(eyey - centery) < EPSILON && Math.abs(eyez - centerz) < EPSILON) {
+	    return identity(out);
+	  }
+
+	  z0 = eyex - centerx;
+	  z1 = eyey - centery;
+	  z2 = eyez - centerz;
+	  len = 1 / Math.hypot(z0, z1, z2);
+	  z0 *= len;
+	  z1 *= len;
+	  z2 *= len;
+	  x0 = upy * z2 - upz * z1;
+	  x1 = upz * z0 - upx * z2;
+	  x2 = upx * z1 - upy * z0;
+	  len = Math.hypot(x0, x1, x2);
+
+	  if (!len) {
+	    x0 = 0;
+	    x1 = 0;
+	    x2 = 0;
+	  } else {
+	    len = 1 / len;
+	    x0 *= len;
+	    x1 *= len;
+	    x2 *= len;
+	  }
+
+	  y0 = z1 * x2 - z2 * x1;
+	  y1 = z2 * x0 - z0 * x2;
+	  y2 = z0 * x1 - z1 * x0;
+	  len = Math.hypot(y0, y1, y2);
+
+	  if (!len) {
+	    y0 = 0;
+	    y1 = 0;
+	    y2 = 0;
+	  } else {
+	    len = 1 / len;
+	    y0 *= len;
+	    y1 *= len;
+	    y2 *= len;
+	  }
+
+	  out[0] = x0;
+	  out[1] = y0;
+	  out[2] = z0;
+	  out[3] = 0;
+	  out[4] = x1;
+	  out[5] = y1;
+	  out[6] = z1;
+	  out[7] = 0;
+	  out[8] = x2;
+	  out[9] = y2;
+	  out[10] = z2;
+	  out[11] = 0;
+	  out[12] = -(x0 * eyex + x1 * eyey + x2 * eyez);
+	  out[13] = -(y0 * eyex + y1 * eyey + y2 * eyez);
+	  out[14] = -(z0 * eyex + z1 * eyey + z2 * eyez);
+	  out[15] = 1;
+	  return out;
+	}
 
 	/**
 	 * 3 Dimensional Vector
@@ -669,10 +704,10 @@
 	 * @returns {vec3} a new 3D vector
 	 */
 
-	function create$1$1() {
-	  var out = new ARRAY_TYPE$1(3);
+	function create$1() {
+	  var out = new ARRAY_TYPE(3);
 
-	  if (ARRAY_TYPE$1 != Float32Array) {
+	  if (ARRAY_TYPE != Float32Array) {
 	    out[0] = 0;
 	    out[1] = 0;
 	    out[2] = 0;
@@ -697,30 +732,6 @@
 	  return out;
 	}
 	/**
-	 * Normalize a vec3
-	 *
-	 * @param {vec3} out the receiving vector
-	 * @param {ReadonlyVec3} a vector to normalize
-	 * @returns {vec3} out
-	 */
-
-	function normalize(out, a) {
-	  var x = a[0];
-	  var y = a[1];
-	  var z = a[2];
-	  var len = x * x + y * y + z * z;
-
-	  if (len > 0) {
-	    //TODO: evaluate use of glm_invsqrt here?
-	    len = 1 / Math.sqrt(len);
-	  }
-
-	  out[0] = a[0] * len;
-	  out[1] = a[1] * len;
-	  out[2] = a[2] * len;
-	  return out;
-	}
-	/**
 	 * Perform some operation over an array of vec3s.
 	 *
 	 * @param {Array} a the array of vectors to iterate over
@@ -734,7 +745,7 @@
 	 */
 
 	(function () {
-	  var vec = create$1$1();
+	  var vec = create$1();
 	  return function (a, stride, offset, count, fn, arg) {
 	    var i, l;
 
@@ -775,16 +786,16 @@
 	class Mesh {
 	    constructor(gl, params) {
 	        _position.set(this, [0, 0, 0]);
-	        _positionVec3.set(this, create$1$1());
+	        _positionVec3.set(this, create$1());
 	        _scale.set(this, [1, 1, 1]);
-	        _scaleVec3.set(this, create$1$1());
+	        _scaleVec3.set(this, create$1());
 	        _rotationAxis.set(this, [0, 0, 0]);
-	        _rotationAxisVec3.set(this, create$1$1());
+	        _rotationAxisVec3.set(this, create$1());
 	        _rotationAngle.set(this, 0);
 	        _gl$2.set(this, void 0);
 	        _geometry.set(this, void 0);
 	        this.modelMatrixNeedsUpdate = false;
-	        this.modelMatrix = create$1();
+	        this.modelMatrix = create();
 	        /**
 	         * DrawMode
 	         * @default gl.TRIANGLES
@@ -815,6 +826,7 @@
 	        this.vaoExtension.bindVertexArrayOES(null);
 	        this.program.bind();
 	        for (const [key, uniform] of Object.entries(uniforms)) {
+	            // @ts-ignore
 	            this.program.setUniform(key, uniform['type'], uniform['value']);
 	        }
 	        this.program.setUniform(MODEL_MATRIX_UNIFORM_NAME, UNIFORM_TYPE_MATRIX4X4, this.modelMatrix);
@@ -827,6 +839,10 @@
 	    get scale() {
 	        return __classPrivateFieldGet(this, _scale);
 	    }
+	    use() {
+	        this.program.bind();
+	        return this;
+	    }
 	    /**
 	     * Set uniform value. Query the uniform location if necessary and cache it in-memory for future use
 	     * @param {string} uniformName
@@ -835,9 +851,7 @@
 	     * @returns {this}
 	     */
 	    setUniform(uniformName, uniformType, uniformValue) {
-	        this.program.bind();
 	        this.program.setUniform(uniformName, uniformType, uniformValue);
-	        this.program.unbind();
 	        return this;
 	    }
 	    /**
@@ -883,21 +897,17 @@
 	        translate(this.modelMatrix, this.modelMatrix, __classPrivateFieldGet(this, _positionVec3));
 	        rotate(this.modelMatrix, this.modelMatrix, __classPrivateFieldGet(this, _rotationAngle), __classPrivateFieldGet(this, _rotationAxisVec3));
 	        scale(this.modelMatrix, this.modelMatrix, __classPrivateFieldGet(this, _scaleVec3));
-	        this.program.bind();
 	        this.program.setUniform(MODEL_MATRIX_UNIFORM_NAME, UNIFORM_TYPE_MATRIX4X4, this.modelMatrix);
-	        this.program.unbind();
 	        return this;
 	    }
 	    /**
 	     * Assign camera projection matrix and view matrix to model uniforms
-	     * @param {PerspectiveCamera} camera
+	     * @param {PerspectiveCamera|OrthographicCamera} camera
 	     * @returns {this}
 	     */
 	    setCamera(camera) {
-	        this.program.bind();
 	        this.program.setUniform(PROJECTION_MATRIX_UNIFORM_NAME, UNIFORM_TYPE_MATRIX4X4, camera.projectionMatrix);
 	        this.program.setUniform(VIEW_MATRIX_UNIFORM_NAME, UNIFORM_TYPE_MATRIX4X4, camera.viewMatrix);
-	        this.program.unbind();
 	        return this;
 	    }
 	    /**
@@ -909,7 +919,6 @@
 	            this.updateModelMatrix();
 	            this.modelMatrixNeedsUpdate = false;
 	        }
-	        this.program.bind();
 	        this.vaoExtension.bindVertexArrayOES(this.vao);
 	        if (this.hasIndices) {
 	            __classPrivateFieldGet(this, _gl$2).drawElements(this.drawMode, __classPrivateFieldGet(this, _geometry).vertexCount, __classPrivateFieldGet(this, _gl$2).UNSIGNED_SHORT, 0);
@@ -918,7 +927,6 @@
 	            __classPrivateFieldGet(this, _gl$2).drawArrays(this.drawMode, 0, __classPrivateFieldGet(this, _geometry).vertexCount);
 	        }
 	        this.vaoExtension.bindVertexArrayOES(null);
-	        this.program.unbind();
 	        return this;
 	    }
 	    /**
@@ -944,7 +952,7 @@
 	 * @public
 	 */
 	class Texture {
-	    constructor(gl, { format = gl.RGB, internalFormat = format, type = gl.UNSIGNED_BYTE, unpackAlignment = 1, wrapS = gl.CLAMP_TO_EDGE, wrapT = gl.CLAMP_TO_EDGE, minFilter = gl.NEAREST, magFilter = gl.NEAREST, } = {}) {
+	    constructor(gl, { format = gl.RGB, internalFormat = format, type = gl.UNSIGNED_BYTE, unpackAlignment = 1, wrapS = gl.CLAMP_TO_EDGE, wrapT = gl.CLAMP_TO_EDGE, minFilter = gl.LINEAR, magFilter = gl.LINEAR, } = {}) {
 	        _gl$4.set(this, void 0);
 	        _texture.set(this, void 0);
 	        _width.set(this, void 0);
@@ -1054,7 +1062,7 @@
 	     * @returns {this}
 	     */
 	    setIsFlip() {
-	        this.setPixelStore(__classPrivateFieldGet(this, _gl$4).UNPACK_FLIP_Y_WEBGL, true);
+	        this.setPixelStore(__classPrivateFieldGet(this, _gl$4).UNPACK_FLIP_Y_WEBGL, 1);
 	        return this;
 	    }
 	    /**
@@ -1100,7 +1108,7 @@
 	     */
 	    setAnisotropy(anisotropyLevel) {
 	        if (!anisotropyLevel) {
-	            return;
+	            return this;
 	        }
 	        if (__classPrivateFieldGet(this, _anisotropyExtension)) {
 	            const maxAnisotropySupported = __classPrivateFieldGet(this, _gl$4).getParameter(__classPrivateFieldGet(this, _anisotropyExtension).MAX_TEXTURE_MAX_ANISOTROPY_EXT);
@@ -1118,6 +1126,118 @@
 	_gl$4 = new WeakMap(), _texture = new WeakMap(), _width = new WeakMap(), _height = new WeakMap(), _format = new WeakMap(), _internalFormat = new WeakMap(), _type = new WeakMap(), _anisotropyExtension = new WeakMap();
 	Texture.isPowerOf2 = (width, height) => isPowerOf2(width) && isPowerOf2(height);
 
+	var _gl$5, _buffer, _depthBuffer, _width$1, _height$1, _depth;
+	class Framebuffer {
+	    constructor(gl, { inputTexture, width = gl.canvas.width, height = gl.canvas.height, wrapS = gl.CLAMP_TO_EDGE, wrapT = gl.CLAMP_TO_EDGE, minFilter = gl.NEAREST, magFilter = gl.NEAREST, format = gl.RGBA, internalFormat = format, type = gl.UNSIGNED_BYTE, depth = true, } = {}) {
+	        _gl$5.set(this, void 0);
+	        _buffer.set(this, void 0);
+	        _depthBuffer.set(this, void 0);
+	        _width$1.set(this, void 0);
+	        _height$1.set(this, void 0);
+	        _depth.set(this, void 0);
+	        __classPrivateFieldSet(this, _gl$5, gl);
+	        __classPrivateFieldSet(this, _width$1, width);
+	        __classPrivateFieldSet(this, _height$1, height);
+	        __classPrivateFieldSet(this, _depth, depth);
+	        if (inputTexture) {
+	            this.texture = inputTexture;
+	        }
+	        else {
+	            this.texture = new Texture(gl, {
+	                type,
+	                format,
+	                internalFormat,
+	                wrapS,
+	                wrapT,
+	                minFilter,
+	                magFilter,
+	            })
+	                .bind()
+	                .fromSize(width, height);
+	        }
+	        __classPrivateFieldSet(this, _buffer, gl.createFramebuffer());
+	        this.updateWithSize(__classPrivateFieldGet(this, _width$1), __classPrivateFieldGet(this, _height$1));
+	    }
+	    bind() {
+	        __classPrivateFieldGet(this, _gl$5).bindFramebuffer(__classPrivateFieldGet(this, _gl$5).FRAMEBUFFER, __classPrivateFieldGet(this, _buffer));
+	        return this;
+	    }
+	    unbind() {
+	        __classPrivateFieldGet(this, _gl$5).bindFramebuffer(__classPrivateFieldGet(this, _gl$5).FRAMEBUFFER, null);
+	        return this;
+	    }
+	    updateWithSize(width, height, updateTexture = false) {
+	        this.bind();
+	        const level = 0;
+	        const texture = this.texture.getTexture();
+	        __classPrivateFieldGet(this, _gl$5).framebufferTexture2D(__classPrivateFieldGet(this, _gl$5).FRAMEBUFFER, __classPrivateFieldGet(this, _gl$5).COLOR_ATTACHMENT0, __classPrivateFieldGet(this, _gl$5).TEXTURE_2D, texture, level);
+	        this.unbind();
+	        if (__classPrivateFieldGet(this, _depth)) {
+	            __classPrivateFieldSet(this, _depthBuffer, __classPrivateFieldGet(this, _gl$5).createRenderbuffer());
+	            __classPrivateFieldGet(this, _gl$5).bindRenderbuffer(__classPrivateFieldGet(this, _gl$5).RENDERBUFFER, __classPrivateFieldGet(this, _depthBuffer));
+	            __classPrivateFieldGet(this, _gl$5).renderbufferStorage(__classPrivateFieldGet(this, _gl$5).RENDERBUFFER, __classPrivateFieldGet(this, _gl$5).DEPTH_COMPONENT16, width, height);
+	            __classPrivateFieldGet(this, _gl$5).framebufferRenderbuffer(__classPrivateFieldGet(this, _gl$5).FRAMEBUFFER, __classPrivateFieldGet(this, _gl$5).DEPTH_ATTACHMENT, __classPrivateFieldGet(this, _gl$5).RENDERBUFFER, __classPrivateFieldGet(this, _depthBuffer));
+	            __classPrivateFieldGet(this, _gl$5).bindRenderbuffer(__classPrivateFieldGet(this, _gl$5).RENDERBUFFER, null);
+	        }
+	        if (updateTexture) {
+	            this.texture.bind().fromSize(width, height);
+	        }
+	        __classPrivateFieldSet(this, _width$1, width);
+	        __classPrivateFieldSet(this, _height$1, height);
+	        return this;
+	    }
+	    reset() {
+	        this.texture
+	            .bind()
+	            .fromSize(__classPrivateFieldGet(this, _width$1), __classPrivateFieldGet(this, _height$1))
+	            .unbind();
+	        return this;
+	    }
+	    delete() {
+	        this.texture.delete();
+	        __classPrivateFieldGet(this, _gl$5).deleteFramebuffer(__classPrivateFieldGet(this, _buffer));
+	    }
+	}
+	_gl$5 = new WeakMap(), _buffer = new WeakMap(), _depthBuffer = new WeakMap(), _width$1 = new WeakMap(), _height$1 = new WeakMap(), _depth = new WeakMap();
+
+	class OrthographicCamera {
+	    constructor(left, right, top, bottom, near, far) {
+	        this.left = -1;
+	        this.right = 1;
+	        this.top = 1;
+	        this.bottom = -1;
+	        this.near = 0.1;
+	        this.far = 2000;
+	        this.zoom = 1;
+	        this.position = [0, 0, 0];
+	        this.lookAtPosition = [0, 0, 0];
+	        this.projectionMatrix = create();
+	        this.viewMatrix = create();
+	        this.left = left;
+	        this.right = right;
+	        this.top = top;
+	        this.bottom = bottom;
+	        this.near = near;
+	        this.far = far;
+	        this.updateProjectionMatrix();
+	    }
+	    updateViewMatrix() {
+	        lookAt(this.viewMatrix, this.position, this.lookAtPosition, OrthographicCamera.UP_VECTOR);
+	        return this;
+	    }
+	    updateProjectionMatrix() {
+	        ortho(this.projectionMatrix, this.left, this.right, this.bottom, this.top, this.near, this.far);
+	        return this;
+	    }
+	    lookAt(target) {
+	        this.lookAtPosition = target;
+	        this.updateViewMatrix();
+	        return this;
+	    }
+	}
+	OrthographicCamera.UP_VECTOR = [0, 1, 0];
+
+	// @ts-nocheck
 	/**
 	 * @private
 	 */
@@ -1126,9 +1246,9 @@
 	    const segW = width / wSegs;
 	    const segH = height / hSegs;
 	    for (let iy = 0; iy <= hSegs; iy++) {
-	        let y = iy * segH - height / 2;
+	        const y = iy * segH - height / 2;
 	        for (let ix = 0; ix <= wSegs; ix++, i++) {
-	            let x = ix * segW - width / 2;
+	            const x = ix * segW - width / 2;
 	            vertices[i * 3 + u] = x * uDir;
 	            vertices[i * 3 + v] = y * vDir;
 	            vertices[i * 3 + w] = depth / 2;
@@ -1139,10 +1259,10 @@
 	            uv[i * 2 + 1] = 1 - iy / hSegs;
 	            if (iy === hSegs || ix === wSegs)
 	                continue;
-	            let a = io + ix + iy * (wSegs + 1);
-	            let b = io + ix + (iy + 1) * (wSegs + 1);
-	            let c = io + ix + (iy + 1) * (wSegs + 1) + 1;
-	            let d = io + ix + iy * (wSegs + 1) + 1;
+	            const a = io + ix + iy * (wSegs + 1);
+	            const b = io + ix + (iy + 1) * (wSegs + 1);
+	            const c = io + ix + (iy + 1) * (wSegs + 1) + 1;
+	            const d = io + ix + iy * (wSegs + 1) + 1;
 	            indices[ii * 6] = a;
 	            indices[ii * 6 + 1] = b;
 	            indices[ii * 6 + 2] = d;
@@ -1178,267 +1298,136 @@
 	        indices: index,
 	    };
 	}
-	function createBox(params = {}) {
-	    const { width = 1, height = 1, depth = 1, widthSegments = 1, heightSegments = 1, depthSegments = 1, separateFaces = false, } = params;
-	    const wSegs = widthSegments;
-	    const hSegs = heightSegments;
-	    const dSegs = depthSegments;
-	    const num = (wSegs + 1) * (hSegs + 1) * 2 +
-	        (wSegs + 1) * (dSegs + 1) * 2 +
-	        (hSegs + 1) * (dSegs + 1) * 2;
-	    const numIndices = (wSegs * hSegs * 2 + wSegs * dSegs * 2 + hSegs * dSegs * 2) * 6;
-	    const vertices = new Float32Array(num * 3);
-	    const normal = new Float32Array(num * 3);
-	    const uv = new Float32Array(num * 2);
-	    const indices = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices);
-	    const sidesData = [];
-	    let i = 0;
-	    let ii = 0;
-	    {
-	        // RIGHT
-	        if (separateFaces) {
-	            const num = (dSegs + 1) * (hSegs + 1);
-	            const numIndices = dSegs * hSegs * 6;
-	            const vertices = new Float32Array(num * 3);
-	            const normal = new Float32Array(num * 3);
-	            const uv = new Float32Array(num * 2);
-	            const indices = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices);
-	            buildPlane(vertices, normal, uv, indices, depth, height, width, dSegs, hSegs, 2, 1, 0, -1, -1, i, ii);
-	            sidesData.push({
-	                orientation: 'right',
-	                vertices,
-	                normal,
-	                uv,
-	                indices,
-	            });
-	        }
-	        else {
-	            buildPlane(vertices, normal, uv, indices, depth, height, width, dSegs, hSegs, 2, 1, 0, -1, -1, i, ii);
-	        }
-	    }
-	    {
-	        // LEFT
-	        if (separateFaces) {
-	            const num = (dSegs + 1) * (hSegs + 1);
-	            const numIndices = dSegs * hSegs * 6;
-	            const vertices = new Float32Array(num * 3);
-	            const normal = new Float32Array(num * 3);
-	            const uv = new Float32Array(num * 2);
-	            const indices = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices);
-	            buildPlane(vertices, normal, uv, indices, depth, height, -width, dSegs, hSegs, 2, 1, 0, 1, -1, i, ii);
-	            sidesData.push({
-	                orientation: 'left',
-	                vertices,
-	                normal,
-	                uv,
-	                indices,
-	            });
-	        }
-	        else {
-	            buildPlane(vertices, normal, uv, indices, depth, height, -width, dSegs, hSegs, 2, 1, 0, 1, -1, (i += (dSegs + 1) * (hSegs + 1)), (ii += dSegs * hSegs));
-	        }
-	    }
-	    {
-	        // TOP
-	        if (separateFaces) {
-	            const num = (dSegs + 1) * (hSegs + 1);
-	            const numIndices = dSegs * hSegs * 6;
-	            const vertices = new Float32Array(num * 3);
-	            const normal = new Float32Array(num * 3);
-	            const uv = new Float32Array(num * 2);
-	            const indices = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices);
-	            buildPlane(vertices, normal, uv, indices, width, depth, height, dSegs, hSegs, 0, 2, 1, 1, 1, i, ii);
-	            sidesData.push({
-	                orientation: 'top',
-	                vertices,
-	                normal,
-	                uv,
-	                indices,
-	            });
-	        }
-	        else {
-	            buildPlane(vertices, normal, uv, indices, width, depth, height, dSegs, hSegs, 0, 2, 1, 1, 1, (i += (dSegs + 1) * (hSegs + 1)), (ii += dSegs * hSegs));
-	        }
-	    }
-	    {
-	        // BOTTOM
-	        if (separateFaces) {
-	            const num = (dSegs + 1) * (hSegs + 1);
-	            const numIndices = dSegs * hSegs * 6;
-	            const vertices = new Float32Array(num * 3);
-	            const normal = new Float32Array(num * 3);
-	            const uv = new Float32Array(num * 2);
-	            const indices = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices);
-	            buildPlane(vertices, normal, uv, indices, width, depth, -height, dSegs, hSegs, 0, 2, 1, 1, -1, i, ii);
-	            sidesData.push({
-	                orientation: 'bottom',
-	                vertices,
-	                normal,
-	                uv,
-	                indices,
-	            });
-	        }
-	        else {
-	            buildPlane(vertices, normal, uv, indices, width, depth, -height, dSegs, hSegs, 0, 2, 1, 1, -1, (i += (wSegs + 1) * (dSegs + 1)), (ii += wSegs * dSegs));
-	        }
-	    }
-	    {
-	        // BACK
-	        if (separateFaces) {
-	            const num = (wSegs + 1) * (dSegs + 1);
-	            const numIndices = wSegs * dSegs * 6;
-	            const vertices = new Float32Array(num * 3);
-	            const normal = new Float32Array(num * 3);
-	            const uv = new Float32Array(num * 2);
-	            const indices = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices);
-	            buildPlane(vertices, normal, uv, indices, width, height, -depth, wSegs, hSegs, 0, 1, 2, -1, -1, i, ii);
-	            sidesData.push({
-	                orientation: 'back',
-	                vertices,
-	                normal,
-	                uv,
-	                indices,
-	            });
-	        }
-	        else {
-	            buildPlane(vertices, normal, uv, indices, width, height, -depth, wSegs, hSegs, 0, 1, 2, -1, -1, (i += (wSegs + 1) * (dSegs + 1)), (ii += wSegs * dSegs));
-	        }
-	    }
-	    {
-	        // FRONT
-	        if (separateFaces) {
-	            const num = (wSegs + 1) * (hSegs + 1);
-	            const numIndices = wSegs * hSegs * 6;
-	            const vertices = new Float32Array(num * 3);
-	            const normal = new Float32Array(num * 3);
-	            const uv = new Float32Array(num * 2);
-	            const indices = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices);
-	            buildPlane(vertices, normal, uv, indices, width, height, depth, wSegs, hSegs, 0, 1, 2, 1, -1, i, ii);
-	            sidesData.push({
-	                orientation: 'front',
-	                vertices,
-	                normal,
-	                uv,
-	                indices,
-	            });
-	        }
-	        else {
-	            buildPlane(vertices, normal, uv, indices, width, height, depth, wSegs, hSegs, 0, 1, 2, 1, -1, (i += (wSegs + 1) * (hSegs + 1)), (ii += wSegs * hSegs));
-	        }
-	    }
-	    if (separateFaces) {
-	        return sidesData;
-	    }
-	    else {
-	        return {
-	            vertices,
-	            normal,
-	            uv,
-	            indices,
-	        };
-	    }
-	}
-	/**
-	 * Generates geometry data for a fullscreen quad in normalized coordinates
-	 * @param {SphereInterface} params
-	 * @returns {{ vertices, uv }}
-	 */
-	function createFullscreenQuad() {
-	    return {
-	        vertices: new Float32Array([1, 1, -1, 1, -1, -1, -1, -1, 1, -1, 1, 1]),
-	        uv: new Float32Array([1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1]),
-	    };
-	}
-	/**
-	 * Generates geometry data for a sphere
-	 * @param {SphereInterface} params
-	 * @returns {{ vertices, normal, uv, indices }}
-	 */
-	function createSphere(params = {}) {
-	    const { radius = 0.5, widthSegments = 16, heightSegments = Math.ceil(widthSegments * 0.5), phiStart = 0, phiLength = Math.PI * 2, thetaStart = 0, thetaLength = Math.PI, } = params;
-	    const wSegs = widthSegments;
-	    const hSegs = heightSegments;
-	    const pStart = phiStart;
-	    const pLength = phiLength;
-	    const tStart = thetaStart;
-	    const tLength = thetaLength;
-	    const num = (wSegs + 1) * (hSegs + 1);
-	    const numIndices = wSegs * hSegs * 6;
-	    const position = new Float32Array(num * 3);
-	    const normal = new Float32Array(num * 3);
-	    const uv = new Float32Array(num * 2);
-	    const index = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices);
-	    let i = 0;
-	    let iv = 0;
-	    let ii = 0;
-	    let te = tStart + tLength;
-	    const grid = [];
-	    let n = create$1$1();
-	    for (let iy = 0; iy <= hSegs; iy++) {
-	        let vRow = [];
-	        let v = iy / hSegs;
-	        for (let ix = 0; ix <= wSegs; ix++, i++) {
-	            let u = ix / wSegs;
-	            let x = -radius *
-	                Math.cos(pStart + u * pLength) *
-	                Math.sin(tStart + v * tLength);
-	            let y = radius * Math.cos(tStart + v * tLength);
-	            let z = radius * Math.sin(pStart + u * pLength) * Math.sin(tStart + v * tLength);
-	            position[i * 3] = x;
-	            position[i * 3 + 1] = y;
-	            position[i * 3 + 2] = z;
-	            set(n, x, y, z);
-	            normalize(n, n);
-	            normal[i * 3] = n[0];
-	            normal[i * 3 + 1] = n[1];
-	            normal[i * 3 + 2] = n[2];
-	            uv[i * 2] = u;
-	            uv[i * 2 + 1] = 1 - v;
-	            vRow.push(iv++);
-	        }
-	        grid.push(vRow);
-	    }
-	    for (let iy = 0; iy < hSegs; iy++) {
-	        for (let ix = 0; ix < wSegs; ix++) {
-	            let a = grid[iy][ix + 1];
-	            let b = grid[iy][ix];
-	            let c = grid[iy + 1][ix];
-	            let d = grid[iy + 1][ix + 1];
-	            if (iy !== 0 || tStart > 0) {
-	                index[ii * 3] = a;
-	                index[ii * 3 + 1] = b;
-	                index[ii * 3 + 2] = d;
-	                ii++;
-	            }
-	            if (iy !== hSegs - 1 || te < Math.PI) {
-	                index[ii * 3] = b;
-	                index[ii * 3 + 1] = c;
-	                index[ii * 3 + 2] = d;
-	                ii++;
-	            }
-	        }
-	    }
-	    return {
-	        vertices: position,
-	        normal,
-	        uv,
-	        indices: index,
-	    };
-	}
 
-	var index = /*#__PURE__*/Object.freeze({
-	    __proto__: null,
-	    createPlane: createPlane,
-	    createBox: createBox,
-	    createFullscreenQuad: createFullscreenQuad,
-	    createSphere: createSphere
-	});
+	var _gl$6, _framebuffers, _programs, _textures, _camera, _activeProgram;
+	class SwapRenderer {
+	    constructor(gl) {
+	        _gl$6.set(this, void 0);
+	        _framebuffers.set(this, new Map());
+	        _programs.set(this, new Map());
+	        _textures.set(this, new Map());
+	        _camera.set(this, void 0);
+	        _activeProgram.set(this, void 0);
+	        __classPrivateFieldSet(this, _gl$6, gl);
+	        __classPrivateFieldSet(this, _camera, new OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0.1, 2));
+	        __classPrivateFieldGet(this, _camera).position = [0, 0, 1];
+	        __classPrivateFieldGet(this, _camera).lookAt([0, 0, 0]);
+	        getExtension(gl, 'OES_texture_float');
+	    }
+	    getTexture(name) {
+	        const texture = __classPrivateFieldGet(this, _textures).get(name);
+	        return texture;
+	    }
+	    addTexture(name, texture) {
+	        __classPrivateFieldGet(this, _textures).set(name, texture);
+	        return this;
+	    }
+	    createTexture(name, width, height, data, filtering = __classPrivateFieldGet(this, _gl$6).NEAREST) {
+	        const texture = new Texture(__classPrivateFieldGet(this, _gl$6), {
+	            type: __classPrivateFieldGet(this, _gl$6).FLOAT,
+	            format: __classPrivateFieldGet(this, _gl$6).RGBA,
+	            minFilter: filtering,
+	            magFilter: filtering,
+	        });
+	        texture.bind();
+	        if (data) {
+	            texture.fromData(data, width, height);
+	        }
+	        else {
+	            texture.fromSize(width, height);
+	        }
+	        texture.unbind();
+	        this.addTexture(name, texture);
+	        return this;
+	    }
+	    addFramebuffer(name, framebuffer) {
+	        __classPrivateFieldGet(this, _framebuffers).set(name, framebuffer);
+	        return this;
+	    }
+	    createFramebuffer(name, width, height) {
+	        const inputTexture = __classPrivateFieldGet(this, _textures).get(name);
+	        const framebuffer = new Framebuffer(__classPrivateFieldGet(this, _gl$6), {
+	            width,
+	            height,
+	            depth: false,
+	            inputTexture,
+	        });
+	        this.addFramebuffer(name, framebuffer);
+	        return this;
+	    }
+	    createProgram(programName, vertexShaderSource, fragmentShaderSource) {
+	        const { indices, vertices, uv } = createPlane();
+	        const geometry = new Geometry(__classPrivateFieldGet(this, _gl$6));
+	        geometry
+	            .addIndex({ typedArray: indices })
+	            .addAttribute('position', { typedArray: vertices, size: 3 })
+	            .addAttribute('uv', { typedArray: uv, size: 2 });
+	        const mesh = new Mesh(__classPrivateFieldGet(this, _gl$6), {
+	            geometry,
+	            vertexShaderSource,
+	            fragmentShaderSource,
+	        });
+	        __classPrivateFieldGet(this, _programs).set(programName, mesh);
+	        return this;
+	    }
+	    useProgram(programName) {
+	        __classPrivateFieldSet(this, _activeProgram, __classPrivateFieldGet(this, _programs).get(programName));
+	        __classPrivateFieldGet(this, _activeProgram).use();
+	        return this;
+	    }
+	    setUniform(uniformName, uniformType, uniformValue) {
+	        __classPrivateFieldGet(this, _activeProgram).setUniform(uniformName, uniformType, uniformValue);
+	        return this;
+	    }
+	    setSize(width, height) {
+	        __classPrivateFieldGet(this, _gl$6).viewport(0, 0, width, height);
+	        return this;
+	    }
+	    run(inputNameArr, outputName) {
+	        let framebuffer;
+	        if (outputName) {
+	            framebuffer = __classPrivateFieldGet(this, _framebuffers).get(outputName);
+	            framebuffer.bind();
+	        }
+	        else {
+	            __classPrivateFieldGet(this, _gl$6).bindFramebuffer(__classPrivateFieldGet(this, _gl$6).FRAMEBUFFER, null);
+	        }
+	        for (let i = 0; i < inputNameArr.length; i++) {
+	            const inputName = inputNameArr[i];
+	            const inputTexture = __classPrivateFieldGet(this, _textures).get(inputName);
+	            __classPrivateFieldGet(this, _gl$6).activeTexture(__classPrivateFieldGet(this, _gl$6).TEXTURE0 + i);
+	            inputTexture.bind();
+	        }
+	        __classPrivateFieldGet(this, _activeProgram).setCamera(__classPrivateFieldGet(this, _camera)).draw();
+	        if (framebuffer) {
+	            framebuffer.unbind();
+	        }
+	        return this;
+	    }
+	    swap(name1, name2) {
+	        const tex1 = __classPrivateFieldGet(this, _textures).get(name1);
+	        const tex2 = __classPrivateFieldGet(this, _textures).get(name2);
+	        __classPrivateFieldGet(this, _textures).set(name1, tex2);
+	        __classPrivateFieldGet(this, _textures).set(name2, tex1);
+	        const fbo1 = __classPrivateFieldGet(this, _framebuffers).get(name1);
+	        const fbo2 = __classPrivateFieldGet(this, _framebuffers).get(name2);
+	        __classPrivateFieldGet(this, _framebuffers).set(name1, fbo2);
+	        __classPrivateFieldGet(this, _framebuffers).set(name2, fbo1);
+	        return this;
+	    }
+	    reset() {
+	        __classPrivateFieldGet(this, _framebuffers).clear();
+	        __classPrivateFieldGet(this, _programs).clear();
+	        return this;
+	    }
+	}
+	_gl$6 = new WeakMap(), _framebuffers = new WeakMap(), _programs = new WeakMap(), _textures = new WeakMap(), _camera = new WeakMap(), _activeProgram = new WeakMap();
 
 	const VERTEX_SHADER_UPDATE_POSITIONS = `
   attribute vec4 position;
 
   void main () {
-    gl_Position = position;
+    gl_Position = projectionMatrix * viewMatrix * modelMatrix * position;
   }
 `;
 
@@ -1449,23 +1438,88 @@
   uniform vec2 canvasDimensions;
   uniform vec3 mousePos;
   uniform float deltaTime;
+  uniform float curlNoiseFactor;
+  uniform float positionFactor;
 
   vec2 euclideanModulo(vec2 n, vec2 m) {
     return mod(mod(n, m) + m, m);
+  }
+
+  vec4 permute(vec4 x){return mod(x*x*34.+x,289.);}
+  float snoise(vec3 v){
+    const vec2 C = 1./vec2(6,3);
+    const vec4 D = vec4(0,.5,1,2);
+    vec3 i  = floor(v + dot(v, C.yyy));
+    vec3 x0 = v - i + dot(i, C.xxx);
+    vec3 g = step(x0.yzx, x0.xyz);
+    vec3 l = 1. - g;
+    vec3 i1 = min( g.xyz, l.zxy );
+    vec3 i2 = max( g.xyz, l.zxy );
+    vec3 x1 = x0 - i1 + C.x;
+    vec3 x2 = x0 - i2 + C.y;
+    vec3 x3 = x0 - D.yyy;
+    i = mod(i,289.);
+    vec4 p = permute( permute( permute(
+      i.z + vec4(0., i1.z, i2.z, 1.))
+    + i.y + vec4(0., i1.y, i2.y, 1.))
+    + i.x + vec4(0., i1.x, i2.x, 1.));
+    vec3 ns = .142857142857 * D.wyz - D.xzx;
+    vec4 j = p - 49. * floor(p * ns.z * ns.z);
+    vec4 x_ = floor(j * ns.z);
+    vec4 x = x_ * ns.x + ns.yyyy;
+    vec4 y = floor(j - 7. * x_ ) *ns.x + ns.yyyy;
+    vec4 h = 1. - abs(x) - abs(y);
+    vec4 b0 = vec4( x.xy, y.xy );
+    vec4 b1 = vec4( x.zw, y.zw );
+    vec4 sh = -step(h, vec4(0));
+    vec4 a0 = b0.xzyw + (floor(b0)*2.+ 1.).xzyw*sh.xxyy ;
+    vec4 a1 = b1.xzyw + (floor(b1)*2.+ 1.).xzyw*sh.zzww ;
+    vec3 p0 = vec3(a0.xy,h.x);
+    vec3 p1 = vec3(a0.zw,h.y);
+    vec3 p2 = vec3(a1.xy,h.z);
+    vec3 p3 = vec3(a1.zw,h.w);
+    vec4 norm = inversesqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
+    p0 *= norm.x;
+    p1 *= norm.y;
+    p2 *= norm.z;
+    p3 *= norm.w;
+    vec4 m = max(.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.);
+    return .5 + 12. * dot( m * m * m, vec4( dot(p0,x0), dot(p1,x1),dot(p2,x2), dot(p3,x3) ) );
+  }
+
+  vec3 snoiseVec3( vec3 x ){
+    return vec3(  snoise(vec3( x )*2.-1.),
+                  snoise(vec3( x.y - 19.1 , x.z + 33.4 , x.x + 47.2 ))*2.-1.,
+                  snoise(vec3( x.z + 74.2 , x.x - 124.5 , x.y + 99.4 )*2.-1.)
+    );
+  }
+
+  vec3 curlNoise( vec3 p ){
+    const float e = .1;
+    vec3 dx = vec3( e   , 0.0 , 0.0 );
+    vec3 dy = vec3( 0.0 , e   , 0.0 );
+    vec3 dz = vec3( 0.0 , 0.0 , e   );
+
+    vec3 p_x0 = snoiseVec3( p - dx );
+    vec3 p_x1 = snoiseVec3( p + dx );
+    vec3 p_y0 = snoiseVec3( p - dy );
+    vec3 p_y1 = snoiseVec3( p + dy );
+    vec3 p_z0 = snoiseVec3( p - dz );
+    vec3 p_z1 = snoiseVec3( p + dz );
+
+    float x = p_y1.z - p_y0.z - p_z1.y + p_z0.y;
+    float y = p_z1.x - p_z0.x - p_x1.z + p_x0.z;
+    float z = p_x1.y - p_x0.y - p_y1.x + p_y0.x;
+
+    const float divisor = 1.0 / ( 2.0 * e );
+    return normalize( vec3( x , y , z ) * divisor );
   }
 
   void main () {
     vec2 texCoords = gl_FragCoord.xy / textureDimensions;
     vec2 position = texture2D(positionsTexture, texCoords).xy;
     vec2 velocity = texture2D(velocitiesTexture, texCoords).xy;
-    vec2 newPosition = euclideanModulo(position + velocity * deltaTime, canvasDimensions);
-
-    float dist = distance(position, mousePos.xy);
-    float maxDist = mousePos.z;
-
-    newPosition.x -= (maxDist - clamp(dist, -maxDist, maxDist)) * velocity.x * 0.1;
-    newPosition.y -= (maxDist - clamp(dist, -maxDist, maxDist)) * velocity.y * 0.1;
-
+    vec2 newPosition = euclideanModulo(position + curlNoise(vec3(position.xy * positionFactor, 0.0)).xy * curlNoiseFactor * deltaTime, canvasDimensions);
     gl_FragColor = vec4(newPosition, 1, 1);
   }
 `;
@@ -1497,158 +1551,102 @@
   }
 `;
 
+	const POSITIONS1_PROGRAM = 'position1';
+	const POSITIONS2_PROGRAM = 'position2';
+	const VELOCITY_PROGRAM = 'velocity';
+
 	const stats = new stats_min();
 	document.body.appendChild(stats.domElement);
 
-	const dpr = devicePixelRatio;
+	const dpr = Math.min(devicePixelRatio, 2);
 	const canvas = document.createElement('canvas');
 	const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
 	const errorLogWrapper = document.getElementById('error-log');
 	const infoLogWrapper = document.getElementById('info-log');
-	// const webglLint = getExtension(gl, 'GMAN_debug_helper')
-
-	checkExtensionsSupport();
-
-	const orthoProjectionMatrix = create();
-	{
-	  const left = 0;
-	  const right = innerWidth;
-	  const bottom = 0;
-	  const top = innerHeight;
-	  const near = -1;
-	  const far = 1;
-	  ortho(orthoProjectionMatrix, left, right, bottom, top, near, far);
-	}
 
 	const particleTexWidth = 500;
 	const particleTexHeight = 500;
 	const numParticles = particleTexWidth * particleTexHeight;
+	const ids = new Array(numParticles);
+
+	for (let i = 0; i < numParticles; i++) {
+	  ids[i] = i;
+	}
+
+	getExtension(gl, 'GMAN_debug_helper');
+
+	checkExtensionsSupport();
+
+	const orthoCamera = new OrthographicCamera(0, innerWidth, innerHeight, 0, -1, 1);
+	orthoCamera.position = [0, 0, 1];
+	orthoCamera.lookAt([0, 0, 0]);
+
+	// const orthoProjectionMatrix = mat4.create()
+	// {
+	//   const left = 0
+	//   const right = innerWidth
+	//   const bottom = 0
+	//   const top = innerHeight
+	//   const near = -1
+	//   const far = 1
+	//   mat4.ortho(orthoProjectionMatrix, left, right, bottom, top, near, far)
+	// }
+
+	const swapRenderer = new SwapRenderer(gl);
+
+	swapRenderer
+	  .createProgram(
+	    'updatePosition',
+	    VERTEX_SHADER_UPDATE_POSITIONS,
+	    FRAGMENT_SHADER_UPDATE_POSITIONS,
+	  )
+	  .useProgram('updatePosition')
+	  .setUniform('positionsTexture', UNIFORM_TYPE_INT, 0)
+	  .setUniform('velocitiesTexture', UNIFORM_TYPE_INT, 1)
+	  .setUniform('textureDimensions', UNIFORM_TYPE_VEC2, [
+	    particleTexWidth,
+	    particleTexHeight,
+	  ])
+	  .setUniform('canvasDimensions', UNIFORM_TYPE_VEC2, [innerWidth, innerHeight])
+	  .setUniform('deltaTime', UNIFORM_TYPE_FLOAT, 0)
+	  .setUniform('curlNoiseFactor', UNIFORM_TYPE_FLOAT, 200)
+	  .setUniform('positionFactor', UNIFORM_TYPE_FLOAT, 0.005);
+
+	const positions = new Float32Array(
+	  ids.map(() => [rand(innerWidth), rand(innerHeight), 0, 0]).flat(),
+	);
+	const velocities = new Float32Array(
+	  ids.map(() => [rand(-300, 300), rand(-300, 300), 0, 0]).flat(),
+	);
+
+	swapRenderer
+	  .createTexture(
+	    POSITIONS1_PROGRAM,
+	    particleTexWidth,
+	    particleTexHeight,
+	    positions,
+	  )
+	  .createFramebuffer(POSITIONS1_PROGRAM, particleTexWidth, particleTexHeight)
+
+	  .createTexture(POSITIONS2_PROGRAM, particleTexWidth, particleTexHeight)
+	  .createFramebuffer(POSITIONS2_PROGRAM, particleTexWidth, particleTexHeight)
+
+	  .createTexture(
+	    VELOCITY_PROGRAM,
+	    particleTexWidth,
+	    particleTexHeight,
+	    velocities,
+	  )
+	  .createFramebuffer(VELOCITY_PROGRAM, particleTexWidth, particleTexHeight);
 
 	infoLogWrapper.innerText = `Rendering ${humanizeNumber(numParticles)} particles`;
 
-	const ids = new Array(numParticles).fill().map((_, i) => i);
-	const positions = new Float32Array(
-	  ids.map((_) => [rand(innerWidth), rand(innerHeight), 0, 0]).flat(),
-	);
-	const velocities = new Float32Array(
-	  ids.map((_) => [rand(-300, 300), rand(-300, 300), 0, 0]).flat(),
-	);
-
-	const velicityTexture = new Texture(gl, {
-	  format: gl.RGBA,
-	  internalFormat: gl.RGBA,
-	  type: gl.FLOAT,
-	});
-	// webglLint.tagObject(velicityTexture.getTexture(), 'velocity textiure')
-	velicityTexture
-	  .bind()
-	  .fromData(velocities, particleTexWidth, particleTexHeight)
-	  .unbind();
-
-	// const velicityTexture = new Texture(gl, {
-	//   image: velocities,
-	//   width: particleTexWidth,
-	//   height: particleTexHeight,
-	//   format: gl.RGBA,
-	//   internalFormat: gl.RGBA,
-	//   minFilter: gl.NEAREST,
-	//   magFilter: gl.NEAREST,
-	//   type: gl.FLOAT,
-	// })
-	// const positionTex1 = new Texture(gl, {
-	//   image: positions,
-	//   width: particleTexWidth,
-	//   height: particleTexHeight,
-	//   format: gl.RGBA,
-	//   internalFormat: gl.RGBA,
-	//   minFilter: gl.NEAREST,
-	//   magFilter: gl.NEAREST,
-	//   type: gl.FLOAT,
-	// })
-	// const positionTex2 = new Texture(gl, {
-	//   image: null,
-	//   width: particleTexWidth,
-	//   height: particleTexHeight,
-	//   format: gl.RGBA,
-	//   internalFormat: gl.RGBA,
-	//   minFilter: gl.NEAREST,
-	//   magFilter: gl.NEAREST,
-	//   type: gl.FLOAT,
-	// })
-
-	const positionTex1 = new Texture(gl, {
-	  format: gl.RGBA,
-	  internalFormat: gl.RGBA,
-	  type: gl.FLOAT,
-	});
-	// webglLint.tagObject(positionTex1.getTexture(), 'position 1')
-	positionTex1
-	  .bind()
-	  .fromData(positions, particleTexWidth, particleTexHeight)
-	  .unbind();
-
-	const positionTex2 = new Texture(gl, {
-	  format: gl.RGBA,
-	  internalFormat: gl.RGBA,
-	  type: gl.FLOAT,
-	});
-	// webglLint.tagObject(positionTex2.getTexture(), 'position 2')
-	positionTex2.bind().fromSize(particleTexWidth, particleTexHeight).unbind();
-
-	// const positionTex1 = new Texture(gl, {
-	//   image: positions,
-	//   width: particleTexWidth,
-	//   height: particleTexHeight,
-	//   format: gl.RGBA,
-	//   internalFormat: gl.RGBA,
-	//   minFilter: gl.NEAREST,
-	//   magFilter: gl.NEAREST,
-	//   type: gl.FLOAT,
-	// })
-
-	const positionsFB1 = createFramebuffer(gl, positionTex1.getTexture());
-	const positionsFB2 = createFramebuffer(gl, positionTex2.getTexture());
-
 	let oldTime = 0;
-	let oldPositionsInfo = {
-	  fb: positionsFB1,
-	  tex: positionTex1.getTexture(),
-	};
-	let newPositionsInfo = {
-	  fb: positionsFB2,
-	  tex: positionTex2.getTexture(),
-	};
-
-	let updatePositionsMesh;
 	let drawMesh;
-	let oldMouseX = innerWidth / 2;
-	let oldMouseY = innerHeight / 2;
 
 	gl.enable(gl.BLEND);
 	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 	gl.enable(gl.DEPTH_TEST);
-
-	{
-	  const { vertices } = index.createFullscreenQuad();
-	  const geometry = new Geometry(gl);
-	  geometry.addAttribute('position', { typedArray: vertices, size: 2 });
-
-	  const textureDimensions = [particleTexWidth, particleTexHeight];
-	  const canvasDimensions = [innerWidth, innerHeight];
-	  updatePositionsMesh = new Mesh(gl, {
-	    geometry,
-	    uniforms: {
-	      positionsTexture: { type: 'int', value: 0 },
-	      velocitiesTexture: { type: 'int', value: 1 },
-	      textureDimensions: { type: 'vec2', value: textureDimensions },
-	      canvasDimensions: { type: 'vec2', value: canvasDimensions },
-	      mousePos: { type: 'vec3', value: [innerWidth / 2, innerHeight / 2, 40] },
-	      deltaTime: { type: 'float', value: 0 },
-	    },
-	    vertexShaderSource: VERTEX_SHADER_UPDATE_POSITIONS,
-	    fragmentShaderSource: FRAGMENT_SHADER_UPDATE_POSITIONS,
-	  });
-	}
 
 	{
 	  const geometry = new Geometry(gl);
@@ -1660,9 +1658,8 @@
 	  drawMesh = new Mesh(gl, {
 	    geometry,
 	    uniforms: {
-	      positionsTexture: { type: 'int', value: 0 },
-	      textureDimensions: { type: 'vec2', value: textureDimensions },
-	      projectionMatrix: { type: 'mat4', value: orthoProjectionMatrix },
+	      positionsTexture: { type: UNIFORM_TYPE_INT, value: 0 },
+	      textureDimensions: { type: UNIFORM_TYPE_VEC2, value: textureDimensions },
 	    },
 	    vertexShaderSource: VERTEX_SHADER_PARTICLES,
 	    fragmentShaderSource: FRAGMENT_SHADER_PARTICLES,
@@ -1674,18 +1671,29 @@
 	requestAnimationFrame(updateFrame);
 	resize();
 	window.addEventListener('resize', resize);
-	document.addEventListener('mousemove', (e) => {
-	  const dx = Math.min(e.pageX - oldMouseX, 100);
-	  const dy = Math.min(e.pageY - oldMouseY, 100);
-	  const dist = Math.sqrt(dx * dx + dy * dy);
-	  console.log(dx, dy);
-	  oldMouseX = e.pageX;
-	  oldMouseY = e.pageY;
-	  updatePositionsMesh.setUniform('mousePos', 'vec3', [
-	    e.pageX,
-	    innerHeight - e.pageY,
-	    dist + 20,
-	  ]);
+	document.addEventListener('click', () => {
+	  const positions = new Float32Array(
+	    ids.map(() => [rand(innerWidth), rand(innerHeight), 0, 0]).flat(),
+	  );
+	  swapRenderer
+	    .createTexture(
+	      POSITIONS1_PROGRAM,
+	      particleTexWidth,
+	      particleTexHeight,
+	      positions,
+	    )
+	    .createFramebuffer(POSITIONS1_PROGRAM, particleTexWidth, particleTexHeight)
+	    .useProgram('updatePosition')
+	    .setUniform(
+	      'curlNoiseFactor',
+	      UNIFORM_TYPE_FLOAT,
+	      150 + Math.random() * 100,
+	    )
+	    .setUniform(
+	      'positionFactor',
+	      UNIFORM_TYPE_FLOAT,
+	      0.001 + Math.random() * 0.009,
+	    );
 	});
 
 	function updateFrame(ts) {
@@ -1694,55 +1702,26 @@
 	  oldTime = ts;
 
 	  stats.begin();
-	  gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+
+	  swapRenderer
+	    .setSize(particleTexWidth, particleTexHeight)
+	    .useProgram('updatePosition')
+	    .setUniform('deltaTime', UNIFORM_TYPE_FLOAT, dt)
+	    .run([POSITIONS1_PROGRAM, VELOCITY_PROGRAM], POSITIONS2_PROGRAM);
+
 	  gl.clearColor(0.9, 0.9, 0.9, 1);
 	  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	  gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-	  // gl.viewport(0, 0, particleTexWidth, particleTexHeight)
-	  // gl.activeTexture(gl.TEXTURE0)
-	  // gl.bindTexture(gl.TEXTURE_2D, oldPositionsInfo.tex)
-	  // gl.activeTexture(gl.TEXTURE0 + 1)
-	  // gl.bindTexture(gl.TEXTURE_2D, velicityTexture.texture)
-
-	  // updatePositionsMesh.setUniform('deltaTime', 'float', dt).draw()
-
-	  gl.bindFramebuffer(gl.FRAMEBUFFER, newPositionsInfo.fb);
-	  gl.viewport(0, 0, particleTexWidth, particleTexHeight);
+	  const posTexture = swapRenderer.getTexture(POSITIONS1_PROGRAM);
 
 	  gl.activeTexture(gl.TEXTURE0);
-	  gl.bindTexture(gl.TEXTURE_2D, oldPositionsInfo.tex);
-	  gl.activeTexture(gl.TEXTURE0 + 1);
-	  gl.bindTexture(gl.TEXTURE_2D, velicityTexture.getTexture());
+	  posTexture.bind();
 
-	  updatePositionsMesh.setUniform('deltaTime', 'float', dt).draw();
+	  drawMesh.use().setCamera(orthoCamera).draw();
 
-	  // {
-	  //   const results = new Uint8Array(particleTexWidth * particleTexHeight * 4)
-	  //   gl.readPixels(
-	  //     0,
-	  //     0,
-	  //     particleTexWidth,
-	  //     particleTexHeight,
-	  //     gl.RGBA,
-	  //     gl.FLOAT,
-	  //     results,
-	  //   )
-	  //   debugger
-	  // }
+	  swapRenderer.swap(POSITIONS1_PROGRAM, POSITIONS2_PROGRAM);
 
-	  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-	  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
-	  gl.activeTexture(gl.TEXTURE0);
-	  gl.bindTexture(gl.TEXTURE_2D, newPositionsInfo.tex);
-
-	  drawMesh.draw();
-
-	  {
-	    const temp = oldPositionsInfo;
-	    oldPositionsInfo = newPositionsInfo;
-	    newPositionsInfo = temp;
-	  }
 	  stats.end();
 
 	  requestAnimationFrame(updateFrame);
@@ -1763,37 +1742,18 @@
 	  canvas.style.setProperty('height', `${innerHeight}px`);
 	}
 
-	function createFramebuffer(gl, tex) {
-	  const fb = gl.createFramebuffer();
-	  gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
-	  gl.framebufferTexture2D(
-	    gl.FRAMEBUFFER,
-	    gl.COLOR_ATTACHMENT0,
-	    gl.TEXTURE_2D,
-	    tex,
-	    0,
-	  );
-	  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-	  return fb
-	}
-
 	function checkExtensionsSupport() {
 	  // check we can use floating point textures
 	  const ext1 = getExtension(gl, 'OES_texture_float');
 	  if (!ext1) {
+	    errorLogWrapper.style.display = 'flex';
 	    errorLogWrapper.innerHTML += `
     <p>⚠️ Need OES_texture_float</p>
   `;
 	  }
-	  // check we can render to floating point textures
-	  const ext2 = getExtension(gl, 'WEBGL_color_buffer_float');
-	  if (!ext2) {
-	    errorLogWrapper.innerHTML += `
-    <p>⚠️ Need WEBGL_color_buffer_float</p>
-  `;
-	  }
 	  // check we can use textures in a vertex shader
 	  if (gl.getParameter(gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS) < 1) {
+	    errorLogWrapper.style.display = 'flex';
 	    errorLogWrapper.innerHTML += `
     <p>⚠️ Can not use textures in vertex shaders</p>
   `;

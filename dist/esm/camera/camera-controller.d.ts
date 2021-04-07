@@ -1,4 +1,5 @@
-export default class CameraController {
+import { PerspectiveCamera } from '../index';
+export declare class CameraController {
     private camera;
     private domElement;
     private target;
@@ -36,7 +37,9 @@ export default class CameraController {
     private _panDelta;
     private _panEnd;
     private _paused;
-    constructor(camera: any, domElement?: HTMLElement);
+    private _isDebug;
+    private _outputEl;
+    constructor(camera: PerspectiveCamera, domElement?: HTMLElement, isDebug?: boolean);
     setEventHandler(): void;
     removeEventHandler(): void;
     startTick(): void;

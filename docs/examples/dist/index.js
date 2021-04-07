@@ -46,8 +46,8 @@
   				label: "Enviornment Map"
   			},
   			{
-  				label: "Planar Perspective Projection",
-  				id: "planar-perspective-projection"
+  				label: "Projection Mapping",
+  				id: "projection-mapping"
   			}
   		]
   	},
@@ -87,16 +87,24 @@
   		]
   	},
   	{
-  		label: "GPGPU",
-  		group: "gpgpu",
+  		label: "Swap Renderer",
+  		group: "swap-renderer",
   		children: [
   			{
   				label: "Particles",
   				id: "gpgpu-particles"
   			},
   			{
+  				label: "Noise Texture",
+  				id: "swaprenderer-noise-texture"
+  			},
+  			{
+  				label: "Image",
+  				id: "swaprenderer-image"
+  			},
+  			{
   				label: "Fluid",
-  				id: "gpgpu-fluid"
+  				id: "swaprenderer-fluid"
   			}
   		]
   	},

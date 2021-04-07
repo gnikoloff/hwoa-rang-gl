@@ -48,6 +48,9 @@
     const UNIFORM_TYPE_VEC3 = 'vec3';
     const UNIFORM_TYPE_VEC4 = 'vec4';
     const UNIFORM_TYPE_MATRIX4X4 = 'mat4';
+
+    const POINTS = 0x0000;
+    const LINES = 0x0001;
     const TRIANGLES = 0x0004;
 
     const STATIC_DRAW = 0x88e4;
@@ -71,7 +74,7 @@
     ${gl.getShaderInfoLog(shader)}
   `);
         gl.deleteShader(shader);
-        return;
+        return shader;
     }
     /**
      * Create and link WebGLProgram with provided shader strings
@@ -97,6 +100,7 @@
         }
         console.error(gl.getProgramInfoLog(program));
         gl.deleteProgram(program);
+        return program;
     }
     /**
      * Create a ARRAY_BUFFER buffer
@@ -182,7 +186,9 @@
          * @param uniformValue
          * @returns {this}
          */
-        setUniform(uniformName, uniformType, uniformValue) {
+        setUniform(uniformName, uniformType, 
+        // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+        uniformValue) {
             let uniformLocation;
             if (__classPrivateFieldGet(this, _uniformLocations).has(uniformName)) {
                 uniformLocation = __classPrivateFieldGet(this, _uniformLocations).get(uniformName);
@@ -212,7 +218,7 @@
                     break;
                 default:
                     console.error(`Unrecognised uniform type: ${uniformType}`);
-                    return;
+                    return this;
             }
             return this;
         }
@@ -606,6 +612,41 @@
       return out;
     }
     /**
+     * Generates a orthogonal projection matrix with the given bounds
+     *
+     * @param {mat4} out mat4 frustum matrix will be written into
+     * @param {number} left Left bound of the frustum
+     * @param {number} right Right bound of the frustum
+     * @param {number} bottom Bottom bound of the frustum
+     * @param {number} top Top bound of the frustum
+     * @param {number} near Near bound of the frustum
+     * @param {number} far Far bound of the frustum
+     * @returns {mat4} out
+     */
+
+    function ortho(out, left, right, bottom, top, near, far) {
+      var lr = 1 / (left - right);
+      var bt = 1 / (bottom - top);
+      var nf = 1 / (near - far);
+      out[0] = -2 * lr;
+      out[1] = 0;
+      out[2] = 0;
+      out[3] = 0;
+      out[4] = 0;
+      out[5] = -2 * bt;
+      out[6] = 0;
+      out[7] = 0;
+      out[8] = 0;
+      out[9] = 0;
+      out[10] = 2 * nf;
+      out[11] = 0;
+      out[12] = (left + right) * lr;
+      out[13] = (top + bottom) * bt;
+      out[14] = (far + near) * nf;
+      out[15] = 1;
+      return out;
+    }
+    /**
      * Generates a look-at matrix with the given eye position, focal point, and up axis.
      * If you want a matrix that actually makes an object look at another object, you should use targetTo instead.
      *
@@ -868,6 +909,7 @@
             this.vaoExtension.bindVertexArrayOES(null);
             this.program.bind();
             for (const [key, uniform] of Object.entries(uniforms)) {
+                // @ts-ignore
                 this.program.setUniform(key, uniform['type'], uniform['value']);
             }
             this.program.setUniform(MODEL_MATRIX_UNIFORM_NAME, UNIFORM_TYPE_MATRIX4X4, this.modelMatrix);
@@ -880,6 +922,10 @@
         get scale() {
             return __classPrivateFieldGet(this, _scale);
         }
+        use() {
+            this.program.bind();
+            return this;
+        }
         /**
          * Set uniform value. Query the uniform location if necessary and cache it in-memory for future use
          * @param {string} uniformName
@@ -888,9 +934,7 @@
          * @returns {this}
          */
         setUniform(uniformName, uniformType, uniformValue) {
-            this.program.bind();
             this.program.setUniform(uniformName, uniformType, uniformValue);
-            this.program.unbind();
             return this;
         }
         /**
@@ -936,21 +980,17 @@
             translate(this.modelMatrix, this.modelMatrix, __classPrivateFieldGet(this, _positionVec3));
             rotate(this.modelMatrix, this.modelMatrix, __classPrivateFieldGet(this, _rotationAngle), __classPrivateFieldGet(this, _rotationAxisVec3));
             scale(this.modelMatrix, this.modelMatrix, __classPrivateFieldGet(this, _scaleVec3));
-            this.program.bind();
             this.program.setUniform(MODEL_MATRIX_UNIFORM_NAME, UNIFORM_TYPE_MATRIX4X4, this.modelMatrix);
-            this.program.unbind();
             return this;
         }
         /**
          * Assign camera projection matrix and view matrix to model uniforms
-         * @param {PerspectiveCamera} camera
+         * @param {PerspectiveCamera|OrthographicCamera} camera
          * @returns {this}
          */
         setCamera(camera) {
-            this.program.bind();
             this.program.setUniform(PROJECTION_MATRIX_UNIFORM_NAME, UNIFORM_TYPE_MATRIX4X4, camera.projectionMatrix);
             this.program.setUniform(VIEW_MATRIX_UNIFORM_NAME, UNIFORM_TYPE_MATRIX4X4, camera.viewMatrix);
-            this.program.unbind();
             return this;
         }
         /**
@@ -962,7 +1002,6 @@
                 this.updateModelMatrix();
                 this.modelMatrixNeedsUpdate = false;
             }
-            this.program.bind();
             this.vaoExtension.bindVertexArrayOES(this.vao);
             if (this.hasIndices) {
                 __classPrivateFieldGet(this, _gl$2).drawElements(this.drawMode, __classPrivateFieldGet(this, _geometry).vertexCount, __classPrivateFieldGet(this, _gl$2).UNSIGNED_SHORT, 0);
@@ -971,7 +1010,6 @@
                 __classPrivateFieldGet(this, _gl$2).drawArrays(this.drawMode, 0, __classPrivateFieldGet(this, _geometry).vertexCount);
             }
             this.vaoExtension.bindVertexArrayOES(null);
-            this.program.unbind();
             return this;
         }
         /**
@@ -1068,7 +1106,6 @@
             else {
                 __classPrivateFieldGet(this, _instanceExtension).drawArraysInstancedANGLE(this.drawMode, 0, __classPrivateFieldGet(this, _geometry$1).vertexCount, this.instanceCount);
             }
-            this.program.unbind();
             this.vaoExtension.bindVertexArrayOES(null);
             return this;
         }
@@ -1096,7 +1133,7 @@
      * @public
      */
     class Texture {
-        constructor(gl, { format = gl.RGB, internalFormat = format, type = gl.UNSIGNED_BYTE, unpackAlignment = 1, wrapS = gl.CLAMP_TO_EDGE, wrapT = gl.CLAMP_TO_EDGE, minFilter = gl.NEAREST, magFilter = gl.NEAREST, } = {}) {
+        constructor(gl, { format = gl.RGB, internalFormat = format, type = gl.UNSIGNED_BYTE, unpackAlignment = 1, wrapS = gl.CLAMP_TO_EDGE, wrapT = gl.CLAMP_TO_EDGE, minFilter = gl.LINEAR, magFilter = gl.LINEAR, } = {}) {
             _gl$4.set(this, void 0);
             _texture.set(this, void 0);
             _width.set(this, void 0);
@@ -1206,7 +1243,7 @@
          * @returns {this}
          */
         setIsFlip() {
-            this.setPixelStore(__classPrivateFieldGet(this, _gl$4).UNPACK_FLIP_Y_WEBGL, true);
+            this.setPixelStore(__classPrivateFieldGet(this, _gl$4).UNPACK_FLIP_Y_WEBGL, 1);
             return this;
         }
         /**
@@ -1252,7 +1289,7 @@
          */
         setAnisotropy(anisotropyLevel) {
             if (!anisotropyLevel) {
-                return;
+                return this;
             }
             if (__classPrivateFieldGet(this, _anisotropyExtension)) {
                 const maxAnisotropySupported = __classPrivateFieldGet(this, _gl$4).getParameter(__classPrivateFieldGet(this, _anisotropyExtension).MAX_TEXTURE_MAX_ANISOTROPY_EXT);
@@ -1270,39 +1307,37 @@
     _gl$4 = new WeakMap(), _texture = new WeakMap(), _width = new WeakMap(), _height = new WeakMap(), _format = new WeakMap(), _internalFormat = new WeakMap(), _type = new WeakMap(), _anisotropyExtension = new WeakMap();
     Texture.isPowerOf2 = (width, height) => isPowerOf2(width) && isPowerOf2(height);
 
-    var _gl$5, _buffer, _depthBuffer, _width$1, _height$1;
+    var _gl$5, _buffer, _depthBuffer, _width$1, _height$1, _depth;
     class Framebuffer {
-        constructor(gl, { width = gl.canvas.width, height = gl.canvas.height, target = gl.FRAMEBUFFER, wrapS = gl.CLAMP_TO_EDGE, wrapT = gl.CLAMP_TO_EDGE, minFilter = gl.NEAREST, magFilter = gl.NEAREST, format = gl.RGBA, internalFormat = format, type = gl.UNSIGNED_BYTE, depth = true, } = {}) {
+        constructor(gl, { inputTexture, width = gl.canvas.width, height = gl.canvas.height, wrapS = gl.CLAMP_TO_EDGE, wrapT = gl.CLAMP_TO_EDGE, minFilter = gl.NEAREST, magFilter = gl.NEAREST, format = gl.RGBA, internalFormat = format, type = gl.UNSIGNED_BYTE, depth = true, } = {}) {
             _gl$5.set(this, void 0);
             _buffer.set(this, void 0);
             _depthBuffer.set(this, void 0);
             _width$1.set(this, void 0);
             _height$1.set(this, void 0);
+            _depth.set(this, void 0);
             __classPrivateFieldSet(this, _gl$5, gl);
             __classPrivateFieldSet(this, _width$1, width);
             __classPrivateFieldSet(this, _height$1, height);
-            this.texture = new Texture(gl, {
-                type,
-                format,
-                internalFormat,
-                wrapS,
-                wrapT,
-                minFilter,
-                magFilter,
-            });
-            this.texture.bind().fromSize(width, height).unbind();
-            __classPrivateFieldSet(this, _buffer, gl.createFramebuffer());
-            gl.bindFramebuffer(target, __classPrivateFieldGet(this, _buffer));
-            const level = 0;
-            const texture = this.texture.getTexture();
-            gl.framebufferTexture2D(target, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, level);
-            if (depth) {
-                __classPrivateFieldSet(this, _depthBuffer, __classPrivateFieldGet(this, _gl$5).createRenderbuffer());
-                __classPrivateFieldGet(this, _gl$5).bindRenderbuffer(__classPrivateFieldGet(this, _gl$5).RENDERBUFFER, __classPrivateFieldGet(this, _depthBuffer));
-                __classPrivateFieldGet(this, _gl$5).renderbufferStorage(__classPrivateFieldGet(this, _gl$5).RENDERBUFFER, __classPrivateFieldGet(this, _gl$5).DEPTH_COMPONENT16, __classPrivateFieldGet(this, _width$1), __classPrivateFieldGet(this, _height$1));
-                __classPrivateFieldGet(this, _gl$5).framebufferRenderbuffer(target, __classPrivateFieldGet(this, _gl$5).DEPTH_ATTACHMENT, __classPrivateFieldGet(this, _gl$5).RENDERBUFFER, __classPrivateFieldGet(this, _depthBuffer));
+            __classPrivateFieldSet(this, _depth, depth);
+            if (inputTexture) {
+                this.texture = inputTexture;
             }
-            gl.bindFramebuffer(target, null);
+            else {
+                this.texture = new Texture(gl, {
+                    type,
+                    format,
+                    internalFormat,
+                    wrapS,
+                    wrapT,
+                    minFilter,
+                    magFilter,
+                })
+                    .bind()
+                    .fromSize(width, height);
+            }
+            __classPrivateFieldSet(this, _buffer, gl.createFramebuffer());
+            this.updateWithSize(__classPrivateFieldGet(this, _width$1), __classPrivateFieldGet(this, _height$1));
         }
         bind() {
             __classPrivateFieldGet(this, _gl$5).bindFramebuffer(__classPrivateFieldGet(this, _gl$5).FRAMEBUFFER, __classPrivateFieldGet(this, _buffer));
@@ -1310,6 +1345,26 @@
         }
         unbind() {
             __classPrivateFieldGet(this, _gl$5).bindFramebuffer(__classPrivateFieldGet(this, _gl$5).FRAMEBUFFER, null);
+            return this;
+        }
+        updateWithSize(width, height, updateTexture = false) {
+            this.bind();
+            const level = 0;
+            const texture = this.texture.getTexture();
+            __classPrivateFieldGet(this, _gl$5).framebufferTexture2D(__classPrivateFieldGet(this, _gl$5).FRAMEBUFFER, __classPrivateFieldGet(this, _gl$5).COLOR_ATTACHMENT0, __classPrivateFieldGet(this, _gl$5).TEXTURE_2D, texture, level);
+            this.unbind();
+            if (__classPrivateFieldGet(this, _depth)) {
+                __classPrivateFieldSet(this, _depthBuffer, __classPrivateFieldGet(this, _gl$5).createRenderbuffer());
+                __classPrivateFieldGet(this, _gl$5).bindRenderbuffer(__classPrivateFieldGet(this, _gl$5).RENDERBUFFER, __classPrivateFieldGet(this, _depthBuffer));
+                __classPrivateFieldGet(this, _gl$5).renderbufferStorage(__classPrivateFieldGet(this, _gl$5).RENDERBUFFER, __classPrivateFieldGet(this, _gl$5).DEPTH_COMPONENT16, width, height);
+                __classPrivateFieldGet(this, _gl$5).framebufferRenderbuffer(__classPrivateFieldGet(this, _gl$5).FRAMEBUFFER, __classPrivateFieldGet(this, _gl$5).DEPTH_ATTACHMENT, __classPrivateFieldGet(this, _gl$5).RENDERBUFFER, __classPrivateFieldGet(this, _depthBuffer));
+                __classPrivateFieldGet(this, _gl$5).bindRenderbuffer(__classPrivateFieldGet(this, _gl$5).RENDERBUFFER, null);
+            }
+            if (updateTexture) {
+                this.texture.bind().fromSize(width, height);
+            }
+            __classPrivateFieldSet(this, _width$1, width);
+            __classPrivateFieldSet(this, _height$1, height);
             return this;
         }
         reset() {
@@ -1324,7 +1379,7 @@
             __classPrivateFieldGet(this, _gl$5).deleteFramebuffer(__classPrivateFieldGet(this, _buffer));
         }
     }
-    _gl$5 = new WeakMap(), _buffer = new WeakMap(), _depthBuffer = new WeakMap(), _width$1 = new WeakMap(), _height$1 = new WeakMap();
+    _gl$5 = new WeakMap(), _buffer = new WeakMap(), _depthBuffer = new WeakMap(), _width$1 = new WeakMap(), _height$1 = new WeakMap(), _depth = new WeakMap();
 
     class DampedAction {
         constructor() {
@@ -1351,7 +1406,7 @@
         }
     }
     class CameraController {
-        constructor(camera, domElement = document.body) {
+        constructor(camera, domElement = document.body, isDebug = false) {
             this.target = create$1();
             this.minDistance = 0;
             this.maxDistance = Infinity;
@@ -1383,6 +1438,7 @@
             this._panDelta = { x: 0, y: 0 };
             this._panEnd = { x: 0, y: 0 };
             this._paused = false;
+            this._isDebug = false;
             if (!camera) {
                 console.error('camera is undefined');
             }
@@ -1432,6 +1488,23 @@
             this._bindEvens();
             this.setEventHandler();
             this.startTick();
+            this._isDebug = isDebug;
+            if (isDebug) {
+                this._outputEl = document.createElement('div');
+                this._outputEl.setAttribute('style', `
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      z-index: 999;
+      font-family: monospace;
+      font-size: 14px;
+      user-select: none;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 4px;
+      padding: 3px 6px;
+    `);
+                document.body.appendChild(this._outputEl);
+            }
         }
         setEventHandler() {
             this.domElement.addEventListener('contextmenu', this._contextMenuHandler, false);
@@ -1466,6 +1539,12 @@
             if (!this._paused) {
                 this.updateDampedAction();
                 this.updateCamera();
+                if (this._isDebug) {
+                    const cameraX = Math.round(this.camera.position[0] * 100) / 100;
+                    const cameraY = Math.round(this.camera.position[1] * 100) / 100;
+                    const cameraZ = Math.round(this.camera.position[2] * 100) / 100;
+                    this._outputEl.textContent = `x: ${cameraX} y: ${cameraY} z: ${cameraZ}`;
+                }
             }
             this.loopId = requestAnimationFrame(this.tick);
         }
@@ -1637,6 +1716,7 @@
                     this._zoomDistanceEnd = Math.sqrt(dX * dX + dY * dY);
                     dDis = this._zoomDistanceEnd - this._zoomDistance;
                     dDis *= 1.5;
+                    // eslint-disable-next-line no-case-declarations
                     let targetRadius = this._spherical.radius - dDis;
                     targetRadius = clamp(targetRadius, this.minDistance, this.maxDistance);
                     this._zoomDistance = this._zoomDistanceEnd;
@@ -1759,6 +1839,44 @@
     }
     PerspectiveCamera.UP_VECTOR = [0, 1, 0];
 
+    class OrthographicCamera {
+        constructor(left, right, top, bottom, near, far) {
+            this.left = -1;
+            this.right = 1;
+            this.top = 1;
+            this.bottom = -1;
+            this.near = 0.1;
+            this.far = 2000;
+            this.zoom = 1;
+            this.position = [0, 0, 0];
+            this.lookAtPosition = [0, 0, 0];
+            this.projectionMatrix = create();
+            this.viewMatrix = create();
+            this.left = left;
+            this.right = right;
+            this.top = top;
+            this.bottom = bottom;
+            this.near = near;
+            this.far = far;
+            this.updateProjectionMatrix();
+        }
+        updateViewMatrix() {
+            lookAt(this.viewMatrix, this.position, this.lookAtPosition, OrthographicCamera.UP_VECTOR);
+            return this;
+        }
+        updateProjectionMatrix() {
+            ortho(this.projectionMatrix, this.left, this.right, this.bottom, this.top, this.near, this.far);
+            return this;
+        }
+        lookAt(target) {
+            this.lookAtPosition = target;
+            this.updateViewMatrix();
+            return this;
+        }
+    }
+    OrthographicCamera.UP_VECTOR = [0, 1, 0];
+
+    // @ts-nocheck
     /**
      * @private
      */
@@ -1767,9 +1885,9 @@
         const segW = width / wSegs;
         const segH = height / hSegs;
         for (let iy = 0; iy <= hSegs; iy++) {
-            let y = iy * segH - height / 2;
+            const y = iy * segH - height / 2;
             for (let ix = 0; ix <= wSegs; ix++, i++) {
-                let x = ix * segW - width / 2;
+                const x = ix * segW - width / 2;
                 vertices[i * 3 + u] = x * uDir;
                 vertices[i * 3 + v] = y * vDir;
                 vertices[i * 3 + w] = depth / 2;
@@ -1780,10 +1898,10 @@
                 uv[i * 2 + 1] = 1 - iy / hSegs;
                 if (iy === hSegs || ix === wSegs)
                     continue;
-                let a = io + ix + iy * (wSegs + 1);
-                let b = io + ix + (iy + 1) * (wSegs + 1);
-                let c = io + ix + (iy + 1) * (wSegs + 1) + 1;
-                let d = io + ix + iy * (wSegs + 1) + 1;
+                const a = io + ix + iy * (wSegs + 1);
+                const b = io + ix + (iy + 1) * (wSegs + 1);
+                const c = io + ix + (iy + 1) * (wSegs + 1) + 1;
+                const d = io + ix + iy * (wSegs + 1) + 1;
                 indices[ii * 6] = a;
                 indices[ii * 6 + 1] = b;
                 indices[ii * 6 + 2] = d;
@@ -1980,17 +2098,6 @@
         }
     }
     /**
-     * Generates geometry data for a fullscreen quad in normalized coordinates
-     * @param {SphereInterface} params
-     * @returns {{ vertices, uv }}
-     */
-    function createFullscreenQuad() {
-        return {
-            vertices: new Float32Array([1, 1, -1, 1, -1, -1, -1, -1, 1, -1, 1, 1]),
-            uv: new Float32Array([1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1]),
-        };
-    }
-    /**
      * Generates geometry data for a sphere
      * @param {SphereInterface} params
      * @returns {{ vertices, normal, uv, indices }}
@@ -2012,19 +2119,19 @@
         let i = 0;
         let iv = 0;
         let ii = 0;
-        let te = tStart + tLength;
+        const te = tStart + tLength;
         const grid = [];
-        let n = create$1();
+        const n = create$1();
         for (let iy = 0; iy <= hSegs; iy++) {
-            let vRow = [];
-            let v = iy / hSegs;
+            const vRow = [];
+            const v = iy / hSegs;
             for (let ix = 0; ix <= wSegs; ix++, i++) {
-                let u = ix / wSegs;
-                let x = -radius *
+                const u = ix / wSegs;
+                const x = -radius *
                     Math.cos(pStart + u * pLength) *
                     Math.sin(tStart + v * tLength);
-                let y = radius * Math.cos(tStart + v * tLength);
-                let z = radius * Math.sin(pStart + u * pLength) * Math.sin(tStart + v * tLength);
+                const y = radius * Math.cos(tStart + v * tLength);
+                const z = radius * Math.sin(pStart + u * pLength) * Math.sin(tStart + v * tLength);
                 position[i * 3] = x;
                 position[i * 3 + 1] = y;
                 position[i * 3 + 2] = z;
@@ -2041,10 +2148,10 @@
         }
         for (let iy = 0; iy < hSegs; iy++) {
             for (let ix = 0; ix < wSegs; ix++) {
-                let a = grid[iy][ix + 1];
-                let b = grid[iy][ix];
-                let c = grid[iy + 1][ix];
-                let d = grid[iy + 1][ix + 1];
+                const a = grid[iy][ix + 1];
+                const b = grid[iy][ix];
+                const c = grid[iy + 1][ix];
+                const d = grid[iy + 1][ix + 1];
                 if (iy !== 0 || tStart > 0) {
                     index[ii * 3] = a;
                     index[ii * 3 + 1] = b;
@@ -2071,19 +2178,160 @@
         __proto__: null,
         createPlane: createPlane,
         createBox: createBox,
-        createFullscreenQuad: createFullscreenQuad,
         createSphere: createSphere
     });
+
+    var _gl$6, _framebuffers, _programs, _textures, _camera, _activeProgram;
+    class SwapRenderer {
+        constructor(gl) {
+            _gl$6.set(this, void 0);
+            _framebuffers.set(this, new Map());
+            _programs.set(this, new Map());
+            _textures.set(this, new Map());
+            _camera.set(this, void 0);
+            _activeProgram.set(this, void 0);
+            __classPrivateFieldSet(this, _gl$6, gl);
+            __classPrivateFieldSet(this, _camera, new OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0.1, 2));
+            __classPrivateFieldGet(this, _camera).position = [0, 0, 1];
+            __classPrivateFieldGet(this, _camera).lookAt([0, 0, 0]);
+            getExtension(gl, 'OES_texture_float');
+        }
+        getTexture(name) {
+            const texture = __classPrivateFieldGet(this, _textures).get(name);
+            return texture;
+        }
+        addTexture(name, texture) {
+            __classPrivateFieldGet(this, _textures).set(name, texture);
+            return this;
+        }
+        createTexture(name, width, height, data, filtering = __classPrivateFieldGet(this, _gl$6).NEAREST) {
+            const texture = new Texture(__classPrivateFieldGet(this, _gl$6), {
+                type: __classPrivateFieldGet(this, _gl$6).FLOAT,
+                format: __classPrivateFieldGet(this, _gl$6).RGBA,
+                minFilter: filtering,
+                magFilter: filtering,
+            });
+            texture.bind();
+            if (data) {
+                texture.fromData(data, width, height);
+            }
+            else {
+                texture.fromSize(width, height);
+            }
+            texture.unbind();
+            this.addTexture(name, texture);
+            return this;
+        }
+        addFramebuffer(name, framebuffer) {
+            __classPrivateFieldGet(this, _framebuffers).set(name, framebuffer);
+            return this;
+        }
+        createFramebuffer(name, width, height) {
+            const inputTexture = __classPrivateFieldGet(this, _textures).get(name);
+            const framebuffer = new Framebuffer(__classPrivateFieldGet(this, _gl$6), {
+                width,
+                height,
+                depth: false,
+                inputTexture,
+            });
+            this.addFramebuffer(name, framebuffer);
+            return this;
+        }
+        createProgram(programName, vertexShaderSource, fragmentShaderSource) {
+            const { indices, vertices, uv } = createPlane();
+            const geometry = new Geometry(__classPrivateFieldGet(this, _gl$6));
+            geometry
+                .addIndex({ typedArray: indices })
+                .addAttribute('position', { typedArray: vertices, size: 3 })
+                .addAttribute('uv', { typedArray: uv, size: 2 });
+            const mesh = new Mesh(__classPrivateFieldGet(this, _gl$6), {
+                geometry,
+                vertexShaderSource,
+                fragmentShaderSource,
+            });
+            __classPrivateFieldGet(this, _programs).set(programName, mesh);
+            return this;
+        }
+        useProgram(programName) {
+            __classPrivateFieldSet(this, _activeProgram, __classPrivateFieldGet(this, _programs).get(programName));
+            __classPrivateFieldGet(this, _activeProgram).use();
+            return this;
+        }
+        setUniform(uniformName, uniformType, uniformValue) {
+            __classPrivateFieldGet(this, _activeProgram).setUniform(uniformName, uniformType, uniformValue);
+            return this;
+        }
+        setSize(width, height) {
+            __classPrivateFieldGet(this, _gl$6).viewport(0, 0, width, height);
+            return this;
+        }
+        run(inputNameArr, outputName) {
+            let framebuffer;
+            if (outputName) {
+                framebuffer = __classPrivateFieldGet(this, _framebuffers).get(outputName);
+                framebuffer.bind();
+            }
+            else {
+                __classPrivateFieldGet(this, _gl$6).bindFramebuffer(__classPrivateFieldGet(this, _gl$6).FRAMEBUFFER, null);
+            }
+            for (let i = 0; i < inputNameArr.length; i++) {
+                const inputName = inputNameArr[i];
+                const inputTexture = __classPrivateFieldGet(this, _textures).get(inputName);
+                __classPrivateFieldGet(this, _gl$6).activeTexture(__classPrivateFieldGet(this, _gl$6).TEXTURE0 + i);
+                inputTexture.bind();
+            }
+            __classPrivateFieldGet(this, _activeProgram).setCamera(__classPrivateFieldGet(this, _camera)).draw();
+            if (framebuffer) {
+                framebuffer.unbind();
+            }
+            return this;
+        }
+        swap(name1, name2) {
+            const tex1 = __classPrivateFieldGet(this, _textures).get(name1);
+            const tex2 = __classPrivateFieldGet(this, _textures).get(name2);
+            __classPrivateFieldGet(this, _textures).set(name1, tex2);
+            __classPrivateFieldGet(this, _textures).set(name2, tex1);
+            const fbo1 = __classPrivateFieldGet(this, _framebuffers).get(name1);
+            const fbo2 = __classPrivateFieldGet(this, _framebuffers).get(name2);
+            __classPrivateFieldGet(this, _framebuffers).set(name1, fbo2);
+            __classPrivateFieldGet(this, _framebuffers).set(name2, fbo1);
+            return this;
+        }
+        reset() {
+            __classPrivateFieldGet(this, _framebuffers).clear();
+            __classPrivateFieldGet(this, _programs).clear();
+            return this;
+        }
+    }
+    _gl$6 = new WeakMap(), _framebuffers = new WeakMap(), _programs = new WeakMap(), _textures = new WeakMap(), _camera = new WeakMap(), _activeProgram = new WeakMap();
 
     exports.CameraController = CameraController;
     exports.Framebuffer = Framebuffer;
     exports.Geometry = Geometry;
     exports.GeometryUtils = index;
+    exports.INDEX_ATTRIB_NAME = INDEX_ATTRIB_NAME;
+    exports.INSTANCED_OFFSET_MODEL_MATRIX = INSTANCED_OFFSET_MODEL_MATRIX;
     exports.InstancedMesh = InstancedMesh;
+    exports.LINES = LINES;
+    exports.MODEL_MATRIX_UNIFORM_NAME = MODEL_MATRIX_UNIFORM_NAME;
     exports.Mesh = Mesh;
+    exports.OrthographicCamera = OrthographicCamera;
+    exports.POINTS = POINTS;
+    exports.POSITION_ATTRIB_NAME = POSITION_ATTRIB_NAME;
+    exports.PROJECTION_MATRIX_UNIFORM_NAME = PROJECTION_MATRIX_UNIFORM_NAME;
     exports.PerspectiveCamera = PerspectiveCamera;
     exports.Program = Program;
+    exports.STATIC_DRAW = STATIC_DRAW;
+    exports.SwapRenderer = SwapRenderer;
+    exports.TRIANGLES = TRIANGLES;
     exports.Texture = Texture;
+    exports.UNIFORM_TYPE_FLOAT = UNIFORM_TYPE_FLOAT;
+    exports.UNIFORM_TYPE_INT = UNIFORM_TYPE_INT;
+    exports.UNIFORM_TYPE_MATRIX4X4 = UNIFORM_TYPE_MATRIX4X4;
+    exports.UNIFORM_TYPE_VEC2 = UNIFORM_TYPE_VEC2;
+    exports.UNIFORM_TYPE_VEC3 = UNIFORM_TYPE_VEC3;
+    exports.UNIFORM_TYPE_VEC4 = UNIFORM_TYPE_VEC4;
+    exports.VIEW_MATRIX_UNIFORM_NAME = VIEW_MATRIX_UNIFORM_NAME;
     exports.compileShader = compileShader;
     exports.createBuffer = createBuffer;
     exports.createIndexBuffer = createIndexBuffer;

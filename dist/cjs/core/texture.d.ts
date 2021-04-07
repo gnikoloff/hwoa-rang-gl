@@ -27,20 +27,20 @@ export declare class Texture {
      * @param {number} [height
      * @returns {this}
      */
-    fromImage(image: any, width?: any, height?: any): this;
+    fromImage(image: HTMLImageElement | HTMLVideoElement | HTMLCanvasElement, width?: number, height?: number): this;
     /**
      * @param {number} width
      * @param {number} height
      * @returns {this}
      */
-    fromSize(width: any, height: any): this;
+    fromSize(width: number, height: number): this;
     /**
      * @param dataArray
      * @param {number} [width]
      * @param {number} [height]
      * @returns {this}
      */
-    fromData(dataArray: any, width: any, height: any): this;
+    fromData(dataArray: any, width: number, height: number): this;
     /**
      * @returns {this}
      */
@@ -61,7 +61,7 @@ export declare class Texture {
      * @param params
      * @returns {this}
      */
-    setPixelStore(name: any, params: any): this;
+    setPixelStore(name: GLenum, params: GLenum): this;
     /**
      * @param {GLenum} [filter = gl.LINEAR]
      * @returns {this}
@@ -84,6 +84,6 @@ export declare class Texture {
      * @param {number} anisotropyLevel
      * @returns {this}
      */
-    setAnisotropy(anisotropyLevel: any): this;
+    setAnisotropy(anisotropyLevel: number): this;
     delete(): void;
 }

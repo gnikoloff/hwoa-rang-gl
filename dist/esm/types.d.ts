@@ -1,4 +1,5 @@
 import { Geometry } from './core/geometry';
+import { Texture } from './core/texture';
 import { UNIFORM_TYPE_INT, UNIFORM_TYPE_FLOAT, UNIFORM_TYPE_VEC2, UNIFORM_TYPE_VEC3, UNIFORM_TYPE_VEC4, UNIFORM_TYPE_MATRIX4X4 } from './utils/gl-constants';
 export declare type UniformType = typeof UNIFORM_TYPE_INT | typeof UNIFORM_TYPE_FLOAT | typeof UNIFORM_TYPE_VEC2 | typeof UNIFORM_TYPE_VEC3 | typeof UNIFORM_TYPE_VEC4 | typeof UNIFORM_TYPE_MATRIX4X4;
 export interface MeshInterface {
@@ -12,7 +13,7 @@ export interface MeshInterface {
      * ```
      * @defaultValue {}
      */
-    uniforms?: object;
+    uniforms?: Record<string, unknown>;
     /**
      * Vertex shader program as string
      */
@@ -28,7 +29,6 @@ export interface InstancedMeshInterface extends MeshInterface {
 export interface FramebufferInterface {
     width?: number;
     height?: number;
-    target?: GLenum;
     wrapS?: GLenum;
     wrapT?: GLenum;
     minFilter?: GLenum;
@@ -37,6 +37,7 @@ export interface FramebufferInterface {
     type?: GLenum;
     internalFormat?: GLenum;
     depth?: boolean;
+    inputTexture?: Texture;
 }
 export interface TextureInterface {
     format?: GLenum;
@@ -49,7 +50,7 @@ export interface TextureInterface {
     magFilter?: GLenum;
 }
 export interface OES_vertex_array_objectInterface {
-    createVertexArrayOES(): WebGLVertexArrayObjectOES | null;
+    createVertexArrayOES(): WebGLVertexArrayObjectOES;
     deleteVertexArrayOES(arrayObject: WebGLVertexArrayObjectOES | null): void;
     isVertexArrayOES(arrayObject: WebGLVertexArrayObjectOES | null): boolean;
     bindVertexArrayOES(arrayObject: WebGLVertexArrayObjectOES | null): void;
@@ -95,7 +96,7 @@ export interface WebGLArrayBufferInterface {
      * @defaultValue 1
      */
     offset?: number;
-    instancedDivisor: number | null;
+    instancedDivisor?: number;
 }
 export interface PlaneInterface {
     /**
