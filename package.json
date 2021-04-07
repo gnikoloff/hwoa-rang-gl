@@ -8,7 +8,7 @@
     "lint": "eslint src",
     "watch": "rollup -c -w",
     "build": "rollup -c",
-    "serve:examples": "cd docs/examples && npm run serve",
+    "serve:examples": "cd docs && http-serve .",
     "watch:examples": "cd docs/examples && npm run watch",
     "build:examples": "cd docs/examples && npm run start",
     "start:examples:dev": "run-p watch watch:examples serve:examples",
