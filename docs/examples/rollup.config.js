@@ -22,8 +22,10 @@ export default [
     },
     plugins: [
       copy({
-        targets: [{ src: `index.html`, dest: `dist` }],
-        targets: [{ src: `assets`, dest: `dist` }],
+        targets: [
+          { src: `index.html`, dest: `dist` },
+          { src: `assets`, dest: `dist` },
+        ],
       }),
       ...sharedPlugins,
     ],
