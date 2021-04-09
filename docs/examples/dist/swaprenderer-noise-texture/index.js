@@ -1985,6 +1985,7 @@
 	    .setSize(innerWidth, innerHeight)
 	    .useProgram(BLUR_PROGRAM)
 	    .run([BLUR1], BLUR2)
+	    .setSize(innerWidth * dpr, innerHeight * dpr)
 	    .run([BLUR1], null)
 	    .swap(BLUR1, BLUR2);
 

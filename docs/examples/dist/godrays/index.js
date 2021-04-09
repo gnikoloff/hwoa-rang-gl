@@ -5173,6 +5173,8 @@
 	const canvas = document.createElement('canvas');
 	const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
 
+	const ext = getExtension(gl, 'OES_texture_float');
+
 	const stats = new stats_min();
 	document.body.appendChild(stats.domElement);
 
@@ -5200,10 +5202,14 @@
 	orthoCamera.lookAt([0, 0, 0]);
 
 	let renderTargetBlurX = new Framebuffer(gl, {
+	  format: gl.RGB,
+	  type: ext ? gl.FLOAT : gl.UNSIGNED_BYTE,
 	  width: innerWidth / SCALE_DOWN_POSTFX,
 	  height: innerHeight / SCALE_DOWN_POSTFX,
 	});
 	let renderTargetBlurY = new Framebuffer(gl, {
+	  format: gl.RGBA,
+	  type: ext ? gl.FLOAT : gl.UNSIGNED_BYTE,
 	  width: innerWidth / SCALE_DOWN_POSTFX,
 	  height: innerHeight / SCALE_DOWN_POSTFX,
 	});
