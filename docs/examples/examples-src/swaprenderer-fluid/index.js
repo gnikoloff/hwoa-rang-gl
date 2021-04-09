@@ -415,8 +415,8 @@ camera.lookAt([0, 0, 0])
 const sceneFramebuffer = new Framebuffer(gl, {
   minFilter: gl.LINEAR,
   magFilter: gl.LINEAR,
-  width: innerWidth * dpr,
-  height: innerHeight * dpr,
+  width: innerWidth,
+  height: innerHeight,
 })
 
 const swapRenderer = new SwapRenderer(gl)
@@ -492,7 +492,7 @@ function updateFrame() {
   sceneFramebuffer.unbind()
 
   swapRenderer
-    .setSize(gl.drawingBufferWidth, gl.drawingBufferHeight)
+    .setSize(innerWidth * dpr, innerHeight * dpr)
     .useProgram(config.programMode)
     .run(PROGRAM_INPUT_TEXTURES.get(config.programMode), null)
 
@@ -566,7 +566,7 @@ function resize() {
     ? gl.LINEAR
     : gl.NEAREST
 
-  sceneFramebuffer.updateWithSize(innerWidth, innerHeight, true)
+  sceneFramebuffer.updateWithSize(innerWidth * dpr, innerHeight * dpr, true)
 
   swapRenderer
 
