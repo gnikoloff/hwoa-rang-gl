@@ -54,7 +54,7 @@ const FRAGMENT_SHADER_GBUFFER = `
   }
 `
 
-const VERTEX_SHADER_LIGHTING = `
+const VERTEX_SHADER_BASE = `
   attribute vec4 position;
 
   void main () {
@@ -135,16 +135,44 @@ const FRAGMENT_SHADER_DIRECTIONAL_LIGHTING = `
   }
 `
 
+const VERTEX_SHADER_DEBUG_GBUFFER = `
+  attribute vec4 position;
+  attribute vec2 uv;
+
+  varying vec2 v_uv;
+
+  void main () {
+    gl_Position = projectionMatrix * viewMatrix * modelMatrix * position;
+
+    v_uv = uv;
+  }
+`
+
+const FRAGMENT_SHADER_DEBUG_GBUFFER = `
+  precision highp float;
+
+  uniform sampler2D texture;
+
+  varying vec2 v_uv;
+
+  void main () {
+    gl_FragColor = texture2D(texture, v_uv);
+  }
+`
+
 const LIGHTS_COUNT = 100
-const LIGHTS_SCALE = 12
+const LIGHTS_SCALE = 7
 const BOXES_RADIUS_X = 30
 const BOXES_RADIUS_Z = 30
 const BOXES_ROW_X_COUNT = 20
 const BOXES_ROW_Z_COUNT = 20
 const TOTAL_BOXES_COUNT = BOXES_ROW_X_COUNT * BOXES_ROW_Z_COUNT
+const DEBUG_QUAD_WIDTH = innerWidth * 0.125
+const DEBUG_QUAD_HEIGHT = innerHeight * 0.125
 
 const CONFIG = {
   lightsCount: 12,
+  debug: false,
 }
 
 const gui = new dat.GUI()
@@ -160,6 +188,9 @@ const lightSpheres = []
 let activeLightSpheres
 let drawMesh
 let fullscreenQuadMesh
+let debugPositionsMesh
+let debugNormalsMesh
+let debugUvsMesh
 
 gl.clearColor(0.0, 0.0, 0.0, 1.0)
 gl.depthFunc(gl.LEQUAL)
@@ -175,7 +206,14 @@ const perspCamera = new PerspectiveCamera(
 perspCamera.position = [10, 4, 10]
 perspCamera.lookAt([0, 0, 0])
 
-const orthoCamera = new OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0.1, 2)
+const orthoCamera = new OrthographicCamera(
+  -innerWidth / 2,
+  innerWidth / 2,
+  innerHeight / 2,
+  -innerHeight / 2,
+  0.1,
+  2,
+)
 orthoCamera.position = [0, 0, 1]
 orthoCamera.lookAt([0, 0, 0])
 
@@ -370,16 +408,16 @@ img.src = window.location.href.includes('github')
   }
 
   for (let i = 0; i < LIGHTS_COUNT; i++) {
-    const randX = (Math.random() * 2 - 1) * 20
+    const randX = (Math.random() * 2 - 1) * 10
     const randY = 1 + Math.random() * 2
-    const randZ = (Math.random() * 2 - 1) * 20
+    const randZ = (Math.random() * 2 - 1) * 10
 
     const randShininess = Math.random() * 4
     const randSpecular = Math.random() * 0.65 + 0.35
 
-    const randR = Math.random() * 0.5
-    const randG = Math.random() * 0.5
-    const randB = Math.random() * 0.5
+    const randR = Math.random()
+    const randG = Math.random()
+    const randB = Math.random()
 
     const mesh = new Mesh(gl, {
       geometry,
@@ -387,7 +425,11 @@ img.src = window.location.href.includes('github')
         ...sharedLightsUniforms,
         'PointLight.shininessSpecularRadius': {
           type: UNIFORM_TYPE_VEC3,
-          value: [randShininess, randSpecular, LIGHTS_SCALE],
+          value: [
+            randShininess,
+            randSpecular,
+            LIGHTS_SCALE * 0.4 + Math.random() * (LIGHTS_SCALE * 0.6),
+          ],
         },
         'PointLight.position': {
           type: UNIFORM_TYPE_VEC3,
@@ -398,7 +440,7 @@ img.src = window.location.href.includes('github')
           value: [randR, randG, randB],
         },
       },
-      vertexShaderSource: VERTEX_SHADER_LIGHTING,
+      vertexShaderSource: VERTEX_SHADER_BASE,
       fragmentShaderSource: FRAGMENT_SHADER_POINT_LIGHTING,
     })
     mesh
@@ -412,8 +454,8 @@ img.src = window.location.href.includes('github')
 // ------------- Directional fullscreen quad -------------
 {
   const { indices, vertices } = GeometryUtils.createPlane({
-    // width: innerWidth,
-    // height: innerHeight,
+    width: innerWidth,
+    height: innerHeight,
   })
   const geometry = new Geometry(gl)
   geometry.addIndex({ typedArray: indices }).addAttribute('position', {
@@ -430,8 +472,57 @@ img.src = window.location.href.includes('github')
       resolution: { type: UNIFORM_TYPE_VEC2, value: [innerWidth, innerHeight] },
       lightDirection: { type: UNIFORM_TYPE_VEC3, value: [1, 2, 2] },
     },
-    vertexShaderSource: VERTEX_SHADER_LIGHTING,
+    vertexShaderSource: VERTEX_SHADER_BASE,
     fragmentShaderSource: FRAGMENT_SHADER_DIRECTIONAL_LIGHTING,
+  })
+}
+
+// ------------- Debug Positions quad -------------
+{
+  const { indices, vertices, uv } = GeometryUtils.createPlane({
+    width: DEBUG_QUAD_WIDTH,
+    height: DEBUG_QUAD_HEIGHT,
+  })
+  const geometry = new Geometry(gl)
+  geometry
+    .addIndex({ typedArray: indices })
+    .addAttribute('position', {
+      typedArray: vertices,
+      size: 3,
+    })
+    .addAttribute('uv', {
+      typedArray: uv,
+      size: 2,
+    })
+  debugPositionsMesh = new Mesh(gl, {
+    geometry,
+    vertexShaderSource: VERTEX_SHADER_DEBUG_GBUFFER,
+    fragmentShaderSource: FRAGMENT_SHADER_DEBUG_GBUFFER,
+  })
+  debugNormalsMesh = new Mesh(gl, {
+    geometry,
+    vertexShaderSource: VERTEX_SHADER_DEBUG_GBUFFER,
+    fragmentShaderSource: FRAGMENT_SHADER_DEBUG_GBUFFER,
+  })
+  let accX = -innerWidth / 2 + DEBUG_QUAD_WIDTH / 2 + 20
+  debugPositionsMesh.setPosition({
+    x: accX,
+    y: -innerHeight / 2 + DEBUG_QUAD_HEIGHT / 2 + 20,
+  })
+  accX += DEBUG_QUAD_WIDTH + 10
+  debugNormalsMesh.setPosition({
+    x: accX,
+    y: -innerHeight / 2 + DEBUG_QUAD_HEIGHT / 2 + 20,
+  })
+  debugUvsMesh = new Mesh(gl, {
+    geometry,
+    vertexShaderSource: VERTEX_SHADER_DEBUG_GBUFFER,
+    fragmentShaderSource: FRAGMENT_SHADER_DEBUG_GBUFFER,
+  })
+  accX += DEBUG_QUAD_WIDTH + 10
+  debugUvsMesh.setPosition({
+    x: accX,
+    y: -innerHeight / 2 + DEBUG_QUAD_HEIGHT / 2 + 20,
   })
 }
 
@@ -443,6 +534,7 @@ gui
   .onChange((val) => {
     activeLightSpheres = lightSpheres.filter((_, i) => i < val)
   })
+gui.add(CONFIG, 'debug')
 
 document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)
@@ -516,6 +608,21 @@ function updateFrame(ts) {
     ])
     .setCamera(orthoCamera)
     .draw()
+
+  if (CONFIG.debug) {
+    gl.disable(gl.BLEND)
+    gl.activeTexture(gl.TEXTURE0)
+    texturePosition.bind()
+    debugPositionsMesh.use().setCamera(orthoCamera).draw()
+
+    gl.activeTexture(gl.TEXTURE0)
+    textureNormal.bind()
+    debugNormalsMesh.use().setCamera(orthoCamera).draw()
+
+    gl.activeTexture(gl.TEXTURE0)
+    textureColor.bind()
+    debugUvsMesh.use().setCamera(orthoCamera).draw()
+  }
 
   stats.end()
 
