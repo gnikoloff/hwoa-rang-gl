@@ -151,6 +151,7 @@ const gui = new dat.GUI()
 const stats = new Stats()
 document.body.appendChild(stats.domElement)
 
+const errorLogWrapper = document.getElementById('error-log')
 const dpr = Math.min(devicePixelRatio, 2)
 const canvas = document.createElement('canvas')
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
@@ -184,17 +185,26 @@ new CameraController(perspCamera, canvas)
 
 const ext = getExtension(gl, 'WEBGL_draw_buffers')
 if (!ext) {
-  // TODO: handle missing extension
+  errorLogWrapper.style.display = 'flex'
+  errorLogWrapper.innerHTML += `
+      <p>⚠️ Need WEBGL_draw_buffers</p>
+    `
 }
 
 const ext2 = getExtension(gl, 'OES_texture_float')
 if (!ext2) {
-  // TODO: handle missing extension
+  errorLogWrapper.style.display = 'flex'
+  errorLogWrapper.innerHTML += `
+    <p>⚠️ Need OES_texture_float</p>
+  `
 }
 
 const ext3 = getExtension(gl, 'WEBGL_depth_texture')
 if (!ext3) {
-  // TODO: handle missing extension
+  errorLogWrapper.style.display = 'flex'
+  errorLogWrapper.innerHTML += `
+    <p>⚠️ Need WEBGL_depth_texture</p>
+  `
 }
 
 const gBuffer = gl.createFramebuffer()

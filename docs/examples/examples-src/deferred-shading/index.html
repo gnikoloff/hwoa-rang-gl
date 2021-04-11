@@ -7,16 +7,24 @@
   <title>GLTF</title>
   <style>
     * { margin: 0; padding: 0; }
-    #gltf-info {
+    #error-log {
       position: fixed;
-      bottom: 24px;
-      right: 24px;
-      font-size: 14px;
-      font-family: sans-serif;
+      top: 5vh;
+      right: 5vw;
+      bottom: 5vh;
+      left: 5vw;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      font-family: monospace;
+      background: white;
+      color: #111;
+      display: none;;
     }
   </style>
 </head>
 <body>
+  <div id="error-log"></div>
   <div id="gltf-info"></div>
    <!-- <script
     src="https://greggman.github.io/webgl-lint/webgl-lint.js"
