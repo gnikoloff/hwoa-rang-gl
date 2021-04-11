@@ -15,7 +15,7 @@ import {
 } from '../../../../dist/esm'
 
 const VERTEX_SHADER_SPHERES = `
-  struct PointLightInfo {
+  struct PointLightBase {
     float shininess;
     vec3 lightColor;
     vec3 specularColor;
@@ -23,7 +23,7 @@ const VERTEX_SHADER_SPHERES = `
     vec3 worldPosition;
   };
 
-  uniform PointLightInfo PointLight;
+  uniform PointLightBase PointLight;
 
   uniform vec3 eyePosition;
 
@@ -47,7 +47,7 @@ const VERTEX_SHADER_SPHERES = `
 `
 
 const FRAGMENT_SHADER_SPHERES = `
-  struct PointLightInfo {
+  struct PointLightBase {
     float shininess;
     vec3 lightColor;
     vec3 specularColor;
@@ -55,7 +55,7 @@ const FRAGMENT_SHADER_SPHERES = `
     vec3 worldPosition;
   };
 
-  uniform PointLightInfo PointLight;
+  uniform PointLightBase PointLight;
 
   uniform vec3 lightDirection;
 
