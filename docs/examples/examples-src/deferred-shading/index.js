@@ -32,7 +32,7 @@ const VERTEX_SHADER_GBUFFER = `
     gl_Position = projectionMatrix * viewMatrix * worldPosition;
 
     v_uv = uv;
-    v_normal = (modelMatrix * vec4(normal, 0.0)).xyz;
+    v_normal = (modelMatrix * vec4(normal, 1.0)).xyz;
     v_position = worldPosition.xyz;
   }
 `
@@ -83,6 +83,62 @@ const FRAGMENT_SHADER_LIGHTING = `
   varying vec3 v_lightWorldPosition;
   varying vec3 v_color;
 
+  // const float constant = 0.0;
+  // const float linear = 0.0;
+  // const float exp = 0.3;
+  
+  // struct BaseLight {
+  //   vec3 Color;
+  //   float AmbientIntensity;
+  //   float DiffuseIntensity;
+  // };
+
+  // vec4 CalcLightInternal(BaseLight Light,
+	// 				   vec3 LightDirection,
+	// 				   vec3 WorldPos,
+	// 				   vec3 Normal) {
+  //     vec4 AmbientColor = vec4(Light.Color * Light.AmbientIntensity, 1.0);
+  //     float DiffuseFactor = dot(Normal, -LightDirection);
+
+  //     vec4 DiffuseColor  = vec4(0, 0, 0, 0);
+  //     vec4 SpecularColor = vec4(0, 0, 0, 0);
+
+  //     if (DiffuseFactor > 0.0) {
+  //         DiffuseColor = vec4(Light.Color * Light.DiffuseIntensity * DiffuseFactor, 1.0);
+
+  //         vec3 VertexToEye = normalize(gEyeWorldPos - WorldPos);
+  //         vec3 LightReflect = normalize(reflect(LightDirection, Normal));
+  //         float SpecularFactor = dot(VertexToEye, LightReflect);        
+  //         if (SpecularFactor > 0.0) {
+  //             SpecularFactor = pow(SpecularFactor, gSpecularPower);
+  //             SpecularColor = vec4(Light.Color * gMatSpecularIntensity * SpecularFactor, 1.0);
+  //         }
+  //     }
+
+  //     return (AmbientColor + DiffuseColor + SpecularColor);
+  // }
+
+  // vec4 CalcPointLight(vec3 WorldPos, vec3 Normal) {
+  //     vec3 LightDirection = WorldPos - gPointLight.Position;
+  //     float Distance = length(LightDirection);
+  //     LightDirection = normalize(LightDirection);
+
+  //     vec4 Color = CalcLightInternal(gPointLight.Base, LightDirection, WorldPos, Normal);
+
+  //     // float Attenuation =  gPointLight.Atten.Constant +
+  //     //                     gPointLight.Atten.Linear * Distance +
+  //     //                     gPointLight.Atten.Exp * Distance * Distance;
+
+  //     float Attenuation = constant +
+  //                        linear * distance +
+  //                        exp * distance * distance;
+
+  //     Attenuation = max(1.0, Attenuation);
+
+  //     return Color / Attenuation;
+  // }
+
+
   void main () {
     vec2 fragCoord = gl_FragCoord.xy / resolution;
 
@@ -99,17 +155,18 @@ const FRAGMENT_SHADER_LIGHTING = `
     float nDotL = max(dot(lightDirection, normal), 0.0);
 
     vec3 diffuse = nDotL * v_color;
-    float ambient = 0.25;
-    vec3 specular = pow(max(dot(reflectionDirection, eyeDirection), 0.0), 10.0) * v_color;
+    float ambient = 0.1;
+    vec3 specular = pow(max(dot(reflectionDirection, eyeDirection), 0.0), 20.0) * v_color;
   
     vec4 baseColor = texture2D(texture, uv);
 
     gl_FragColor = vec4(attenuation * (ambient + diffuse + specular) * baseColor.rgb, baseColor.a);
+    
     // gl_FragColor = vec4(vec3(attenuation), 1.0);
 
-    // gl_FragColor = vec4(0.1, 0.0, 0.0, 0.01);
+    // gl_FragColor += vec4(0.1, 0.0, 0.0, 0.01);
 
-    // gl_FragColor = vec4(uv, 0.0, 1.0);
+    // gl_FragColor = vec4(normal, 1.0);
 
   }
 `
@@ -121,13 +178,13 @@ const possibleColors = [
   [0, 1, 0],
 ]
 const lightPositions = [
-  [-1.8460756451259845, -10.5326157780950695, -0.8501768035388659],
-  [-1.6886470947973846, -10.3541314382509203, -0.9849650002184944],
+  [-0.8, 0.75, -0.5],
+  [-1.8, -0.75, -0.98],
   [-2, -3, 0],
-  [0.51175500697923582, -0.7176899591288173, -1.173398318610027],
+  [-1.51, -0.71, -1.17],
 ]
 
-const LIGHTS_COUNT = 4
+const LIGHTS_COUNT = 1
 
 const stats = new Stats()
 document.body.appendChild(stats.domElement)
@@ -144,8 +201,6 @@ let lightSpheres
 let lightHelpers
 
 gl.clearColor(0.0, 0.0, 0.0, 1.0)
-gl.enable(gl.DEPTH_TEST)
-gl.enable(gl.CULL_FACE)
 gl.depthFunc(gl.LEQUAL)
 
 const camera = new PerspectiveCamera(
@@ -177,7 +232,12 @@ if (!ext3) {
 const gBuffer = gl.createFramebuffer()
 gl.bindFramebuffer(gl.FRAMEBUFFER, gBuffer)
 
-const texturePosition = new Texture(gl, { type: gl.FLOAT, format: gl.RGB })
+const texturePosition = new Texture(gl, {
+  type: gl.FLOAT,
+  format: gl.RGB,
+  minFilter: gl.NEAREST,
+  magFilter: gl.NEAREST,
+})
   .bind()
   .fromSize(innerWidth, innerHeight)
 
@@ -189,7 +249,12 @@ gl.framebufferTexture2D(
   0,
 )
 
-const textureNormal = new Texture(gl, { type: gl.FLOAT, format: gl.RGB })
+const textureNormal = new Texture(gl, {
+  type: gl.FLOAT,
+  format: gl.RGB,
+  minFilter: gl.NEAREST,
+  magFilter: gl.NEAREST,
+})
   .bind()
   .fromSize(innerWidth, innerHeight)
 
@@ -200,7 +265,12 @@ gl.framebufferTexture2D(
   textureNormal.getTexture(),
   0,
 )
-const textureColor = new Texture(gl, { type: gl.FLOAT, format: gl.RGB })
+const textureColor = new Texture(gl, {
+  type: gl.FLOAT,
+  format: gl.RGB,
+  minFilter: gl.NEAREST,
+  magFilter: gl.NEAREST,
+})
   .bind()
   .fromSize(innerWidth, innerHeight)
 
@@ -319,10 +389,11 @@ img.src = window.location.href.includes('github')
   })
 
   {
+    const scale = 4
     const { indices, vertices } = GeometryUtils.createBox({
-      width: 0.1,
-      height: 0.1,
-      depth: 0.1,
+      width: scale,
+      height: scale,
+      depth: scale,
     })
     const geometry = new Geometry(gl)
     geometry
@@ -356,7 +427,7 @@ img.src = window.location.href.includes('github')
     const transformMatrix = mat4.create()
     const translateVec = vec3.fromValues(randX, randY, randZ)
 
-    const scale = 6.25
+    const scale = 3
     const scaleVec = vec3.fromValues(scale, scale, scale)
 
     mat4.translate(transformMatrix, transformMatrix, translateVec)
@@ -390,13 +461,15 @@ function updateFrame(ts) {
   gl.bindFramebuffer(gl.FRAMEBUFFER, gBuffer)
 
   gl.depthMask(true)
+  gl.enable(gl.DEPTH_TEST)
   gl.disable(gl.BLEND)
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-  drawMesh.use().setRotation({ x: 1, y: 1 }, ts).setCamera(camera).draw()
+  drawMesh.use().setRotation({ y: 1 }, ts).setCamera(camera).draw()
 
   gl.bindFramebuffer(gl.FRAMEBUFFER, null)
   gl.depthMask(false)
+  gl.disable(gl.DEPTH_TEST)
   gl.enable(gl.BLEND)
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
