@@ -192,7 +192,7 @@ if (!ext2) {
   // TODO: handle missing extension
 }
 
-const ext3 = getExtension('WEBGL_depth_texture')
+const ext3 = getExtension(gl, 'WEBGL_depth_texture')
 if (!ext3) {
   // TODO: handle missing extension
 }
