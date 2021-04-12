@@ -13,155 +13,23 @@ import {
   Mesh,
   Texture,
   InstancedMesh,
+  Framebuffer,
   UNIFORM_TYPE_INT,
   UNIFORM_TYPE_VEC2,
   UNIFORM_TYPE_VEC3,
 } from '../../../../dist/esm'
 
-const VERTEX_SHADER_GBUFFER = `
-  attribute vec4 position;
-  attribute vec2 uv;
-  attribute vec3 normal;
-  attribute mat4 instanceModelMatrix;
+import VERTEX_SHADER_BASE from './base.vert'
+import FRAGMENT_SHADER_BASE from './base.frag'
 
-  varying vec2 v_uv;
-  varying vec3 v_normal;
-  varying vec3 v_position;
+import VERTEX_SHADER_GBUFFER from './gbuffer.vert'
+import FRAGMENT_SHADER_GBUFFER from './gbuffer.frag'
 
-  void main () {
-    vec4 worldPosition = modelMatrix * instanceModelMatrix * position;
-
-    gl_Position = projectionMatrix * viewMatrix * worldPosition;
-
-    v_uv = uv;
-    v_normal = (modelMatrix * vec4(normal, 1.0)).xyz;
-    v_position = worldPosition.xyz;
-  }
-`
-const FRAGMENT_SHADER_GBUFFER = `
-  #extension GL_EXT_draw_buffers : require
-  precision highp float;
-
-  varying vec2 v_uv;
-  varying vec3 v_normal;
-  varying vec3 v_position;
-
-  void main () {
-
-    gl_FragData[0] = vec4(v_position, 0.0);
-    gl_FragData[1] = vec4(normalize(v_normal.xyz), 0.0);
-    gl_FragData[2] = vec4(v_uv, 0.0, 0.0);
-  }
-`
-
-const VERTEX_SHADER_BASE = `
-  attribute vec4 position;
-
-  void main () {
-    gl_Position = projectionMatrix * viewMatrix * modelMatrix * position;
-  }
-`
-
-const FRAGMENT_SHADER_POINT_LIGHTING = `
-  precision highp float;
-
-  struct PointLightBase {
-    vec3 shininessSpecularRadius;
-    vec3 position;
-    vec3 color;
-  };
-
-  uniform sampler2D positionTexture;
-  uniform sampler2D normalTexture;
-  uniform sampler2D colorTexture;
-  uniform sampler2D texture;
-  uniform vec3 eyePosition;
-  uniform vec2 resolution;
-  uniform PointLightBase PointLight;
-
-  void main () {
-    vec2 fragCoord = gl_FragCoord.xy / resolution;
-
-    vec3 position = texture2D(positionTexture, fragCoord).xyz;
-    vec3 normal = normalize(texture2D(normalTexture, fragCoord).xyz);
-    vec2 uv = texture2D(colorTexture, fragCoord).xy;
-
-    vec4 baseColor = texture2D(texture, uv);
-
-    vec3 eyeDirection = normalize(eyePosition - position);
-    vec3 lightVec = PointLight.position - position;
-
-    float shininess = PointLight.shininessSpecularRadius.x;
-    float specularFactor = PointLight.shininessSpecularRadius.y;
-    float lightR = PointLight.shininessSpecularRadius.z;
-
-    float dist = distance(PointLight.position, position);
-    if(dist < lightR){
-      float attenuation = dist / (1.0 - (dist / lightR) * (dist / lightR));
-      attenuation = attenuation / lightR + 1.0;
-      attenuation = 1.0 / (attenuation * attenuation);
-
-      // float diffuse = abs(dot(normal, normalize(lightVec)));
-      vec3 lightDirection = normalize(lightVec);
-      vec3 reflectionDirection = reflect(-lightDirection, normal);
-      float nDotL = max(dot(lightDirection, normal), 0.0);
-      vec3 diffuse = nDotL * PointLight.color;
-
-      gl_FragColor = vec4(diffuse * PointLight.color * baseColor.rgb * attenuation * shininess, baseColor.a);
-    }
-  }
-`
-
-const FRAGMENT_SHADER_DIRECTIONAL_LIGHTING = `
-  precision highp float;
-
-  uniform vec2 resolution;
-  uniform sampler2D positionTexture;
-  uniform sampler2D normalTexture;
-  uniform sampler2D colorTexture;
-  uniform sampler2D texture;
-  uniform vec3 lightDirection;
-
-  void main () {
-    vec2 fragCoord = gl_FragCoord.xy / resolution;
-
-    // vec3 position = texture2D(positionTexture, fragCoord).xyz;
-    vec3 normal = normalize(texture2D(normalTexture, fragCoord).xyz);
-    vec2 uv = texture2D(colorTexture, fragCoord).xy;
-
-    float light = dot(normal, lightDirection);
-    gl_FragColor = texture2D(texture, uv);
-    gl_FragColor.rgb *= light * 0.25;
-  }
-`
-
-const VERTEX_SHADER_DEBUG_GBUFFER = `
-  attribute vec4 position;
-  attribute vec2 uv;
-
-  varying vec2 v_uv;
-
-  void main () {
-    gl_Position = projectionMatrix * viewMatrix * modelMatrix * position;
-
-    v_uv = uv;
-  }
-`
-
-const FRAGMENT_SHADER_DEBUG_GBUFFER = `
-  precision highp float;
-
-  uniform sampler2D texture;
-
-  varying vec2 v_uv;
-
-  void main () {
-    gl_FragColor = texture2D(texture, v_uv);
-  }
-`
+import FRAGMENT_SHADER_POINT_LIGHTING from './point-lighting.frag'
+import FRAGMENT_SHADER_DIRECTIONAL_LIGHTING from './directional-lighting.frag'
 
 const LIGHTS_COUNT = 100
-const LIGHTS_SCALE = 7
+const LIGHTS_SCALE = 8
 const BOXES_RADIUS_X = 30
 const BOXES_RADIUS_Z = 30
 const BOXES_ROW_X_COUNT = 20
@@ -172,6 +40,8 @@ const DEBUG_QUAD_HEIGHT = innerHeight * 0.125
 
 const CONFIG = {
   lightsCount: 12,
+  directionalLight: true,
+  fxaa: true,
   debug: false,
 }
 
@@ -182,12 +52,16 @@ document.body.appendChild(stats.domElement)
 const errorLogWrapper = document.getElementById('error-log')
 const dpr = Math.min(devicePixelRatio, 2)
 const canvas = document.createElement('canvas')
-const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
+const canvasOpts = { antialias: false }
+const gl =
+  canvas.getContext('webgl', canvasOpts) ||
+  canvas.getContext('experimental-webgl', canvasOpts)
 const lightSpheres = []
 
 let activeLightSpheres
 let drawMesh
 let fullscreenQuadMesh
+let fxaaMesh
 let debugPositionsMesh
 let debugNormalsMesh
 let debugUvsMesh
@@ -298,29 +172,21 @@ gl.framebufferTexture2D(
   0,
 )
 
-var depthTexture = gl.createTexture()
-gl.bindTexture(gl.TEXTURE_2D, depthTexture)
-gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false)
-gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
-gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
-gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-gl.texImage2D(
-  gl.TEXTURE_2D,
-  0,
-  gl.DEPTH_COMPONENT,
-  innerWidth,
-  innerHeight,
-  0,
-  gl.DEPTH_COMPONENT,
-  gl.UNSIGNED_SHORT,
-  null,
-)
+const depthTexture = new Texture(gl, {
+  minFilter: gl.LINEAR,
+  magFilter: gl.LINEAR,
+  type: gl.UNSIGNED_SHORT,
+  format: gl.DEPTH_COMPONENT,
+})
+  .bind()
+  .setIsFlip(false)
+  .fromSize(innerWidth, innerHeight)
+
 gl.framebufferTexture2D(
   gl.FRAMEBUFFER,
   gl.DEPTH_ATTACHMENT,
   gl.TEXTURE_2D,
-  depthTexture,
+  depthTexture.getTexture(),
   0,
 )
 
@@ -340,6 +206,39 @@ const textureImage = new Texture(gl, { minFilter: gl.LINEAR_MIPMAP_LINEAR })
   .fromSize(512, 512)
   .generateMipmap()
 
+// ------------- FXAA -------------
+const fxaaFramebuffer = new Framebuffer(gl, {
+  format: gl.RGBA,
+  type: gl.FLOAT,
+  width: innerWidth,
+  height: innerHeight,
+})
+{
+  const { indices, vertices, uv } = GeometryUtils.createPlane({
+    width: innerWidth,
+    height: innerHeight,
+  })
+  const geometry = new Geometry(gl)
+  geometry
+    .addIndex({ typedArray: indices })
+    .addAttribute('position', { typedArray: vertices, size: 3 })
+    .addAttribute('uv', { typedArray: uv, size: 2 })
+  fxaaMesh = new Mesh(gl, {
+    geometry,
+    defines: {
+      INCLUDE_UVS: 1,
+      USE_FXAA: 1,
+    },
+    uniforms: {
+      texture: { type: UNIFORM_TYPE_INT, value: 0 },
+      resolution: { type: UNIFORM_TYPE_VEC2, value: [innerWidth, innerHeight] },
+    },
+    vertexShaderSource: VERTEX_SHADER_BASE,
+    fragmentShaderSource: FRAGMENT_SHADER_BASE,
+  })
+}
+
+// ------------- Cube Meshes -------------
 const img = new Image()
 img.onload = () => {
   textureImage.bind().fromImage(img).generateMipmap()
@@ -348,7 +247,6 @@ img.src = window.location.href.includes('github')
   ? '/hwoa-rang-gl/examples/dist/assets/textures/box.jpeg'
   : '/examples/dist/assets/textures/box.jpeg'
 
-// ------------- Cube Meshes -------------
 {
   const { indices, vertices, uv, normal } = GeometryUtils.createBox()
   const geometry = new Geometry(gl)
@@ -373,9 +271,11 @@ img.src = window.location.href.includes('github')
     for (let y = 0; y < BOXES_ROW_Z_COUNT; y++) {
       const posX = x * stepx - (BOXES_ROW_X_COUNT * stepx) / 2
       const posZ = y * stepy - (BOXES_ROW_Z_COUNT * stepy) / 2
-      const translateVec = vec3.fromValues(posX, 0, posZ)
+      const scaleY = 1 + Math.random() * 3
+      const translateVec = vec3.fromValues(posX, scaleY / 2, posZ)
       const matrix = mat4.create()
       mat4.translate(matrix, matrix, translateVec)
+      mat4.scale(matrix, matrix, vec3.fromValues(1, scaleY, 1))
       drawMesh.setMatrixAt(i, matrix)
       i++
     }
@@ -412,12 +312,14 @@ img.src = window.location.href.includes('github')
     const randY = 1 + Math.random() * 2
     const randZ = (Math.random() * 2 - 1) * 10
 
-    const randShininess = Math.random() * 4
-    const randSpecular = Math.random() * 0.65 + 0.35
+    const randShininess = Math.random() * 20
+    const randSpecular = Math.random() * 2
 
     const randR = Math.random()
     const randG = Math.random()
     const randB = Math.random()
+
+    const randScale = LIGHTS_SCALE * 0.4 + Math.random() * (LIGHTS_SCALE * 0.6)
 
     const mesh = new Mesh(gl, {
       geometry,
@@ -425,11 +327,7 @@ img.src = window.location.href.includes('github')
         ...sharedLightsUniforms,
         'PointLight.shininessSpecularRadius': {
           type: UNIFORM_TYPE_VEC3,
-          value: [
-            randShininess,
-            randSpecular,
-            LIGHTS_SCALE * 0.4 + Math.random() * (LIGHTS_SCALE * 0.6),
-          ],
+          value: [randShininess, randSpecular, randScale],
         },
         'PointLight.position': {
           type: UNIFORM_TYPE_VEC3,
@@ -445,7 +343,7 @@ img.src = window.location.href.includes('github')
     })
     mesh
       .setPosition({ x: randX, y: randY, z: randZ })
-      .setScale({ x: LIGHTS_SCALE, y: LIGHTS_SCALE, z: LIGHTS_SCALE })
+      .setScale({ x: randScale, y: randScale, z: randScale })
     lightSpheres.push(mesh)
   }
   activeLightSpheres = lightSpheres.filter((_, i) => i < CONFIG.lightsCount)
@@ -496,13 +394,19 @@ img.src = window.location.href.includes('github')
     })
   debugPositionsMesh = new Mesh(gl, {
     geometry,
-    vertexShaderSource: VERTEX_SHADER_DEBUG_GBUFFER,
-    fragmentShaderSource: FRAGMENT_SHADER_DEBUG_GBUFFER,
+    defines: {
+      INCLUDE_UVS: 1,
+    },
+    vertexShaderSource: VERTEX_SHADER_BASE,
+    fragmentShaderSource: FRAGMENT_SHADER_BASE,
   })
   debugNormalsMesh = new Mesh(gl, {
     geometry,
-    vertexShaderSource: VERTEX_SHADER_DEBUG_GBUFFER,
-    fragmentShaderSource: FRAGMENT_SHADER_DEBUG_GBUFFER,
+    defines: {
+      INCLUDE_UVS: 1,
+    },
+    vertexShaderSource: VERTEX_SHADER_BASE,
+    fragmentShaderSource: FRAGMENT_SHADER_BASE,
   })
   let accX = -innerWidth / 2 + DEBUG_QUAD_WIDTH / 2 + 20
   debugPositionsMesh.setPosition({
@@ -516,8 +420,11 @@ img.src = window.location.href.includes('github')
   })
   debugUvsMesh = new Mesh(gl, {
     geometry,
-    vertexShaderSource: VERTEX_SHADER_DEBUG_GBUFFER,
-    fragmentShaderSource: FRAGMENT_SHADER_DEBUG_GBUFFER,
+    defines: {
+      INCLUDE_UVS: 1,
+    },
+    vertexShaderSource: VERTEX_SHADER_BASE,
+    fragmentShaderSource: FRAGMENT_SHADER_BASE,
   })
   accX += DEBUG_QUAD_WIDTH + 10
   debugUvsMesh.setPosition({
@@ -534,6 +441,8 @@ gui
   .onChange((val) => {
     activeLightSpheres = lightSpheres.filter((_, i) => i < val)
   })
+gui.add(CONFIG, 'directionalLight')
+gui.add(CONFIG, 'fxaa')
 gui.add(CONFIG, 'debug')
 
 document.body.appendChild(canvas)
@@ -564,9 +473,14 @@ function updateFrame(ts) {
     .setCamera(perspCamera)
     .draw()
 
+  if (CONFIG.fxaa) {
+    fxaaFramebuffer.bind()
+  } else {
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null)
+  }
+
   // ------------- Deferred point lighting -------------
 
-  gl.bindFramebuffer(gl.FRAMEBUFFER, null)
   gl.depthMask(false)
   gl.disable(gl.DEPTH_TEST)
   gl.enable(gl.BLEND)
@@ -590,27 +504,41 @@ function updateFrame(ts) {
   )
 
   // ------------- Deferred directional lighting -------------
+  if (CONFIG.directionalLight) {
+    gl.activeTexture(gl.TEXTURE0)
+    texturePosition.bind()
+    gl.activeTexture(gl.TEXTURE1)
+    textureNormal.bind()
+    gl.activeTexture(gl.TEXTURE2)
+    textureColor.bind()
+    gl.activeTexture(gl.TEXTURE3)
+    textureImage.bind()
+    fullscreenQuadMesh
+      .use()
+      .setUniform('lightDirection', UNIFORM_TYPE_VEC3, [
+        Math.sin(ts * 0.25),
+        2,
+        Math.cos(ts * 0.25),
+      ])
+      .setCamera(orthoCamera)
+      .draw()
+  }
 
-  gl.activeTexture(gl.TEXTURE0)
-  texturePosition.bind()
-  gl.activeTexture(gl.TEXTURE1)
-  textureNormal.bind()
-  gl.activeTexture(gl.TEXTURE2)
-  textureColor.bind()
-  gl.activeTexture(gl.TEXTURE3)
-  textureImage.bind()
-  fullscreenQuadMesh
-    .use()
-    .setUniform('lightDirection', UNIFORM_TYPE_VEC3, [
-      Math.sin(ts * 0.25),
-      2,
-      Math.cos(ts * 0.25),
-    ])
-    .setCamera(orthoCamera)
-    .draw()
+  if (CONFIG.fxaa) {
+    fxaaFramebuffer.unbind()
+  }
 
+  gl.disable(gl.BLEND)
+
+  // ------------- FXAA pass -------------
+  if (CONFIG.fxaa) {
+    gl.activeTexture(gl.TEXTURE0)
+    fxaaFramebuffer.texture.bind()
+    fxaaMesh.use().setCamera(orthoCamera).draw()
+  }
+
+  // ------------- Debug -------------
   if (CONFIG.debug) {
-    gl.disable(gl.BLEND)
     gl.activeTexture(gl.TEXTURE0)
     texturePosition.bind()
     debugPositionsMesh.use().setCamera(orthoCamera).draw()
