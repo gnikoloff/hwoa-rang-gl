@@ -3,6 +3,7 @@ import commonjs from 'rollup-plugin-commonjs'
 import sourcemaps from 'rollup-plugin-sourcemaps'
 import json from '@rollup/plugin-json'
 import copy from 'rollup-plugin-copy'
+import glslify from 'rollup-plugin-glslify'
 
 import examplesDefinitions from './EXAMPLES.json'
 
@@ -11,7 +12,13 @@ const exampleInputs = examplesDefinitions.reduce((acc, { children }) => {
   return acc
 }, [])
 
-const sharedPlugins = [json(), commonjs(), nodeResolve(), sourcemaps()]
+const sharedPlugins = [
+  glslify(),
+  json(),
+  commonjs(),
+  nodeResolve(),
+  sourcemaps(),
+]
 
 export default [
   {
@@ -22,8 +29,10 @@ export default [
     },
     plugins: [
       copy({
-        targets: [{ src: `index.html`, dest: `dist` }],
-        targets: [{ src: `assets`, dest: `dist` }],
+        targets: [
+          { src: `index.html`, dest: `dist` },
+          { src: `assets`, dest: `dist` },
+        ],
       }),
       ...sharedPlugins,
     ],
