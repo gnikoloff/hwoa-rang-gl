@@ -31,6 +31,11 @@ export interface MeshInterface {
    */
   uniforms?: Record<string, unknown>
   /**
+   * TODO
+   */
+  defines?: Record<string, unknown>
+
+  /**
    * Vertex shader program as string
    */
   vertexShaderSource: string

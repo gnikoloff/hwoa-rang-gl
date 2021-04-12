@@ -55,17 +55,28 @@ export class Mesh {
   public drawMode: GLenum = TRIANGLES
 
   constructor(gl: WebGLRenderingContext, params: MeshInterface) {
-    const {
-      geometry,
-      uniforms = {},
-      vertexShaderSource,
-      fragmentShaderSource,
-    } = params
+    const { geometry, uniforms = {}, defines = {} } = params
+
+    let { vertexShaderSource, fragmentShaderSource } = params
 
     this.#gl = gl
     this.#geometry = geometry
 
-    this.program = new Program(gl, { vertexShaderSource, fragmentShaderSource })
+    for (const [key, value] of Object.entries(defines)) {
+      vertexShaderSource = `
+        #define ${key} ${value}\n
+        ${vertexShaderSource}
+      `
+      fragmentShaderSource = `
+        #define ${key} ${value}\n
+        ${fragmentShaderSource}
+      `
+    }
+
+    this.program = new Program(gl, {
+      vertexShaderSource,
+      fragmentShaderSource,
+    })
     this.vaoExtension = getExtension(gl, 'OES_vertex_array_object')
     this.vao = this.vaoExtension.createVertexArrayOES()
     this.hasIndices = geometry.attributes.has(INDEX_ATTRIB_NAME)
