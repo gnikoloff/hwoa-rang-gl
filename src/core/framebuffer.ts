@@ -76,7 +76,6 @@ export class Framebuffer {
       texture,
       level,
     )
-    this.unbind()
 
     if (this.#depth) {
       this.#depthBuffer = this.#gl.createRenderbuffer()!
@@ -95,6 +94,7 @@ export class Framebuffer {
       )
       this.#gl.bindRenderbuffer(this.#gl.RENDERBUFFER, null)
     }
+    this.unbind()
 
     if (updateTexture) {
       this.texture.bind().fromSize(width, height)
