@@ -1,9 +1,9 @@
 attribute vec4 position;
-attribute vec2 uv;
+attribute vec3 color;
 attribute vec3 normal;
 attribute mat4 instanceModelMatrix;
 
-varying vec2 v_uv;
+varying vec3 v_color;
 varying vec3 v_normal;
 varying vec3 v_position;
 
@@ -12,7 +12,7 @@ void main () {
 
   gl_Position = projectionMatrix * viewMatrix * worldPosition;
 
-  v_uv = uv;
+  v_color = color;
   v_normal = (modelMatrix * vec4(normal, 1.0)).xyz;
   v_position = worldPosition.xyz;
 }

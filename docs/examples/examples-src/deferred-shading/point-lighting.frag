@@ -9,7 +9,6 @@ struct PointLightBase {
 uniform sampler2D positionTexture;
 uniform sampler2D normalTexture;
 uniform sampler2D colorTexture;
-uniform sampler2D texture;
 uniform vec3 eyePosition;
 uniform vec2 resolution;
 uniform PointLightBase PointLight;
@@ -19,9 +18,9 @@ void main () {
 
   vec3 position = texture2D(positionTexture, fragCoord).xyz;
   vec3 normal = normalize(texture2D(normalTexture, fragCoord).xyz);
-  vec2 uv = texture2D(colorTexture, fragCoord).xy;
+  vec3 color = texture2D(colorTexture, fragCoord).xyz;
 
-  vec4 baseColor = texture2D(texture, uv);
+  vec4 baseColor = vec4(color, 1.0);
 
   vec3 eyeDirection = normalize(eyePosition - position);
   vec3 lightVec = PointLight.position - position;

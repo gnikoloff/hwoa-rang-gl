@@ -17,6 +17,7 @@ import {
   UNIFORM_TYPE_INT,
   UNIFORM_TYPE_VEC2,
   UNIFORM_TYPE_VEC3,
+  UNIFORM_TYPE_FLOAT,
 } from '../../../../dist/esm'
 
 import VERTEX_SHADER_BASE from './base.vert'
@@ -28,7 +29,7 @@ import FRAGMENT_SHADER_GBUFFER from './gbuffer.frag'
 import FRAGMENT_SHADER_POINT_LIGHTING from './point-lighting.frag'
 import FRAGMENT_SHADER_DIRECTIONAL_LIGHTING from './directional-lighting.frag'
 
-const LIGHTS_COUNT = 100
+const LIGHTS_COUNT = 200
 const LIGHTS_SCALE = 8
 const BOXES_RADIUS_X = 30
 const BOXES_RADIUS_Z = 30
@@ -37,10 +38,12 @@ const BOXES_ROW_Z_COUNT = 20
 const TOTAL_BOXES_COUNT = BOXES_ROW_X_COUNT * BOXES_ROW_Z_COUNT
 const DEBUG_QUAD_WIDTH = innerWidth * 0.125
 const DEBUG_QUAD_HEIGHT = innerHeight * 0.125
+const DEBUG_LABEL_WIDTH = 120
+const DEBUG_LABEL_HEIGHT = 24
 
 const CONFIG = {
   lightsCount: 12,
-  directionalLight: true,
+  dirLightFactor: 0.4,
   fxaa: true,
   debug: false,
 }
@@ -201,11 +204,6 @@ ext.drawBuffersWEBGL([
 ])
 gl.bindFramebuffer(gl.FRAMEBUFFER, null)
 
-const textureImage = new Texture(gl, { minFilter: gl.LINEAR_MIPMAP_LINEAR })
-  .bind()
-  .fromSize(512, 512)
-  .generateMipmap()
-
 // ------------- FXAA -------------
 const fxaaFramebuffer = new Framebuffer(gl, {
   format: gl.RGBA,
@@ -239,21 +237,22 @@ const fxaaFramebuffer = new Framebuffer(gl, {
 }
 
 // ------------- Cube Meshes -------------
-const img = new Image()
-img.onload = () => {
-  textureImage.bind().fromImage(img).generateMipmap()
-}
-img.src = window.location.href.includes('github')
-  ? '/hwoa-rang-gl/examples/dist/assets/textures/box.jpeg'
-  : '/examples/dist/assets/textures/box.jpeg'
 
 {
-  const { indices, vertices, uv, normal } = GeometryUtils.createBox()
+  const { indices, vertices, normal } = GeometryUtils.createBox()
   const geometry = new Geometry(gl)
+
+  const colors = new Float32Array(TOTAL_BOXES_COUNT * 3)
+  for (let i = 0; i < TOTAL_BOXES_COUNT; i++) {
+    colors[i * 3 + 0] = 0.1 + Math.random() * 0.5
+    colors[i * 3 + 2] = 0.1 + Math.random() * 0.5
+    colors[i * 3 + 2] = 0.1 + Math.random() * 0.5
+  }
+
   geometry
     .addIndex({ typedArray: indices })
     .addAttribute('position', { typedArray: vertices, size: 3 })
-    .addAttribute('uv', { typedArray: uv, size: 2 })
+    .addAttribute('color', { typedArray: colors, size: 3, instancedDivisor: 1 })
     .addAttribute('normal', { typedArray: normal, size: 3 })
 
   drawMesh = new InstancedMesh(gl, {
@@ -299,7 +298,6 @@ img.src = window.location.href.includes('github')
     positionTexture: { type: UNIFORM_TYPE_INT, value: 0 },
     normalTexture: { type: UNIFORM_TYPE_INT, value: 1 },
     colorTexture: { type: UNIFORM_TYPE_INT, value: 2 },
-    texture: { type: UNIFORM_TYPE_INT, value: 3 },
     eyePosition: { type: UNIFORM_TYPE_VEC3, value: perspCamera.position },
     resolution: {
       type: UNIFORM_TYPE_VEC2,
@@ -308,9 +306,9 @@ img.src = window.location.href.includes('github')
   }
 
   for (let i = 0; i < LIGHTS_COUNT; i++) {
-    const randX = (Math.random() * 2 - 1) * 10
+    const randX = (Math.random() * 2 - 1) * 15
     const randY = 1 + Math.random() * 2
-    const randZ = (Math.random() * 2 - 1) * 10
+    const randZ = (Math.random() * 2 - 1) * 15
 
     const randShininess = Math.random() * 20
     const randSpecular = Math.random() * 2
@@ -366,9 +364,9 @@ img.src = window.location.href.includes('github')
       positionTexture: { type: UNIFORM_TYPE_INT, value: 0 },
       normalTexture: { type: UNIFORM_TYPE_INT, value: 1 },
       colorTexture: { type: UNIFORM_TYPE_INT, value: 2 },
-      texture: { type: UNIFORM_TYPE_INT, value: 3 },
       resolution: { type: UNIFORM_TYPE_VEC2, value: [innerWidth, innerHeight] },
       lightDirection: { type: UNIFORM_TYPE_VEC3, value: [1, 2, 2] },
+      lightFactor: { type: UNIFORM_TYPE_FLOAT, value: CONFIG.dirLightFactor },
     },
     vertexShaderSource: VERTEX_SHADER_BASE,
     fragmentShaderSource: FRAGMENT_SHADER_DIRECTIONAL_LIGHTING,
@@ -441,7 +439,14 @@ gui
   .onChange((val) => {
     activeLightSpheres = lightSpheres.filter((_, i) => i < val)
   })
-gui.add(CONFIG, 'directionalLight')
+gui
+  .add(CONFIG, 'dirLightFactor')
+  .min(0)
+  .max(1)
+  .step(0.05)
+  .onChange((val) => {
+    fullscreenQuadMesh.use().setUniform('lightFactor', UNIFORM_TYPE_FLOAT, val)
+  })
 gui.add(CONFIG, 'fxaa')
 gui.add(CONFIG, 'debug')
 
@@ -457,7 +462,7 @@ function updateFrame(ts) {
 
   // ------------- Render cubes into GBuffer -------------
 
-  gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)
+  gl.viewport(0, 0, innerWidth, innerHeight)
   gl.blendFunc(gl.ONE, gl.ONE)
 
   gl.bindFramebuffer(gl.FRAMEBUFFER, gBuffer)
@@ -492,8 +497,6 @@ function updateFrame(ts) {
   textureNormal.bind()
   gl.activeTexture(gl.TEXTURE2)
   textureColor.bind()
-  gl.activeTexture(gl.TEXTURE3)
-  textureImage.bind()
 
   activeLightSpheres.forEach((mesh) =>
     mesh
@@ -504,29 +507,28 @@ function updateFrame(ts) {
   )
 
   // ------------- Deferred directional lighting -------------
-  if (CONFIG.directionalLight) {
-    gl.activeTexture(gl.TEXTURE0)
-    texturePosition.bind()
-    gl.activeTexture(gl.TEXTURE1)
-    textureNormal.bind()
-    gl.activeTexture(gl.TEXTURE2)
-    textureColor.bind()
-    gl.activeTexture(gl.TEXTURE3)
-    textureImage.bind()
-    fullscreenQuadMesh
-      .use()
-      .setUniform('lightDirection', UNIFORM_TYPE_VEC3, [
-        Math.sin(ts * 0.25),
-        2,
-        Math.cos(ts * 0.25),
-      ])
-      .setCamera(orthoCamera)
-      .draw()
-  }
+
+  gl.activeTexture(gl.TEXTURE0)
+  texturePosition.bind()
+  gl.activeTexture(gl.TEXTURE1)
+  textureNormal.bind()
+  gl.activeTexture(gl.TEXTURE2)
+  textureColor.bind()
+  fullscreenQuadMesh
+    .use()
+    .setUniform('lightDirection', UNIFORM_TYPE_VEC3, [
+      Math.sin(ts * 0.25),
+      2,
+      Math.cos(ts * 0.25),
+    ])
+    .setCamera(orthoCamera)
+    .draw()
 
   if (CONFIG.fxaa) {
     fxaaFramebuffer.unbind()
   }
+
+  gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)
 
   gl.disable(gl.BLEND)
 
@@ -560,6 +562,19 @@ function updateFrame(ts) {
 function resize() {
   perspCamera.aspect = innerWidth / innerHeight
   perspCamera.updateProjectionMatrix()
+
+  orthoCamera.left = -innerWidth / 2
+  orthoCamera.right = innerWidth / 2
+  orthoCamera.top = innerHeight / 2
+  orthoCamera.bottom = -innerHeight / 2
+  orthoCamera.updateProjectionMatrix()
+
+  texturePosition.bind().fromSize(innerWidth, innerHeight)
+  textureNormal.bind().fromSize(innerWidth, innerHeight)
+  textureColor.bind().fromSize(innerWidth, innerHeight)
+  depthTexture.bind().fromSize(innerWidth, innerHeight)
+
+  // fxaaFramebuffer.updateWithSize(innerWidth, innerHeight)
 
   sizeCanvas()
 }
