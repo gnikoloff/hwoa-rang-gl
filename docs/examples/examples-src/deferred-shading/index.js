@@ -68,6 +68,10 @@ let fxaaMesh
 let debugPositionsMesh
 let debugNormalsMesh
 let debugUvsMesh
+let webglDrawBuffersExtension
+let floatTexExtension
+let halfFloatTexExtension
+let webglDepthTextureExtension
 
 gl.clearColor(0.0, 0.0, 0.0, 1.0)
 gl.depthFunc(gl.LEQUAL)
@@ -80,7 +84,7 @@ const perspCamera = new PerspectiveCamera(
   0.1,
   100,
 )
-perspCamera.position = [10, 4, 10]
+perspCamera.position = [5.07, 7.13, 17.64]
 perspCamera.lookAt([0, 0, 0])
 
 const orthoCamera = new OrthographicCamera(
@@ -96,37 +100,42 @@ orthoCamera.lookAt([0, 0, 0])
 
 new CameraController(perspCamera, canvas)
 
-// ------------- Set up GBuffer -------------
+// ------------- Needed WebGL Extensions -------------
 
-const ext = getExtension(gl, 'WEBGL_draw_buffers')
-if (!ext) {
+webglDrawBuffersExtension = getExtension(gl, 'WEBGL_draw_buffers')
+if (!webglDrawBuffersExtension) {
   errorLogWrapper.style.display = 'flex'
   errorLogWrapper.innerHTML += `
       <p>⚠️ Need WEBGL_draw_buffers</p>
     `
 }
 
-const ext2 = getExtension(gl, 'OES_texture_float')
-if (!ext2) {
-  errorLogWrapper.style.display = 'flex'
-  errorLogWrapper.innerHTML += `
-    <p>⚠️ Need OES_texture_float</p>
-  `
+floatTexExtension = getExtension(gl, 'OES_texture_float')
+if (!floatTexExtension) {
+  halfFloatTexExtension = getExtension(gl, 'OES')
+  if (!halfFloatTexExtension) {
+    errorLogWrapper.style.display = 'flex'
+    errorLogWrapper.innerHTML += `
+      <p>⚠️ Need OES_texture_float or OES_texture_half_float</p>
+    `
+  }
 }
 
-const ext3 = getExtension(gl, 'WEBGL_depth_texture')
-if (!ext3) {
+webglDepthTextureExtension = getExtension(gl, 'WEBGL_depth_texture')
+if (!webglDepthTextureExtension) {
   errorLogWrapper.style.display = 'flex'
   errorLogWrapper.innerHTML += `
     <p>⚠️ Need WEBGL_depth_texture</p>
   `
 }
 
+// ------------- Set up GBuffer -------------
+
 const gBuffer = gl.createFramebuffer()
 gl.bindFramebuffer(gl.FRAMEBUFFER, gBuffer)
 
 const texturePosition = new Texture(gl, {
-  type: gl.FLOAT,
+  type: floatTexExtension ? gl.FLOAT : halfFloatTexExtension.HALF_FLOAT_OES,
   format: gl.RGB,
   minFilter: gl.NEAREST,
   magFilter: gl.NEAREST,
@@ -136,14 +145,14 @@ const texturePosition = new Texture(gl, {
 
 gl.framebufferTexture2D(
   gl.FRAMEBUFFER,
-  ext.COLOR_ATTACHMENT0_WEBGL,
+  webglDrawBuffersExtension.COLOR_ATTACHMENT0_WEBGL,
   gl.TEXTURE_2D,
   texturePosition.getTexture(),
   0,
 )
 
 const textureNormal = new Texture(gl, {
-  type: gl.FLOAT,
+  type: floatTexExtension ? gl.FLOAT : halfFloatTexExtension.HALF_FLOAT_OES,
   format: gl.RGB,
   minFilter: gl.NEAREST,
   magFilter: gl.NEAREST,
@@ -153,13 +162,13 @@ const textureNormal = new Texture(gl, {
 
 gl.framebufferTexture2D(
   gl.FRAMEBUFFER,
-  ext.COLOR_ATTACHMENT1_WEBGL,
+  webglDrawBuffersExtension.COLOR_ATTACHMENT1_WEBGL,
   gl.TEXTURE_2D,
   textureNormal.getTexture(),
   0,
 )
 const textureColor = new Texture(gl, {
-  type: gl.FLOAT,
+  type: floatTexExtension ? gl.FLOAT : halfFloatTexExtension.HALF_FLOAT_OES,
   format: gl.RGB,
   minFilter: gl.NEAREST,
   magFilter: gl.NEAREST,
@@ -169,7 +178,7 @@ const textureColor = new Texture(gl, {
 
 gl.framebufferTexture2D(
   gl.FRAMEBUFFER,
-  ext.COLOR_ATTACHMENT2_WEBGL,
+  webglDrawBuffersExtension.COLOR_ATTACHMENT2_WEBGL,
   gl.TEXTURE_2D,
   textureColor.getTexture(),
   0,
@@ -197,17 +206,17 @@ if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) {
   console.log('cant use gBuffer!')
 }
 
-ext.drawBuffersWEBGL([
-  ext.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
-  ext.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1]
-  ext.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2]
+webglDrawBuffersExtension.drawBuffersWEBGL([
+  webglDrawBuffersExtension.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
+  webglDrawBuffersExtension.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1]
+  webglDrawBuffersExtension.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2]
 ])
 gl.bindFramebuffer(gl.FRAMEBUFFER, null)
 
 // ------------- FXAA -------------
 const fxaaFramebuffer = new Framebuffer(gl, {
   format: gl.RGBA,
-  type: gl.FLOAT,
+  type: floatTexExtension ? gl.FLOAT : halfFloatTexExtension.HALF_FLOAT_OES,
   width: innerWidth,
   height: innerHeight,
 })
