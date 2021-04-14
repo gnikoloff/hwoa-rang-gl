@@ -186,8 +186,8 @@ export class Texture {
   /**
    * @returns {this}
    */
-  setIsFlip(): this {
-    this.setPixelStore(this.#gl.UNPACK_FLIP_Y_WEBGL, 1)
+  setIsFlip(flip = 1): this {
+    this.setPixelStore(this.#gl.UNPACK_FLIP_Y_WEBGL, flip)
     return this
   }
 

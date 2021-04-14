@@ -50,6 +50,7 @@ export class Mesh extends Transform {
     this.#gl = gl
     this.#geometry = geometry
 
+    // Assign defines to both vertex and fragment shaders
     for (const [key, value] of Object.entries(defines)) {
       vertexShaderSource = `
         #define ${key} ${value}\n
@@ -61,6 +62,7 @@ export class Mesh extends Transform {
       `
     }
 
+    // create mesh program and vertex array object
     this.program = new Program(gl, {
       vertexShaderSource,
       fragmentShaderSource,
@@ -69,6 +71,7 @@ export class Mesh extends Transform {
     this.vao = this.vaoExtension.createVertexArrayOES()
     this.hasIndices = geometry.attributes.has(INDEX_ATTRIB_NAME)
 
+    // assign geometry attributes to mesh
     this.vaoExtension.bindVertexArrayOES(this.vao)
     geometry.attributes.forEach(
       ({ size, type, normalized, stride, offset, buffer }, key) => {
@@ -94,6 +97,7 @@ export class Mesh extends Transform {
     )
     this.vaoExtension.bindVertexArrayOES(null)
 
+    // assign uniforms to mesh
     this.program.bind()
     for (const [key, uniform] of Object.entries(uniforms)) {
       // @ts-ignore
@@ -105,9 +109,14 @@ export class Mesh extends Transform {
       this.modelMatrix,
     )
     this.program.unbind()
+
     return this
   }
 
+  /**
+   * Binds the program
+   * @returns {this}
+   */
   use(): this {
     this.program.bind()
     return this
@@ -175,6 +184,7 @@ export class Mesh extends Transform {
     }
 
     this.vaoExtension.bindVertexArrayOES(null)
+
     return this
   }
 

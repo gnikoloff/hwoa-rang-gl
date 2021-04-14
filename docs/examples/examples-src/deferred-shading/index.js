@@ -483,7 +483,7 @@ function updateFrame(ts) {
 
   drawMesh
     .use()
-    .setRotation({ y: 1 }, ts * 0.1)
+    .setRotation({ y: ts * 0.25 })
     .setCamera(perspCamera)
     .draw()
 

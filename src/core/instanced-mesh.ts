@@ -2,7 +2,12 @@ import { mat4 } from 'gl-matrix'
 
 import { Mesh } from './mesh'
 
-import { INSTANCED_OFFSET_MODEL_MATRIX } from '../utils/gl-constants'
+import {
+  INSTANCED_OFFSET_MODEL_MATRIX,
+  MODEL_MATRIX_UNIFORM_NAME,
+  UNIFORM_TYPE_MATRIX4X4,
+} from '../utils/gl-constants'
+
 import { getExtension } from '../utils/gl-utils'
 import { Geometry } from './geometry'
 
@@ -27,12 +32,29 @@ export class InstancedMesh extends Mesh {
     }: InstancedMeshInterface,
   ) {
     super(gl, { geometry, uniforms, vertexShaderSource, fragmentShaderSource })
+
     this.#gl = gl
     this.#geometry = geometry
     this.#instanceExtension = getExtension(gl, 'ANGLE_instanced_arrays')
 
     this.instanceCount = instanceCount
 
+    // assign divisors to instanced attributes
+    this.vaoExtension.bindVertexArrayOES(this.vao)
+    geometry.attributes.forEach(({ instancedDivisor }, key) => {
+      if (instancedDivisor) {
+        const location = this.program.getAttribLocation(key)
+        if (location === -1) {
+          return
+        }
+        this.#instanceExtension.vertexAttribDivisorANGLE(
+          location,
+          instancedDivisor,
+        )
+      }
+    })
+
+    // initialize instance instanceModelMatrix attribute as identity matrix
     const instanceMatrixLocation = this.program.getAttribLocation(
       INSTANCED_OFFSET_MODEL_MATRIX,
     )
@@ -51,21 +73,6 @@ export class InstancedMesh extends Mesh {
         j++
       }
     }
-
-    this.vaoExtension.bindVertexArrayOES(this.vao)
-    geometry.attributes.forEach(({ instancedDivisor }, key) => {
-      if (instancedDivisor) {
-        const location = this.program.getAttribLocation(key)
-        if (location === -1) {
-          return
-        }
-        this.#instanceExtension.vertexAttribDivisorANGLE(
-          location,
-          instancedDivisor,
-        )
-      }
-    })
-
     const matrixBuffer = gl.createBuffer()
     gl.bindBuffer(gl.ARRAY_BUFFER, matrixBuffer)
     gl.bufferData(gl.ARRAY_BUFFER, matrixData, gl.DYNAMIC_DRAW)
@@ -94,8 +101,6 @@ export class InstancedMesh extends Mesh {
       stride: 4 * itemsPerInstance,
       instancedDivisor: 1,
     })
-
-    this.#instanceExtension = getExtension(gl, 'ANGLE_instanced_arrays')
   }
   /**
    * @param {number} index - Instance index on which to apply the matrix
@@ -121,9 +126,13 @@ export class InstancedMesh extends Mesh {
    * Draws the instanced mesh
    */
   draw(): this {
-    if (this.modelMatrixNeedsUpdate) {
-      this.updateModelMatrix()
-      this.modelMatrixNeedsUpdate = false
+    if (this.shouldUpdate) {
+      super.updateModelMatrix()
+      this.program.setUniform(
+        MODEL_MATRIX_UNIFORM_NAME,
+        UNIFORM_TYPE_MATRIX4X4,
+        this.modelMatrix,
+      )
     }
     this.program.bind()
     this.vaoExtension.bindVertexArrayOES(this.vao)
