@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { vec3 } from 'gl-matrix'
+import { vec2, vec3 } from 'gl-matrix'
 
 import { BoxInterface, PlaneInterface, SphereInterface } from '../types'
 
@@ -580,4 +580,157 @@ export function createSphere(params: SphereInterface = {}) {
     uv,
     indices: index,
   }
+}
+
+export function createTorus (params = {}) {
+  const {
+    radius = 0.5,
+    tube = 0.35,
+    arc = Math.PI * 2
+  } = params
+
+  let {
+    radialSegments = 8,
+    tubularSegments = 6,
+  } = params
+
+  radialSegments = Math.floor( radialSegments );
+  tubularSegments = Math.floor( tubularSegments );
+
+  const indices = []
+  const vertices = []
+  const normals = []
+  const uvs = []
+
+  const center = vec3.create()
+  const vertex = vec3.create()
+  const normal = vec3.create()
+
+  for ( let j = 0; j <= radialSegments; j ++ ) {
+
+    for ( let i = 0; i <= tubularSegments; i ++ ) {
+
+      const u = i / tubularSegments * arc;
+      const v = j / radialSegments * Math.PI * 2;
+
+      // vertex
+
+      vertex[0] = ( radius + tube * Math.cos( v ) ) * Math.cos( u );
+      vertex[1] = ( radius + tube * Math.cos( v ) ) * Math.sin( u );
+      vertex[2] = tube * Math.sin( v );
+
+      vertices.push(...vertex);
+
+      // normal
+
+      center[0] = radius * Math.cos( u );
+      center[1] = radius * Math.sin( u );
+
+      vec3.sub(normal, vertex, center)
+      vec3.normalize(normal, normal)
+
+      normals.push(...normal);
+
+      // uv
+
+      uvs.push( i / tubularSegments );
+      uvs.push( j / radialSegments );
+
+    }
+
+  }
+
+  // generate indices
+
+  for ( let j = 1; j <= radialSegments; j ++ ) {
+
+    for ( let i = 1; i <= tubularSegments; i ++ ) {
+
+      // indices
+
+      const a = ( tubularSegments + 1 ) * j + i - 1;
+      const b = ( tubularSegments + 1 ) * ( j - 1 ) + i - 1;
+      const c = ( tubularSegments + 1 ) * ( j - 1 ) + i;
+      const d = ( tubularSegments + 1 ) * j + i;
+
+      // faces
+
+      indices.push( a, b, d );
+      indices.push( b, c, d );
+
+    }
+
+  }
+
+  const num = (radialSegments + 1) * (tubularSegments + 1)
+  return {
+    indices: num > 65536 ? new Uint32Array(indices) : new Uint16Array(indices),
+    vertices: new Float32Array(vertices),
+    normal: new Float32Array(normals),
+    uv: new Float32Array(uvs),
+  }
+}
+
+export function createCircle (params = {}) {
+  const {
+    radius = 1,
+    segments = 8,
+    thetaStart = 0,
+    thetaLength = Math.PI * 2,
+  } = params
+  const indices = [];
+  const vertices = [];
+  const normals = [];
+  const uvs = [];
+
+  // helper variables
+
+  const vertex = vec3.create()
+  const uv = vec2.create()
+
+  // center point
+
+  vertices.push( 0, 0, 0 );
+  normals.push( 0, 0, 1 );
+  uvs.push( 0.5, 0.5 );
+
+  for ( let s = 0, i = 3; s <= segments; s ++, i += 3 ) {
+
+    const segment = thetaStart + s / segments * thetaLength;
+
+    // vertex
+
+    vertex[0] = radius * Math.cos( segment );
+    vertex[1] = radius * Math.sin( segment );
+
+    vertices.push(...vertex);
+
+    // normal
+
+    normals.push( 0, 0, 1 );
+
+    // uvs
+
+    uv[0] = ( vertices[ i ] / radius + 1 ) / 2;
+    uv[1] = ( vertices[ i + 1 ] / radius + 1 ) / 2;
+    uvs.push( uv[0], uv[1] );
+
+  }
+
+  // indices
+
+  for ( let i = 1; i <= segments; i ++ ) {
+
+    indices.push( i, i + 1, 0 );
+
+  }
+
+
+  return {
+    indices: segments > 65536 ? new Uint32Array(indices) : new Uint16Array(indices),
+    vertices: new Float32Array(vertices),
+    normal: new Float32Array(normals),
+    uv: new Float32Array(uvs),
+  }
+
 }
