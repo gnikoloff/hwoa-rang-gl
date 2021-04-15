@@ -1,6 +1,7 @@
 import Stats from 'stats-js'
 import * as dat from 'dat.gui'
 import throttle from 'lodash.throttle'
+import { vec3, mat4 } from 'gl-matrix'
 
 import {
   getExtension,
@@ -15,243 +16,17 @@ import {
   UNIFORM_TYPE_VEC2,
 } from '../../../../dist/esm'
 
-import { vec3, mat4 } from 'gl-matrix'
-
-const advectFrag = `
-  uniform sampler2D source;
-  uniform sampler2D velocity;
-  uniform float dt;
-  uniform float scale;
-  uniform vec2 px1;
-  varying vec2 uv;
-
-  void main(){
-    gl_FragColor = texture2D(source, uv-texture2D(velocity, uv).xy * dt * px1) * scale;
-  }
-`
-
-const divergenceFrag = `
-
-  precision mediump sampler2D;
-  uniform sampler2D velocity;
-  
-  varying highp vec2 uv;
-  varying highp vec2 vL;
-  varying highp vec2 vR;
-  varying highp vec2 vT;
-  varying highp vec2 vB;
-
-  void main () {
-    float L = texture2D(velocity, vL).x;
-    float R = texture2D(velocity, vR).x;
-    float T = texture2D(velocity, vT).y;
-    float B = texture2D(velocity, vB).y;
-    vec2 C = texture2D(velocity, uv).xy;
-    
-    if (vL.x < 0.0) { L = -C.x; }
-    if (vR.x > 1.0) { R = -C.x; }
-    if (vT.y > 1.0) { T = -C.y; }
-    if (vB.y < 0.0) { B = -C.y; }
-    
-    float div = 0.5 * (R - L + T - B);
-    gl_FragColor = vec4(div, 0.0, 0.0, 1.0);
-  }
-`
-
-const jacobiFrag = `
-  uniform sampler2D pressure;
-  uniform sampler2D divergence;
-  uniform float alpha;
-  uniform float beta;
-  uniform vec2 px;
-  varying vec2 uv;
-
-  varying highp vec2 vL;
-  varying highp vec2 vR;
-  varying highp vec2 vT;
-  varying highp vec2 vB;
-
-  void main(){
-    float x0 = texture2D(pressure, vL).r;
-    float x1 = texture2D(pressure, vR).r;
-    float y0 = texture2D(pressure, vT).r;
-    float y1 = texture2D(pressure, vB).r;
-    float d = texture2D(divergence, uv).r;
-    
-    float relaxed = (x0 + x1 + y0 + y1 + alpha * d) * beta;
-    gl_FragColor = vec4(relaxed);
-  }
-`
-
-const subtractPressureGradientFrag = `
-  uniform sampler2D pressure;
-  uniform sampler2D velocity;
-  uniform float scale;
-  uniform vec2 px;
-  
-  varying vec2 uv;
-
-  void main(){
-    float x0 = texture2D(pressure, uv-vec2(px.x, 0)).r;
-    float x1 = texture2D(pressure, uv+vec2(px.x, 0)).r;
-    float y0 = texture2D(pressure, uv-vec2(0, px.y)).r;
-    float y1 = texture2D(pressure, uv+vec2(0, px.y)).r;
-    vec2 v = texture2D(velocity, uv).xy;
-    vec4 v2 = vec4((v-(vec2(x1, y1)-vec2(x0, y0))*0.5) * scale, 1.0, 1.0);
-  
-    gl_FragColor = v2;
-  }
-`
-
-const clearFrag = `
-  uniform sampler2D pressure;
-  uniform float value;
-
-  varying vec2 uv;
-  void main () {
-    gl_FragColor = value * texture2D(pressure, uv);
-  }
-`
-
-const curlShader = `
-  uniform sampler2D velocity;
-
-  varying vec2 uv;
-  varying vec2 vL;
-  varying vec2 vR;
-  varying vec2 vT;
-  varying vec2 vB;
-
-  void main () {
-    float L = texture2D(velocity, vL).y;
-    float R = texture2D(velocity, vR).y;
-    float T = texture2D(velocity, vT).x;
-    float B = texture2D(velocity, vB).x;
-    float vorticity = R - L - T + B;
-    gl_FragColor = vec4(0.5 * vorticity, 0.0, 0.0, 1.0);
-  }
-`
-
-const vorticityShader = `
-  uniform sampler2D velocity;
-  uniform sampler2D uCurl;
-  uniform float curl;
-  uniform float dt;
-
-  varying vec2 uv;
-  varying vec2 vL;
-  varying vec2 vR;
-  varying vec2 vT;
-  varying vec2 vB;
-
-  void main () {
-    float L = texture2D(uCurl, vL).x;
-    float R = texture2D(uCurl, vR).x;
-    float T = texture2D(uCurl, vT).x;
-    float B = texture2D(uCurl, vB).x;
-    float C = texture2D(uCurl, uv).x;
-    vec2 force = 0.5 * vec2(abs(T) - abs(B), abs(R) - abs(L));
-    force /= length(force) + 0.0001;
-    force *= curl * C;
-    force.y *= -1.0;
-    vec2 vel = texture2D(velocity, uv).xy;
-    gl_FragColor = vec4(vel + force * dt, 0.0, 1.0);
-  }
-`
-
-const visFrag = `
-  uniform sampler2D velocity;
-  uniform sampler2D pressure;
-
-  uniform sampler2D sceneTexture;
-
-  uniform float uAlpha;
-
-  uniform vec2 px1;
-  varying vec2 uv;
-  
-  void main(){
-    vec2 vel = texture2D(velocity, uv).xy * 0.5 + vec2(0.5);
-    float pre = 0.5 - texture2D(pressure, uv).x  * 0.5;
-
-    vec4 color = vec4(vel, pre, 0.0);
-    vec4 baseColor = texture2D(sceneTexture, uv + vel * 0.5 - 0.25);
-
-    gl_FragColor = baseColor;
-  }
-`
-
-const baseVert = `
-  attribute vec4 position;
-
-  uniform vec2 px;
-  varying vec2 uv;
-  varying vec2 vL;
-  varying vec2 vR;
-  varying vec2 vT;
-  varying vec2 vB;
-  
-  void main(){
-    gl_Position = projectionMatrix * viewMatrix * modelMatrix * position;
-
-    uv = vec2(0.5)+(gl_Position.xy)*0.5;
-    vL = uv - vec2(px.x, 0.0);
-    vR = uv + vec2(px.x, 0.0);
-    vT = uv + vec2(0.0, px.y);
-    vB = uv - vec2(0.0, px.y);
-  }
-`
-
-const cursorVert = `
-  uniform vec2 cursor;
-  uniform vec2 px;
-
-  attribute vec4 position;
-  
-  varying vec2 vPosition;
-  varying vec2 uv;
-  
-  void main(){
-    gl_Position = projectionMatrix * viewMatrix * modelMatrix * position;
-    vPosition = gl_Position.xy;
-    uv = vec2(0.5) + (gl_Position.xy) * 0.5;
-  }
-`
-
-const addForceFrag2 = `
-  uniform sampler2D uBase;
-  uniform vec2 velocity;
-  uniform vec2 cursor;
-  uniform vec2 px;
-
-  varying vec2 uv;
-  varying vec2 vPosition;
-  
-  float blendAdd(float base, float blend) {
-    return min(base+blend,1.0);
-  }
-  
-  vec3 blendAdd(vec3 base, vec3 blend) {
-    return min(base+blend,vec3(1.0));
-  }
-  
-  vec3 blendAdd(vec3 base, vec3 blend, float opacity) {
-    return (blendAdd(base, blend) * opacity + base * (1.0 - opacity));
-  }
-  
-  void main(){    
-    float dist = distance(cursor/px, vPosition/px);
-    vec3 color = texture2D(uBase, uv).rgb;
-    float dx = 2.0 * px.x;
-    float dy = 2.0 * px.y;
-    float marginX = 1.0 - dx;
-    float marginY = 1.0 - dy;
-    if(dist < 20. && length(dist) > 0. && uv.x < marginX && uv.x > dx && uv.y < marginY && uv.y > dy){
-        color = color - vec3(velocity.xy * 10., 0.0) * clamp(2.0 - dist/40., 0.0, 1.0);
-    }
-    gl_FragColor = vec4(color, 1.0);
-  }
-`
+import baseVert from './base.vert'
+import cursorVert from './cursor.vert'
+import advectFrag from './advect.frag'
+import divergenceFrag from './divergence.frag'
+import jacobiFrag from './jacobi.frag'
+import subtractPressureGradientFrag from './subtract-pressure-gradient.frag'
+import clearFrag from './clear.frag'
+import curlShader from './curl.frag'
+import vorticityFrag from './vorticity.frag'
+import visFrag from './visualise.frag'
+import addForceFrag2 from './add-force.frag'
 
 const ITERATIONS_COUNT = 20
 
@@ -426,7 +201,7 @@ swapRenderer
   .createProgram(PROGRAM_DIVERGENCE, baseVert, divergenceFrag)
   .createProgram(PROGRAM_JACOBI, baseVert, jacobiFrag)
   .createProgram(PROGRAM_CURL, baseVert, curlShader)
-  .createProgram(PROGRAM_VORTICITY, baseVert, vorticityShader)
+  .createProgram(PROGRAM_VORTICITY, baseVert, vorticityFrag)
   .createProgram(PROGRAM_CLEAR, baseVert, clearFrag)
   .createProgram(
     PROGRAM_SUBTRACT_PRESSURE_GRADIENT,
@@ -437,6 +212,7 @@ swapRenderer
 
 gl.enable(gl.CULL_FACE)
 gl.enable(gl.DEPTH_TEST)
+gl.depthFunc(gl.LEQUAL)
 
 checkExtensionsSupport()
 
@@ -469,7 +245,9 @@ function onMouseMove(e) {
   targetMouse[1] = (ptY / innerHeight) * -2 + 1
 }
 
-function updateFrame() {
+function updateFrame(ts) {
+  ts /= 1000
+
   lastMouse[0] = mouse[0]
   lastMouse[1] = mouse[1]
 
@@ -484,13 +262,18 @@ function updateFrame() {
 
   stats.begin()
 
+
+  gl.disable(gl.DEPTH_TEST)
   updateFluid()
 
   sceneFramebuffer.bind()
   gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)
-  drawMesh.use().setCamera(camera).draw()
+  gl.enable(gl.DEPTH_TEST)
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+  drawMesh.use().setRotation({ y: ts * 0.2 }).setCamera(camera).draw()
   sceneFramebuffer.unbind()
 
+  gl.disable(gl.DEPTH_TEST)
   swapRenderer
     .setSize(innerWidth * dpr, innerHeight * dpr)
     .useProgram(config.programMode)
@@ -502,7 +285,6 @@ function updateFrame() {
 }
 
 function updateFluid() {
-  gl.disable(gl.DEPTH_TEST)
 
   swapRenderer
     .setSize(bgWidth, bgHeight)

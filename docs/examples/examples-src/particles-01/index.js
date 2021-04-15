@@ -20,6 +20,8 @@ const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
 let oldTime = 0
 let spacing = 1
 let spacingTarget = spacing
+let radius = 10
+let radiusTarget = radius
 
 gl.enable(gl.BLEND)
 gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
@@ -50,11 +52,11 @@ const mesh = new Mesh(gl, {
   vertexShaderSource: `
     uniform float time;
     uniform float spacing;
+    uniform float movementMaxRadius;
 
     attribute vec4 position;
 
     const vec4 cameraPosition = vec4(0.0, 0.0, 40.0, 1.0);
-    const float movementMaxRadius = 10.0;
 
     void main () {
       gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(
@@ -65,7 +67,7 @@ const mesh = new Mesh(gl, {
       );
 
       float dist = distance(cameraPosition, gl_Position);
-      gl_PointSize = dist * 0.225;
+      gl_PointSize = dist * 0.225 * ${devicePixelRatio}.0;
     }
   `,
   fragmentShaderSource: `
@@ -83,6 +85,7 @@ mesh.drawMode = gl.POINTS
 document.body.appendChild(canvas)
 setInterval(() => {
   spacingTarget = Math.random() * 0.85 + 0.15
+  radiusTarget = 5 + Math.random() * 15
 }, 5000)
 requestAnimationFrame(updateFrame)
 sizeCanvas()
@@ -101,10 +104,13 @@ function updateFrame(ts) {
 
   spacing += (spacingTarget - spacing) * (dt * 20)
 
+  radius += (radiusTarget - radius) * (dt * 10)
+
   mesh
     .setCamera(camera)
     .setUniform('time', UNIFORM_TYPE_FLOAT, ts)
     .setUniform('spacing', UNIFORM_TYPE_FLOAT, spacing)
+    .setUniform('movementMaxRadius', UNIFORM_TYPE_FLOAT, radius)
     .draw()
 
   stats.end()
