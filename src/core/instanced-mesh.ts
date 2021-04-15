@@ -11,7 +11,7 @@ import {
 import { getExtension } from '../utils/gl-utils'
 import { Geometry } from './geometry'
 
-import { InstancedMeshInterface } from '../types'
+import { MeshInterface } from './Mesh'
 
 export class InstancedMesh extends Mesh {
   #geometry: Geometry
@@ -58,6 +58,14 @@ export class InstancedMesh extends Mesh {
     const instanceMatrixLocation = this.program.getAttribLocation(
       INSTANCED_OFFSET_MODEL_MATRIX,
     )
+
+    if (instanceMatrixLocation == null || instanceMatrixLocation === -1) {
+      console.error(
+        `Can't query "${INSTANCED_OFFSET_MODEL_MATRIX}" mandatory instanced attribute`,
+      )
+      return this
+    }
+
     const identityMat = mat4.create()
     const itemsPerInstance = 16
     const bytesPerMatrix = itemsPerInstance * Float32Array.BYTES_PER_ELEMENT
@@ -155,4 +163,8 @@ export class InstancedMesh extends Mesh {
     this.vaoExtension.bindVertexArrayOES(null)
     return this
   }
+}
+
+interface InstancedMeshInterface extends MeshInterface {
+  instanceCount?: number
 }

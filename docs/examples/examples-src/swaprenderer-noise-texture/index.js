@@ -122,6 +122,14 @@ document.addEventListener('mousemove', (e) => {
     .useProgram(BLUR_PROGRAM)
     .setUniform('uMouse', UNIFORM_TYPE_VEC2, [e.pageX, innerHeight - e.pageY])
 })
+document.addEventListener('touchmove', (e) => {
+  swapRenderer
+    .useProgram(BLUR_PROGRAM)
+    .setUniform('uMouse', UNIFORM_TYPE_VEC2, [
+      e.touches[0].pageX,
+      innerHeight - e.touches[0].pageY,
+    ])
+})
 
 function updateFrame() {
   stats.begin()
@@ -145,16 +153,41 @@ function resize() {
   canvas.style.setProperty('width', `${innerWidth}px`)
   canvas.style.setProperty('height', `${innerHeight}px`)
 
-  const initData = new Float32Array(innerWidth * innerHeight * 4)
+  let initData
+  let texType
+
+  const ext = getExtension(gl, 'WEBGL_color_buffer_float')
+  if (ext) {
+    initData = new Float32Array(innerWidth * innerHeight * 4)
+    texType = gl.FLOAT
+  } else {
+    const ext = getExtension(gl, 'WEBGL_color_buffer_float')
+    const ext2 = getExtension(gl, 'OES_texture_half_float')
+    if (ext) {
+      initData = new Float32Array(innerWidth * innerHeight * 4)
+      texType = ext2.HALF_FLOAT_OES
+    } else {
+      initData = new Uint8Array(innerWidth * innerHeight * 4)
+      texType = gl.UNSIGNED_BYTE
+    }
+  }
+
   for (var i = 0; i < initData.length; i++) {
     initData[i] = (Math.random() - 0.5) * 255
   }
 
   swapRenderer
-    .createTexture(BLUR1, innerWidth, innerHeight, initData)
+    .createTexture(
+      BLUR1,
+      innerWidth,
+      innerHeight,
+      initData,
+      gl.NEAREST,
+      texType,
+    )
     .createFramebuffer(BLUR1, innerWidth, innerHeight)
 
-    .createTexture(BLUR2, innerWidth, innerHeight)
+    .createTexture(BLUR2, innerWidth, innerHeight, null, gl.NEAREST, texType)
     .createFramebuffer(BLUR2, innerWidth, innerHeight)
 
     .useProgram(BLUR_PROGRAM)

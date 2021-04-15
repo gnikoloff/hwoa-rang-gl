@@ -339,6 +339,12 @@ function checkExtensionsSupport() {
     <p>⚠️ Need OES_texture_float</p>
   `
   }
+  if (!getExtension(gl, 'WEBGL_color_buffer_float')) {
+    errorLogWrapper.style.display = 'flex'
+    errorLogWrapper.innerHTML += `
+    <p>⚠️ Need WEBGL_color_buffer_float</p>
+  `
+  }
   // check we can use textures in a vertex shader
   if (gl.getParameter(gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS) < 1) {
     errorLogWrapper.style.display = 'flex'

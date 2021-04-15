@@ -14,11 +14,7 @@ import {
   VIEW_MATRIX_UNIFORM_NAME,
 } from '../utils/gl-constants'
 
-import {
-  MeshInterface,
-  OES_vertex_array_objectInterface,
-  UniformType,
-} from '../types'
+import { UniformType } from './program'
 
 /**
  * Mesh class for holding the geometry, program and shaders for an object.
@@ -80,7 +76,7 @@ export class Mesh extends Transform {
           return
         }
         const location = this.program.getAttribLocation(key)
-        if (location === -1) {
+        if (location == null || location === -1) {
           return
         }
         this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, buffer)
@@ -196,4 +192,39 @@ export class Mesh extends Transform {
     this.program.delete()
     this.vaoExtension.deleteVertexArrayOES(this.vao)
   }
+}
+
+export interface MeshInterface {
+  geometry: Geometry
+  /**
+   * Uniforms as object list
+   * @example
+   * ```
+   * { type: 'int', value: 1 }
+   * { type: 'vec4', value: [0, 1, 2, 3] }
+   * ```
+   * @defaultValue {}
+   */
+  uniforms?: Record<string, unknown>
+  /**
+   * TODO
+   */
+  defines?: Record<string, unknown>
+
+  /**
+   * Vertex shader program as string
+   */
+  vertexShaderSource: string
+  /**
+   * Fragment shader program as string
+   */
+  fragmentShaderSource: string
+}
+
+interface OES_vertex_array_objectInterface {
+  // TS's lib.dom (as of v3.1.3) does not specify the nulls
+  createVertexArrayOES(): WebGLVertexArrayObjectOES
+  deleteVertexArrayOES(arrayObject: WebGLVertexArrayObjectOES | null): void
+  isVertexArrayOES(arrayObject: WebGLVertexArrayObjectOES | null): boolean
+  bindVertexArrayOES(arrayObject: WebGLVertexArrayObjectOES | null): void
 }

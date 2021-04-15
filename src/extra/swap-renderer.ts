@@ -5,7 +5,8 @@ import { getExtension } from '../utils/gl-utils'
 import { createPlane } from '../geometry-utils'
 import { Texture } from '../core/texture'
 import { OrthographicCamera } from '../camera/orthographic-camera'
-import { UniformType } from '../types'
+
+import { UniformType } from '../core/program'
 
 export class SwapRenderer {
   #gl: WebGLRenderingContext
@@ -17,6 +18,8 @@ export class SwapRenderer {
 
   #activeProgram!: Mesh
 
+  #textureType: GLenum
+
   constructor(gl: WebGLRenderingContext) {
     this.#gl = gl
 
@@ -24,9 +27,18 @@ export class SwapRenderer {
     this.#camera.position = [0, 0, 1]
     this.#camera.lookAt([0, 0, 0])
 
-    const ext1 = getExtension(gl, 'OES_texture_float')
-    if (!ext1) {
-      // TODO: handle
+    const ext = getExtension(gl, 'WEBGL_color_buffer_float')
+
+    if (ext) {
+      this.#textureType = gl.FLOAT
+    } else {
+      const ext = getExtension(gl, 'EXT_color_buffer_half_float')
+      const ext2 = getExtension(gl, 'OES_texture_half_float')
+      if (ext) {
+        this.#textureType = ext2.HALF_FLOAT_OES
+      } else {
+        this.#textureType = gl.UNSIGNED_BYTE
+      }
     }
   }
 
@@ -49,9 +61,10 @@ export class SwapRenderer {
     height: number,
     data: Float32Array | null,
     filtering = this.#gl.NEAREST,
+    inputType: GLenum,
   ): this {
     const texture = new Texture(this.#gl, {
-      type: this.#gl.FLOAT,
+      type: inputType || this.#textureType,
       format: this.#gl.RGBA,
       minFilter: filtering,
       magFilter: filtering,
@@ -106,7 +119,7 @@ export class SwapRenderer {
   }
 
   useProgram(programName: string): this {
-    this.#activeProgram = this.#programs.get(programName)!
+    this.#activeProgram = this.#programs.get(programName)
     this.#activeProgram.use()
     return this
   }

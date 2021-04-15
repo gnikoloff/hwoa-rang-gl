@@ -2,11 +2,6 @@ import { createBuffer, createIndexBuffer } from '../utils/gl-utils'
 
 import { INDEX_ATTRIB_NAME, POSITION_ATTRIB_NAME } from '../utils/gl-constants'
 
-import {
-  WebGLElementBufferInterface,
-  WebGLArrayBufferInterface,
-} from '../types'
-
 /**
  * Geometry class to hold buffers and attributes for a mesh.
  * Accepts the data that makes up your model - indices, vertices, uvs, normals, etc.
@@ -81,4 +76,39 @@ export class Geometry {
       this.#gl.deleteBuffer(buffer)
     })
   }
+}
+
+interface WebGLElementBufferInterface {
+  /**
+   * Indices as typed array
+   */
+  typedArray: Uint32Array | Uint16Array
+}
+
+interface WebGLArrayBufferInterface {
+  /**
+   * Data as typed array
+   */
+  typedArray: Float32Array | Float64Array
+  /**
+   * @defaultValue 1
+   */
+  size?: number
+  /**
+   * @defaultValue 1
+   */
+  type?: number
+  /**
+   * @defaultValue false
+   */
+  normalized?: boolean
+  /**
+   * @defaultValue 0
+   */
+  stride?: number
+  /**
+   * @defaultValue 1
+   */
+  offset?: number
+  instancedDivisor?: number
 }

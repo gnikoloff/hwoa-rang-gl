@@ -42,6 +42,7 @@ for (let i = 0; i < PARTICLE_COUNT; i++) {
 }
 
 const geometry = new Geometry(gl)
+// debugger
 geometry.addAttribute('position', {
   typedArray: vertexArray,
   size: 1,
@@ -89,6 +90,7 @@ setInterval(() => {
 }, 5000)
 requestAnimationFrame(updateFrame)
 sizeCanvas()
+disableScroll()
 window.addEventListener('resize', throttle(resize, 100))
 
 function updateFrame(ts) {
@@ -130,4 +132,14 @@ function sizeCanvas() {
   canvas.height = innerHeight * dpr
   canvas.style.setProperty('width', `${innerWidth}px`)
   canvas.style.setProperty('height', `${innerHeight}px`)
+}
+
+function preventDefault(e) {
+  e.preventDefault()
+}
+
+function disableScroll() {
+  document.body.addEventListener('touchmove', preventDefault, {
+    passive: false,
+  })
 }

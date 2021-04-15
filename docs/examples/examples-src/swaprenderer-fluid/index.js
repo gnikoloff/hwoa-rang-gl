@@ -223,6 +223,7 @@ window.addEventListener('resize', throttle(resize, 100))
 
 document.body.addEventListener('mousemove', onMouseMove)
 document.body.addEventListener('mouseenter', onMouseEnter)
+document.body.addEventListener('touchmove', onTouchMove)
 
 function onMouseEnter(e) {
   const ptX = e.clientX
@@ -235,6 +236,16 @@ function onMouseEnter(e) {
 
   lastMouse[0] = targetMouse[0]
   lastMouse[1] = targetMouse[1]
+}
+
+function onTouchMove(e) {
+  e.preventDefault()
+
+  const ptX = e.touches[0].clientX
+  const ptY = e.touches[0].clientY
+
+  targetMouse[0] = (ptX / innerWidth) * 2 - 1
+  targetMouse[1] = (ptY / innerHeight) * -2 + 1
 }
 
 function onMouseMove(e) {
@@ -262,7 +273,6 @@ function updateFrame(ts) {
 
   stats.begin()
 
-
   gl.disable(gl.DEPTH_TEST)
   updateFluid()
 
@@ -270,7 +280,11 @@ function updateFrame(ts) {
   gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)
   gl.enable(gl.DEPTH_TEST)
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-  drawMesh.use().setRotation({ y: ts * 0.2 }).setCamera(camera).draw()
+  drawMesh
+    .use()
+    .setRotation({ y: ts * 0.2 })
+    .setCamera(camera)
+    .draw()
   sceneFramebuffer.unbind()
 
   gl.disable(gl.DEPTH_TEST)
@@ -285,7 +299,6 @@ function updateFrame(ts) {
 }
 
 function updateFluid() {
-
   swapRenderer
     .setSize(bgWidth, bgHeight)
 
