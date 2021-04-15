@@ -214,7 +214,7 @@ gl.enable(gl.CULL_FACE)
 gl.enable(gl.DEPTH_TEST)
 gl.depthFunc(gl.LEQUAL)
 
-checkExtensionsSupport()
+// checkExtensionsSupport()
 
 document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)

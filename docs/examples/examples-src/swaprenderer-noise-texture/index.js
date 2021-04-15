@@ -112,7 +112,7 @@ gl.enable(gl.BLEND)
 gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 gl.enable(gl.DEPTH_TEST)
 
-checkExtensionsSupport()
+// checkExtensionsSupport()
 document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)
 resize()

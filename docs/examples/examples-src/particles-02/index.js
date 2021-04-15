@@ -142,7 +142,7 @@ new CameraController(camera, canvas)
         pos += animPos * sin(tweenFactor * PI) * 2.0;
 
         gl_Position = projectionMatrix * viewMatrix * modelMatrix * pos;
-        gl_PointSize = 3.0;
+        gl_PointSize = 3.0 * ${devicePixelRatio}.0;
       }
     `,
     fragmentShaderSource: `
