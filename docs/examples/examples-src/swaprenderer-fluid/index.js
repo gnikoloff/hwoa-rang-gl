@@ -214,7 +214,7 @@ gl.enable(gl.CULL_FACE)
 gl.enable(gl.DEPTH_TEST)
 gl.depthFunc(gl.LEQUAL)
 
-// checkExtensionsSupport()
+checkExtensionsSupport()
 
 document.body.appendChild(canvas)
 requestAnimationFrame(updateFrame)
@@ -448,13 +448,13 @@ function resize() {
 
 function checkExtensionsSupport() {
   // check we can use floating point textures
-  const ext1 = getExtension(gl, 'OES_texture_float')
-  if (!ext1) {
-    errorLogWrapper.style.display = 'flex'
-    errorLogWrapper.innerHTML += `
-    <p>⚠️ Need OES_texture_float</p>
-  `
-  }
+  getExtension(gl, 'OES_texture_float')
+  // if (!ext1) {
+  //   errorLogWrapper.style.display = 'flex'
+  //   errorLogWrapper.innerHTML += `
+  //   <p>⚠️ Need OES_texture_float</p>
+  // `
+  // }
   hasFloatPointLinearFiltering = getExtension(gl, 'OES_texture_float_linear')
   if (!hasFloatPointLinearFiltering) {
     // ...

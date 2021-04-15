@@ -99,12 +99,15 @@ vec3.normalize(lightDirection, lightDirection)
       }
     `,
   })
-  boxMesh.setPosition({
-    y: 0.5,
-  })
+  boxMesh
+    .use()
+    .setUniform('lightDirection', UNIFORM_TYPE_VEC3, lightDirection)
+    .setPosition({
+      y: 0.5,
+    })
 }
 
-texture = new Texture(gl).bind().setIsFlip().fromSize(1, 1)
+texture = new Texture(gl).bind().setIsFlip().fromSize(1, 1).generateMipmap()
 
 const image = new Image()
 image.onload = () => {
@@ -113,7 +116,6 @@ image.onload = () => {
     .fromImage(image)
     .generateMipmap()
     .setMinFilter(gl.LINEAR_MIPMAP_NEAREST)
-    .setMagFilter(gl.LINEAR_MIPMAP_NEAREST)
 }
 image.src = window.location.href.includes('github')
   ? '/hwoa-rang-gl/examples/dist/assets/textures/webgl-logo.png'
@@ -175,12 +177,9 @@ image.src = window.location.href.includes('github')
     `,
   })
   floorHelperMesh.drawMode = gl.LINES
-  floorHelperMesh.setRotation(
-    {
-      x: 1,
-    },
-    Math.PI / 2,
-  )
+  floorHelperMesh.setRotation({
+    x: Math.PI / 2,
+  })
 }
 
 document.body.appendChild(canvas)
@@ -200,16 +199,14 @@ function updateFrame(ts) {
   if (texture) {
     texture.bind()
   }
+
   boxMesh
     .use()
-    .setUniform('lightDirection', UNIFORM_TYPE_VEC3, lightDirection)
+
     .setCamera(camera)
-    .setRotation(
-      {
-        y: 1,
-      },
-      ts * 0.5,
-    )
+    .setRotation({
+      y: ts * 0.5,
+    })
     .draw()
 
   floorHelperMesh.use().setCamera(camera).draw()

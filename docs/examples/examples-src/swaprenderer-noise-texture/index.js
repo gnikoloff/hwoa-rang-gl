@@ -157,11 +157,12 @@ function resize() {
   let texType
 
   const ext = getExtension(gl, 'WEBGL_color_buffer_float')
+  getExtension(gl, 'OES_texture_float')
   if (ext) {
     initData = new Float32Array(innerWidth * innerHeight * 4)
     texType = gl.FLOAT
   } else {
-    const ext = getExtension(gl, 'WEBGL_color_buffer_float')
+    const ext = getExtension(gl, 'EXT_color_buffer_half_float')
     const ext2 = getExtension(gl, 'OES_texture_half_float')
     if (ext) {
       initData = new Float32Array(innerWidth * innerHeight * 4)

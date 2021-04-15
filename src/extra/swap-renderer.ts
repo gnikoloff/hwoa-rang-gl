@@ -28,7 +28,7 @@ export class SwapRenderer {
     this.#camera.lookAt([0, 0, 0])
 
     const ext = getExtension(gl, 'WEBGL_color_buffer_float')
-
+    getExtension(gl, 'OES_texture_float')
     if (ext) {
       this.#textureType = gl.FLOAT
     } else {
