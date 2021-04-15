@@ -1,5 +1,4 @@
-import { vec3, mat4, ReadonlyVec3 } from 'gl-matrix'
-
+import { Transform } from './transform'
 import { Program } from './program'
 import { Geometry } from './geometry'
 import { PerspectiveCamera } from '../camera/perspective-camera'
@@ -15,36 +14,20 @@ import {
   VIEW_MATRIX_UNIFORM_NAME,
 } from '../utils/gl-constants'
 
-import {
-  MeshInterface,
-  OES_vertex_array_objectInterface,
-  UniformType,
-} from '../types'
+import { UniformType } from './program'
 
 /**
  * Mesh class for holding the geometry, program and shaders for an object.
  *
  * @public
  */
-export class Mesh {
-  #position: ReadonlyVec3 = [0, 0, 0]
-  #positionVec3: vec3 = vec3.create()
-
-  #scale: ReadonlyVec3 = [1, 1, 1]
-  #scaleVec3: vec3 = vec3.create()
-
-  #rotationAxis: ReadonlyVec3 = [0, 0, 0]
-  #rotationAxisVec3: vec3 = vec3.create()
-  #rotationAngle = 0
-
+export class Mesh extends Transform {
   #gl: WebGLRenderingContext
   #geometry: Geometry
 
-  protected modelMatrixNeedsUpdate = false
   protected vaoExtension: OES_vertex_array_objectInterface
   protected hasIndices: boolean
 
-  public modelMatrix: mat4 = mat4.create()
   public program: Program
   public vao: WebGLVertexArrayObjectOES
 
@@ -55,23 +38,36 @@ export class Mesh {
   public drawMode: GLenum = TRIANGLES
 
   constructor(gl: WebGLRenderingContext, params: MeshInterface) {
-    const {
-      geometry,
-      uniforms = {},
-      vertexShaderSource,
-      fragmentShaderSource,
-    } = params
+    super()
+    const { geometry, uniforms = {}, defines = {} } = params
+
+    let { vertexShaderSource, fragmentShaderSource } = params
 
     this.#gl = gl
     this.#geometry = geometry
 
-    this.program = new Program(gl, { vertexShaderSource, fragmentShaderSource })
+    // Assign defines to both vertex and fragment shaders
+    for (const [key, value] of Object.entries(defines)) {
+      vertexShaderSource = `
+        #define ${key} ${value}\n
+        ${vertexShaderSource}
+      `
+      fragmentShaderSource = `
+        #define ${key} ${value}\n
+        ${fragmentShaderSource}
+      `
+    }
+
+    // create mesh program and vertex array object
+    this.program = new Program(gl, {
+      vertexShaderSource,
+      fragmentShaderSource,
+    })
     this.vaoExtension = getExtension(gl, 'OES_vertex_array_object')
     this.vao = this.vaoExtension.createVertexArrayOES()
     this.hasIndices = geometry.attributes.has(INDEX_ATTRIB_NAME)
 
-    vec3.set(this.#scaleVec3, this.#scale[0], this.#scale[1], this.#scale[2])
-
+    // assign geometry attributes to mesh
     this.vaoExtension.bindVertexArrayOES(this.vao)
     geometry.attributes.forEach(
       ({ size, type, normalized, stride, offset, buffer }, key) => {
@@ -80,7 +76,7 @@ export class Mesh {
           return
         }
         const location = this.program.getAttribLocation(key)
-        if (location === -1) {
+        if (location == null || location === -1) {
           return
         }
         this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, buffer)
@@ -97,6 +93,7 @@ export class Mesh {
     )
     this.vaoExtension.bindVertexArrayOES(null)
 
+    // assign uniforms to mesh
     this.program.bind()
     for (const [key, uniform] of Object.entries(uniforms)) {
       // @ts-ignore
@@ -108,17 +105,14 @@ export class Mesh {
       this.modelMatrix,
     )
     this.program.unbind()
+
     return this
   }
 
-  get position(): ReadonlyVec3 {
-    return this.#position
-  }
-
-  get scale(): ReadonlyVec3 {
-    return this.#scale
-  }
-
+  /**
+   * Binds the program
+   * @returns {this}
+   */
   use(): this {
     this.program.bind()
     return this
@@ -139,81 +133,6 @@ export class Mesh {
     this.program.setUniform(uniformName, uniformType, uniformValue)
     return this
   }
-
-  /**
-   * Sets position
-   * @returns {this}
-   */
-  setPosition(position: { x?: number; y?: number; z?: number }): this {
-    const {
-      x = this.#position[0],
-      y = this.#position[1],
-      z = this.#position[2],
-    } = position
-    this.#position = [x, y, z]
-    vec3.set(this.#positionVec3, x, y, z)
-    this.modelMatrixNeedsUpdate = true
-    return this
-  }
-
-  /**
-   * Sets scale
-   * @returns {this}
-   */
-  setScale(scale: { x?: number; y?: number; z?: number }): this {
-    const { x = this.#scale[0], y = this.#scale[1], z = this.#scale[2] } = scale
-    this.#scale = [x, y, z]
-    vec3.set(this.#scaleVec3, x, y, z)
-    this.modelMatrixNeedsUpdate = true
-    return this
-  }
-
-  /**
-   * Sets rotation
-   * @returns {this}
-   */
-  setRotation(
-    rotation: {
-      x?: number
-      y?: number
-      z?: number
-    },
-    rotationAngle: number,
-  ): this {
-    const {
-      x = this.#rotationAxis[0],
-      y = this.#rotationAxis[1],
-      z = this.#rotationAxis[2],
-    } = rotation
-    this.#rotationAxis = [x, y, z]
-    vec3.set(this.#rotationAxisVec3, x, y, z)
-    this.#rotationAngle = rotationAngle
-    this.modelMatrixNeedsUpdate = true
-    return this
-  }
-
-  /**
-   * Update model matrix with scale, rotation and translation
-   * @returns {this}
-   */
-  updateModelMatrix(): this {
-    mat4.identity(this.modelMatrix)
-    mat4.translate(this.modelMatrix, this.modelMatrix, this.#positionVec3)
-    mat4.rotate(
-      this.modelMatrix,
-      this.modelMatrix,
-      this.#rotationAngle,
-      this.#rotationAxisVec3,
-    )
-    mat4.scale(this.modelMatrix, this.modelMatrix, this.#scaleVec3)
-    this.program.setUniform(
-      MODEL_MATRIX_UNIFORM_NAME,
-      UNIFORM_TYPE_MATRIX4X4,
-      this.modelMatrix,
-    )
-    return this
-  }
-
   /**
    * Assign camera projection matrix and view matrix to model uniforms
    * @param {PerspectiveCamera|OrthographicCamera} camera
@@ -238,9 +157,13 @@ export class Mesh {
    * @returns {this}
    */
   draw(): this {
-    if (this.modelMatrixNeedsUpdate) {
-      this.updateModelMatrix()
-      this.modelMatrixNeedsUpdate = false
+    if (this.shouldUpdate) {
+      super.updateModelMatrix()
+      this.program.setUniform(
+        MODEL_MATRIX_UNIFORM_NAME,
+        UNIFORM_TYPE_MATRIX4X4,
+        this.modelMatrix,
+      )
     }
 
     this.vaoExtension.bindVertexArrayOES(this.vao)
@@ -257,6 +180,7 @@ export class Mesh {
     }
 
     this.vaoExtension.bindVertexArrayOES(null)
+
     return this
   }
 
@@ -268,4 +192,39 @@ export class Mesh {
     this.program.delete()
     this.vaoExtension.deleteVertexArrayOES(this.vao)
   }
+}
+
+export interface MeshInterface {
+  geometry: Geometry
+  /**
+   * Uniforms as object list
+   * @example
+   * ```
+   * { type: 'int', value: 1 }
+   * { type: 'vec4', value: [0, 1, 2, 3] }
+   * ```
+   * @defaultValue {}
+   */
+  uniforms?: Record<string, unknown>
+  /**
+   * TODO
+   */
+  defines?: Record<string, unknown>
+
+  /**
+   * Vertex shader program as string
+   */
+  vertexShaderSource: string
+  /**
+   * Fragment shader program as string
+   */
+  fragmentShaderSource: string
+}
+
+interface OES_vertex_array_objectInterface {
+  // TS's lib.dom (as of v3.1.3) does not specify the nulls
+  createVertexArrayOES(): WebGLVertexArrayObjectOES
+  deleteVertexArrayOES(arrayObject: WebGLVertexArrayObjectOES | null): void
+  isVertexArrayOES(arrayObject: WebGLVertexArrayObjectOES | null): boolean
+  bindVertexArrayOES(arrayObject: WebGLVertexArrayObjectOES | null): void
 }

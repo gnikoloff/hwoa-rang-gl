@@ -1,11 +1,53 @@
-import type { FramebufferInterface } from '../types'
-
 import { Texture } from './texture'
 
+interface FramebufferInterface {
+  /**
+   * @default gl.canvas.width
+   */
+  width?: number
+  /**
+   * @default gl.canvas.height
+   */
+  height?: number
+  /**
+   * @default gl.CLAMP_TO_EDGE
+   */
+  wrapS?: GLenum
+  /**
+   * @default gl.CLAMP_TO_EDGE
+   */
+  wrapT?: GLenum
+  /**
+   * @default gl.NEAREST
+   */
+  minFilter?: GLenum
+  /**
+   * @default gl.NEAREST
+   */
+  magFilter?: GLenum
+  /**
+   * @default gl.RGBA
+   */
+  format?: GLenum
+  /**
+   * @default gl.UNSIGNED_BYTE
+   */
+  type?: GLenum
+  /**
+   * @default gl.RGBA
+   */
+  internalFormat?: GLenum
+  /**
+   * @default true
+   */
+  depth?: boolean
+  inputTexture?: Texture
+}
+
 export class Framebuffer {
-  #gl!: WebGLRenderingContext
-  #buffer!: WebGLFramebuffer
-  #depthBuffer!: WebGLRenderbuffer
+  #gl: WebGLRenderingContext
+  #buffer: WebGLFramebuffer | null
+  #depthBuffer?: WebGLRenderbuffer | null
 
   #width: number
   #height: number
@@ -50,7 +92,7 @@ export class Framebuffer {
         .fromSize(width, height)
     }
 
-    this.#buffer = gl.createFramebuffer()!
+    this.#buffer = gl.createFramebuffer()
 
     this.updateWithSize(this.#width, this.#height)
   }
@@ -76,7 +118,6 @@ export class Framebuffer {
       texture,
       level,
     )
-    this.unbind()
 
     if (this.#depth) {
       this.#depthBuffer = this.#gl.createRenderbuffer()!
@@ -95,6 +136,7 @@ export class Framebuffer {
       )
       this.#gl.bindRenderbuffer(this.#gl.RENDERBUFFER, null)
     }
+    this.unbind()
 
     if (updateTexture) {
       this.texture.bind().fromSize(width, height)

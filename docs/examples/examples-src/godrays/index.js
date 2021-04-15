@@ -122,14 +122,29 @@ const dpr = Math.min(devicePixelRatio, 2)
 const canvas = document.createElement('canvas')
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
 
-const ext = getExtension(gl, 'OES_texture_float')
-
 const stats = new Stats()
 document.body.appendChild(stats.domElement)
 
 let boxesMesh
 let sphereMesh
 let planeMesh
+let texType
+
+{
+  const ext = getExtension(gl, 'WEBGL_color_buffer_float')
+  getExtension(gl, 'OES_texture_float')
+  if (ext) {
+    texType = gl.FLOAT
+  } else {
+    const ext = getExtension(gl, 'EXT_color_buffer_half_float')
+    const ext2 = getExtension(gl, 'OES_texture_half_float')
+    if (ext) {
+      texType = ext2.HALF_FLOAT_OES
+    } else {
+      texType = gl.UNSIGNED_BYTE
+    }
+  }
+}
 
 // gl.enable(gl.BLEND)
 // gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
@@ -152,13 +167,13 @@ orthoCamera.lookAt([0, 0, 0])
 
 let renderTargetBlurX = new Framebuffer(gl, {
   format: gl.RGB,
-  type: ext ? gl.FLOAT : gl.UNSIGNED_BYTE,
+  type: texType,
   width: innerWidth / SCALE_DOWN_POSTFX,
   height: innerHeight / SCALE_DOWN_POSTFX,
 })
 let renderTargetBlurY = new Framebuffer(gl, {
   format: gl.RGBA,
-  type: ext ? gl.FLOAT : gl.UNSIGNED_BYTE,
+  type: texType,
   width: innerWidth / SCALE_DOWN_POSTFX,
   height: innerHeight / SCALE_DOWN_POSTFX,
 })

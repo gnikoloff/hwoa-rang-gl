@@ -1,6 +1,3 @@
-import { ProgramInterface } from '../types'
-
-import { UniformType } from '../types'
 import { createProgram } from '../utils/gl-utils'
 
 import {
@@ -24,7 +21,7 @@ import {
  */
 export class Program {
   #gl: WebGLRenderingContext
-  #program: WebGLProgram
+  #program: WebGLProgram | null
   #attribLocations = new Map()
   #uniformLocations = new Map()
 
@@ -63,7 +60,11 @@ export class Program {
     uniformType: UniformType,
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     uniformValue,
-  ): this {
+  ): this | null {
+    if (!this.#program) {
+      console.error('invalid program')
+      return null
+    }
     let uniformLocation
     if (this.#uniformLocations.has(uniformName)) {
       uniformLocation = this.#uniformLocations.get(uniformName)
@@ -113,7 +114,11 @@ export class Program {
    * @param {string} attribName
    * @returns {number} attribLocation
    */
-  getAttribLocation(attribName: string): number {
+  getAttribLocation(attribName: string): number | null {
+    if (!this.#program) {
+      console.error('invalid program')
+      return null
+    }
     if (this.#attribLocations.has(attribName)) {
       return this.#attribLocations.get(attribName)
     }
@@ -149,4 +154,23 @@ export class Program {
   delete(): void {
     this.#gl.deleteProgram(this.#program)
   }
+}
+
+export type UniformType =
+  | typeof UNIFORM_TYPE_INT
+  | typeof UNIFORM_TYPE_FLOAT
+  | typeof UNIFORM_TYPE_VEC2
+  | typeof UNIFORM_TYPE_VEC3
+  | typeof UNIFORM_TYPE_VEC4
+  | typeof UNIFORM_TYPE_MATRIX4X4
+
+export interface ProgramInterface {
+  /**
+   * Vertex shader program as string
+   */
+  vertexShaderSource: string
+  /**
+   * Fragment shader program as string
+   */
+  fragmentShaderSource: string
 }

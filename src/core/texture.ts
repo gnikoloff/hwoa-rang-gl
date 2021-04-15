@@ -1,15 +1,13 @@
 import { getExtension } from '../utils/gl-utils'
 import { isPowerOf2 } from '../utils/math'
 
-import { TextureInterface } from '../types'
-
 /**
  * Texture class used to store image, video, canvas and data as typed arrays
  * @public
  */
 export class Texture {
   #gl!: WebGLRenderingContext
-  #texture!: WebGLTexture
+  #texture!: WebGLTexture | null
 
   #width!: number
   #height!: number
@@ -40,7 +38,7 @@ export class Texture {
     this.#internalFormat = internalFormat
     this.#type = type
 
-    this.#texture = gl.createTexture()!
+    this.#texture = gl.createTexture()
 
     this.bind()
       .setPixelStore(gl.UNPACK_ALIGNMENT, unpackAlignment)
@@ -56,9 +54,9 @@ export class Texture {
   }
 
   /**
-   * @returns {WebGLTexture}
+   * @returns {WebGLTexture|null}
    */
-  getTexture(): WebGLTexture {
+  getTexture(): WebGLTexture | null {
     return this.#texture
   }
 
@@ -186,8 +184,8 @@ export class Texture {
   /**
    * @returns {this}
    */
-  setIsFlip(): this {
-    this.setPixelStore(this.#gl.UNPACK_FLIP_Y_WEBGL, 1)
+  setIsFlip(flip = 1): this {
+    this.setPixelStore(this.#gl.UNPACK_FLIP_Y_WEBGL, flip)
     return this
   }
 
@@ -269,4 +267,48 @@ export class Texture {
   delete(): void {
     this.#gl.deleteTexture(this.#texture)
   }
+}
+
+// format = gl.RGB,
+//       internalFormat = format,
+//       type = gl.UNSIGNED_BYTE,
+//       unpackAlignment = 1,
+//       wrapS = gl.CLAMP_TO_EDGE,
+//       wrapT = gl.CLAMP_TO_EDGE,
+//       minFilter = gl.LINEAR,
+//       magFilter = gl.LINEAR,
+
+export interface TextureInterface {
+  /**
+   * @default gl.RGB
+   */
+  format?: GLenum
+  /**
+   * @default gl.RGB
+   */
+  internalFormat?: GLenum
+  /**
+   * @default gl.UNSIGNED_BYTE
+   */
+  type?: GLenum
+  /**
+   * @default 1
+   */
+  unpackAlignment?: number
+  /**
+   * @default gl.CLAMP_TO_EDGE
+   */
+  wrapS?: GLenum
+  /**
+   * @default gl.CLAMP_TO_EDGE
+   */
+  wrapT?: GLenum
+  /**
+   * @default gl.LINEAR
+   */
+  minFilter?: GLenum
+  /**
+   * @default gl.LINEAR
+   */
+  magFilter?: GLenum
 }
