@@ -2236,7 +2236,7 @@
     vec2  offset[9];
     vec4 col = vec4(0.0);
 
-    vec2 tracedPos = vec2(v_uv.x * uWindow.x, v_uv.y * uWindow.y) - 500. * dt * rdx * (texture2D(velocity, v_uv).xy - vec2(0.5, 0.5));
+    vec2 tracedPos = vec2(v_uv.x * uWindow.x, v_uv.y * uWindow.y) - 1000. * dt * rdx * (texture2D(velocity, v_uv).xy - vec2(0.5, 0.5));
 
     float dx = 1.0/uWindow.x;
     float dy = 1.0/uWindow.y;
@@ -2522,7 +2522,7 @@
 	    swapRenderer
 	      .setSize(innerWidth, innerHeight)
 	      .useProgram('advect')
-	      .setUniform('dt', UNIFORM_TYPE_FLOAT, dt)
+	      .setUniform('dt', UNIFORM_TYPE_FLOAT, dt * 0.23)
 	      .run(['advect1'], 'advect2');
 
 	    gl.clearColor(1, 1, 1, 1);

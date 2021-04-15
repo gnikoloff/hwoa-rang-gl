@@ -2686,14 +2686,15 @@
 	});
 
 	document.body.addEventListener('mousemove', (e) => {
-	  let pointerX = e.pageX;
-	  if (!pointerX) {
-	    pointerX = e.changedTouches[0].pageX;
-	  }
-	  let pointerY = e.pageY;
-	  if (!pointerY) {
-	    pointerY = e.changedTouches[0].pageY;
-	  }
+	  const pointerX = e.pageX;
+	  const pointerY = e.pageY;
+	  mousePosTarget.x = (pointerX / innerWidth) * 2 - 1;
+	  mousePosTarget.y = 2 - (pointerY / innerHeight) * 2 - 1;
+	});
+
+	document.body.addEventListener('touchmove', (e) => {
+	  const pointerX = e.touches[0].pageX;
+	  const pointerY = e.touches[0].pageY;
 	  mousePosTarget.x = (pointerX / innerWidth) * 2 - 1;
 	  mousePosTarget.y = 2 - (pointerY / innerHeight) * 2 - 1;
 	});

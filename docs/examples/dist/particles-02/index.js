@@ -1964,7 +1964,7 @@
 	    animAttribs[i * 4 + 0] = Math.random() * 2 - 1;
 	    animAttribs[i * 4 + 1] = Math.random() * 2 - 1;
 	    animAttribs[i * 4 + 2] = Math.random() * 2 - 1;
-	    animAttribs[i * 4 + 3] = i / finalCount / 2;
+	    animAttribs[i * 4 + 3] = i / finalCount;
 	  }
 
 	  const geometry = new Geometry(gl);
@@ -2031,7 +2031,7 @@
         pos += animPos * sin(tweenFactor * PI) * 2.0;
 
         gl_Position = projectionMatrix * viewMatrix * modelMatrix * pos;
-        gl_PointSize = 3.0;
+        gl_PointSize = 3.0 * ${devicePixelRatio}.0;
       }
     `,
 	    fragmentShaderSource: `

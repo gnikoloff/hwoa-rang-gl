@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GLTF</title>
+  <style>
+    * { margin: 0; padding: 0; }
+    #error-log {
+      position: fixed;
+      top: 5vh;
+      right: 5vw;
+      bottom: 5vh;
+      left: 5vw;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      font-family: monospace;
+      background: white;
+      color: #111;
+      display: none;
+    }
+    /* #example-info {
+      position: fixed;
+      bottom: 14px;
+      color: white;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-family: Helvetica, sans-serif;
+    } */
+  </style>
+</head>
+<body>
+  <div id="error-log"></div>
+  <!-- <div id="example-info">
+    Deferred Directional & Point Lighting
+  </div> -->
+   <!-- <script
+    src="https://greggman.github.io/webgl-lint/webgl-lint.js"
+    data-gman-debug-helper='
+      {
+        "failUnsetUniforms": false
+      }
+    '
+  ></script> -->
+  <script src="index.js"></script>
+</body>
+</html>

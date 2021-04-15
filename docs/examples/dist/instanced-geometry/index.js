@@ -2241,7 +2241,9 @@
 	    createSphere: createSphere
 	});
 
-	const BOXES_COUNT = 6 * 6;
+	const BOXES_X_COUNT = 12; 
+	const BOXES_Y_COUNT = 12;
+	const BOXES_COUNT = BOXES_X_COUNT * BOXES_Y_COUNT;
 
 	const dpr = Math.min(devicePixelRatio, 2);
 	const canvas = document.createElement('canvas');
@@ -2314,8 +2316,8 @@
 	const scaleVec = create$2();
 
 	document.body.addEventListener('mousemove', (e) => {
-	  mouseX = (e.pageX / innerWidth) * 8 - 4;
-	  mouseY = (1 - e.pageY / innerHeight) * 10 - 5;
+	  mouseX = (e.pageX / innerWidth) * BOXES_X_COUNT - BOXES_X_COUNT / 2;
+	  mouseY = (1 - e.pageY / innerHeight) * BOXES_Y_COUNT - BOXES_Y_COUNT / 2;
 	});
 	document.body.addEventListener('touchmove', (e) => {
 	  e.preventDefault();
@@ -2335,22 +2337,23 @@
 	  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 	  for (let i = 0; i < BOXES_COUNT; i++) {
-	    const x = (i % 6) - 2.5;
-	    const y = (i - x) / 6 - 3;
-	    identity(matrix);
-	    set(translateVec, x, y, 0);
-	    translate(matrix, matrix, translateVec);
-
+	    const x = (i % BOXES_X_COUNT) - BOXES_X_COUNT / 2;
+	    const y = (i - x) / BOXES_Y_COUNT - BOXES_X_COUNT / 2;
+	    
 	    const dx = mouseX - x;
 	    const dy = mouseY - y;
 
 	    const angle = Math.atan2(dx, dy);
 	    const dist = Math.sqrt(dx * dx + dy * dy);
 
+
+	    identity(matrix);
+	    set(translateVec, x, y, dist * 0.3);
+	    translate(matrix, matrix, translateVec);
 	    rotateX(matrix, matrix, angle);
 	    rotateZ(matrix, matrix, angle);
 
-	    const scale$1 = dist * 0.2;
+	    const scale$1 = dist * 0.1;
 	    set(scaleVec, scale$1, scale$1, scale$1);
 	    scale(matrix, matrix, scaleVec);
 	    mesh.setMatrixAt(i, matrix);

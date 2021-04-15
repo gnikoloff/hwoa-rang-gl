@@ -5030,7 +5030,7 @@
 	});
 
 	const VERTEX_SHADER_SPHERES = `
-  struct PointLightInfo {
+  struct PointLightBase {
     float shininess;
     vec3 lightColor;
     vec3 specularColor;
@@ -5038,7 +5038,7 @@
     vec3 worldPosition;
   };
 
-  uniform PointLightInfo PointLight;
+  uniform PointLightBase PointLight;
 
   uniform vec3 eyePosition;
 
@@ -5062,7 +5062,7 @@
 `;
 
 	const FRAGMENT_SHADER_SPHERES = `
-  struct PointLightInfo {
+  struct PointLightBase {
     float shininess;
     vec3 lightColor;
     vec3 specularColor;
@@ -5070,7 +5070,7 @@
     vec3 worldPosition;
   };
 
-  uniform PointLightInfo PointLight;
+  uniform PointLightBase PointLight;
 
   uniform vec3 lightDirection;
 

@@ -1439,6 +1439,192 @@
 	 * @returns {number}
 	 */
 	const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+	/**
+	 * Check if number is power of 2
+	 * @param {number} value
+	 * @returns {number}
+	 */
+	const isPowerOf2 = (value) => (value & (value - 1)) === 0;
+
+	var _gl$4, _texture, _width, _height, _format, _internalFormat, _type, _anisotropyExtension;
+	/**
+	 * Texture class used to store image, video, canvas and data as typed arrays
+	 * @public
+	 */
+	class Texture {
+	    constructor(gl, { format = gl.RGB, internalFormat = format, type = gl.UNSIGNED_BYTE, unpackAlignment = 1, wrapS = gl.CLAMP_TO_EDGE, wrapT = gl.CLAMP_TO_EDGE, minFilter = gl.LINEAR, magFilter = gl.LINEAR, } = {}) {
+	        _gl$4.set(this, void 0);
+	        _texture.set(this, void 0);
+	        _width.set(this, void 0);
+	        _height.set(this, void 0);
+	        _format.set(this, void 0);
+	        _internalFormat.set(this, void 0);
+	        _type.set(this, void 0);
+	        _anisotropyExtension.set(this, void 0);
+	        __classPrivateFieldSet(this, _gl$4, gl);
+	        __classPrivateFieldSet(this, _format, format);
+	        __classPrivateFieldSet(this, _internalFormat, internalFormat);
+	        __classPrivateFieldSet(this, _type, type);
+	        __classPrivateFieldSet(this, _texture, gl.createTexture());
+	        this.bind()
+	            .setPixelStore(gl.UNPACK_ALIGNMENT, unpackAlignment)
+	            .setMinFilter(minFilter)
+	            .setMagFilter(magFilter)
+	            .setWrap(wrapS, wrapT)
+	            .unbind();
+	        __classPrivateFieldSet(this, _anisotropyExtension, getExtension(gl, 'EXT_texture_filter_anisotropic') ||
+	            getExtension(gl, 'MOZ_EXT_texture_filter_anisotropic') ||
+	            getExtension(gl, 'WEBKIT_EXT_texture_filter_anisotropic'));
+	    }
+	    /**
+	     * @returns {WebGLTexture}
+	     */
+	    getTexture() {
+	        return __classPrivateFieldGet(this, _texture);
+	    }
+	    /**
+	     * Binds the texture to gl.TEXTURE_2D
+	     * @returns {this}
+	     */
+	    bind() {
+	        __classPrivateFieldGet(this, _gl$4).bindTexture(__classPrivateFieldGet(this, _gl$4).TEXTURE_2D, __classPrivateFieldGet(this, _texture));
+	        return this;
+	    }
+	    /**
+	     * Unbinds the texture
+	     * @returns {this}
+	     */
+	    unbind() {
+	        __classPrivateFieldGet(this, _gl$4).bindTexture(__classPrivateFieldGet(this, _gl$4).TEXTURE_2D, null);
+	        return this;
+	    }
+	    /**
+	     * @param {HTMLImageElement|HTMLCanvasElement|HTMLVideoElement} image
+	     * @param {number} [width]
+	     * @param {number} [height
+	     * @returns {this}
+	     */
+	    fromImage(image, width = image.width, height = image.height) {
+	        __classPrivateFieldSet(this, _width, width);
+	        __classPrivateFieldSet(this, _height, height);
+	        __classPrivateFieldGet(this, _gl$4).texImage2D(__classPrivateFieldGet(this, _gl$4).TEXTURE_2D, 0, __classPrivateFieldGet(this, _internalFormat), __classPrivateFieldGet(this, _format), __classPrivateFieldGet(this, _type), image);
+	        return this;
+	    }
+	    /**
+	     * @param {number} width
+	     * @param {number} height
+	     * @returns {this}
+	     */
+	    fromSize(width, height) {
+	        if (!width || !height) {
+	            console.warn('Incomplete dimensions for creating empty texture');
+	        }
+	        __classPrivateFieldSet(this, _width, width);
+	        __classPrivateFieldSet(this, _height, height);
+	        __classPrivateFieldGet(this, _gl$4).texImage2D(__classPrivateFieldGet(this, _gl$4).TEXTURE_2D, 0, __classPrivateFieldGet(this, _internalFormat), __classPrivateFieldGet(this, _width), __classPrivateFieldGet(this, _height), 0, __classPrivateFieldGet(this, _format), __classPrivateFieldGet(this, _type), null);
+	        return this;
+	    }
+	    /**
+	     * @param dataArray
+	     * @param {number} [width]
+	     * @param {number} [height]
+	     * @returns {this}
+	     */
+	    fromData(dataArray, width, height) {
+	        if (!width || !height) {
+	            console.warn('Incomplete dimensions for creating texture from data array');
+	        }
+	        __classPrivateFieldSet(this, _width, width);
+	        __classPrivateFieldSet(this, _height, height);
+	        __classPrivateFieldGet(this, _gl$4).texImage2D(__classPrivateFieldGet(this, _gl$4).TEXTURE_2D, 0, __classPrivateFieldGet(this, _internalFormat), __classPrivateFieldGet(this, _width), __classPrivateFieldGet(this, _height), 0, __classPrivateFieldGet(this, _format), __classPrivateFieldGet(this, _type), dataArray);
+	        return this;
+	    }
+	    /**
+	     * @returns {this}
+	     */
+	    generateMipmap() {
+	        __classPrivateFieldGet(this, _gl$4).generateMipmap(__classPrivateFieldGet(this, _gl$4).TEXTURE_2D);
+	        return this;
+	    }
+	    /**
+	     * @param {GLEnum} [format = gl.RGB]
+	     * @param {GLEnum} [internalFormat = gl.RGB]
+	     * @param {GLenum} [type = gl.UNSIGNED_BYTE]
+	     * @returns {this}
+	     */
+	    setFormat(format = __classPrivateFieldGet(this, _gl$4).RGB, internalFormat = __classPrivateFieldGet(this, _gl$4).RGB, type = __classPrivateFieldGet(this, _gl$4).UNSIGNED_BYTE) {
+	        __classPrivateFieldSet(this, _format, format);
+	        __classPrivateFieldSet(this, _internalFormat, internalFormat);
+	        __classPrivateFieldSet(this, _type, type);
+	        return this;
+	    }
+	    /**
+	     * @returns {this}
+	     */
+	    setIsFlip() {
+	        this.setPixelStore(__classPrivateFieldGet(this, _gl$4).UNPACK_FLIP_Y_WEBGL, 1);
+	        return this;
+	    }
+	    /**
+	     * @param {GLenum} name
+	     * @param params
+	     * @returns {this}
+	     */
+	    setPixelStore(name, params) {
+	        __classPrivateFieldGet(this, _gl$4).pixelStorei(name, params);
+	        return this;
+	    }
+	    /**
+	     * @param {GLenum} [filter = gl.LINEAR]
+	     * @returns {this}
+	     */
+	    setMinFilter(filter = __classPrivateFieldGet(this, _gl$4).LINEAR) {
+	        __classPrivateFieldGet(this, _gl$4).texParameteri(__classPrivateFieldGet(this, _gl$4).TEXTURE_2D, __classPrivateFieldGet(this, _gl$4).TEXTURE_MIN_FILTER, filter);
+	        return this;
+	    }
+	    /**
+	     * @param {GLenum} [filter = gl.LINEAR]
+	     * @returns {this}
+	     */
+	    setMagFilter(filter = __classPrivateFieldGet(this, _gl$4).LINEAR) {
+	        __classPrivateFieldGet(this, _gl$4).texParameteri(__classPrivateFieldGet(this, _gl$4).TEXTURE_2D, __classPrivateFieldGet(this, _gl$4).TEXTURE_MAG_FILTER, filter);
+	        return this;
+	    }
+	    /**
+	     *
+	     * @param {GLenum} [wrapS = gl.CLAMP_TO_EDGE]
+	     * @param {GLenum} [wrapT = gl.CLAMP_TO_EDGE]
+	     * @returns {this}
+	     */
+	    setWrap(wrapS = __classPrivateFieldGet(this, _gl$4).CLAMP_TO_EDGE, wrapT = __classPrivateFieldGet(this, _gl$4).CLAMP_TO_EDGE) {
+	        __classPrivateFieldGet(this, _gl$4).texParameteri(__classPrivateFieldGet(this, _gl$4).TEXTURE_2D, __classPrivateFieldGet(this, _gl$4).TEXTURE_WRAP_S, wrapS);
+	        __classPrivateFieldGet(this, _gl$4).texParameteri(__classPrivateFieldGet(this, _gl$4).TEXTURE_2D, __classPrivateFieldGet(this, _gl$4).TEXTURE_WRAP_T, wrapT);
+	        return this;
+	    }
+	    /**
+	     *
+	     * @param {number} anisotropyLevel
+	     * @returns {this}
+	     */
+	    setAnisotropy(anisotropyLevel) {
+	        if (!anisotropyLevel) {
+	            return this;
+	        }
+	        if (__classPrivateFieldGet(this, _anisotropyExtension)) {
+	            const maxAnisotropySupported = __classPrivateFieldGet(this, _gl$4).getParameter(__classPrivateFieldGet(this, _anisotropyExtension).MAX_TEXTURE_MAX_ANISOTROPY_EXT);
+	            __classPrivateFieldGet(this, _gl$4).texParameterf(__classPrivateFieldGet(this, _gl$4).TEXTURE_2D, __classPrivateFieldGet(this, _anisotropyExtension).TEXTURE_MAX_ANISOTROPY_EXT, anisotropyLevel || maxAnisotropySupported);
+	        }
+	        else {
+	            console.warn('EXT_texture_filter_anisotropic extension is not supported');
+	        }
+	        return this;
+	    }
+	    delete() {
+	        __classPrivateFieldGet(this, _gl$4).deleteTexture(__classPrivateFieldGet(this, _texture));
+	    }
+	}
+	_gl$4 = new WeakMap(), _texture = new WeakMap(), _width = new WeakMap(), _height = new WeakMap(), _format = new WeakMap(), _internalFormat = new WeakMap(), _type = new WeakMap(), _anisotropyExtension = new WeakMap();
+	Texture.isPowerOf2 = (width, height) => isPowerOf2(width) && isPowerOf2(height);
 
 	class DampedAction {
 	    constructor() {
@@ -2203,9 +2389,8 @@
 	    createSphere: createSphere
 	});
 
-	const MOBILE_VIEWPORT = 600;
-
-	const regularVertexShader = `
+	const BASE_VERTEX_SHADER = `
+  precision highp float;
 
   attribute vec4 position;
   attribute vec2 uv;
@@ -2217,10 +2402,13 @@
     v_uv = uv;
   }
 `;
-	const regularFragmentShader = `
+	const REGULAR_RRAGMENT_SHADER = `
+  uniform sampler2D texture;
+  
   varying vec2 v_uv;
+
   void main () {
-    gl_FragColor = vec4(v_uv, 0.0, 1.0);
+    gl_FragColor = texture2D(texture, v_uv);
   }
 `;
 
@@ -2231,6 +2419,8 @@
 	const canvas = document.createElement('canvas');
 	const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
 
+	let circleMesh;
+	let torusMesh;
 	let boxMesh;
 	let lineMesh;
 	let sphereMesh;
@@ -2238,9 +2428,12 @@
 
 	gl.enable(gl.BLEND);
 	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
 	gl.enable(gl.DEPTH_TEST);
-	// gl.enable(gl.CULL_FACE)
 	gl.depthFunc(gl.LEQUAL);
+
+	// gl.enable(gl.CULL_FACE)
+	// gl.cullFace(gl.FRONT_AND_BACK)
 
 	const camera = new PerspectiveCamera(
 	  (45 * Math.PI) / 180,
@@ -2248,10 +2441,69 @@
 	  0.1,
 	  100,
 	);
-	camera.position = [0, 0, 10];
+	camera.position = [6.41, 2.46, 4.11];
 	camera.lookAt([0, 0, 0]);
 
 	new CameraController(camera, canvas);
+
+	const uvDebugTexture = new Texture(gl, {
+	  minFilter: gl.LINEAR_MIPMAP_LINEAR,
+	})
+	  .bind()
+	  .fromSize(512, 512)
+	  .generateMipmap();
+
+	const image = new Image();
+	image.onload = () => {
+	  uvDebugTexture.bind().fromImage(image, 512, 512).generateMipmap();
+	};
+
+	image.src = window.location.href.includes('github')
+	  ? '/hwoa-rang-gl/examples/dist/assets/textures/UV_Grid_Sm.png'
+	  : '/examples/dist/assets/textures/UV_Grid_Sm.png';
+
+	/* --------- Circle Geometry --------- */
+	{
+	  const {
+	    indices, vertices, uv
+	  } = index.createCircle();
+	  const geometry = new Geometry(gl);
+	  
+	  geometry
+	    .addIndex({ typedArray: indices })
+	    .addAttribute('position', { typedArray: vertices, size: 3 })
+	    .addAttribute('uv', { typedArray: uv, size: 2 });
+	  circleMesh = new Mesh(gl, {
+	    geometry,
+	    uniforms: {
+	      texture: { type: UNIFORM_TYPE_INT, value: 0 },
+	    },
+	    vertexShaderSource: BASE_VERTEX_SHADER,
+	    fragmentShaderSource: REGULAR_RRAGMENT_SHADER,
+	  });
+	  circleMesh.setPosition({ x: -3, z: -1 });
+	}
+
+	/* --------- Torus Geometry --------- */
+	{
+	  const {
+	    indices, vertices, uv
+	  } = index.createTorus();
+	  const geometry = new Geometry(gl);
+	  geometry
+	    .addIndex({ typedArray: indices })
+	    .addAttribute('position', { typedArray: vertices, size: 3 })
+	    .addAttribute('uv', { typedArray: uv, size: 2 });
+	  torusMesh = new Mesh(gl, {
+	    geometry,
+	    uniforms: {
+	      texture: { type: UNIFORM_TYPE_INT, value: 0 },
+	    },
+	    vertexShaderSource: BASE_VERTEX_SHADER,
+	    fragmentShaderSource: REGULAR_RRAGMENT_SHADER,
+	  });
+	  torusMesh.setPosition({ x: 0, z: -1 });
+	}
 
 	/* --------- Box Geometry --------- */
 	{
@@ -2270,14 +2522,18 @@
 
 	  boxMesh = new Mesh(gl, {
 	    geometry: boxGeometry,
-	    vertexShaderSource: regularVertexShader,
-	    fragmentShaderSource: regularFragmentShader,
+	    uniforms: {
+	      texture: { type: UNIFORM_TYPE_INT, value: 0 },
+	    },
+	    vertexShaderSource: BASE_VERTEX_SHADER,
+	    fragmentShaderSource: REGULAR_RRAGMENT_SHADER,
 	  });
-	  if (innerWidth < MOBILE_VIEWPORT) {
-	    boxMesh.setPosition({ y: -2 });
-	  } else {
-	    boxMesh.setPosition({ x: -2 });
-	  }
+	  boxMesh.setPosition({ x: -3, z: 1 });
+	  // if (innerWidth < MOBILE_VIEWPORT) {
+	  //   boxMesh.setPosition({ y: -2 })
+	  // } else {
+	    
+	  // }
 	}
 
 	/* --------- Line Geometry --------- */
@@ -2287,7 +2543,7 @@
 	  const lineVertices = new Float32Array(lineVerticesCount * 2);
 	  for (let i = 0; i < lineVerticesCount; i++) {
 	    const currStep = i * step;
-	    lineVertices[i * 2 + 0] = Math.sin(currStep) * 0.5;
+	    lineVertices[i * 2 + 0] = Math.sin(currStep * 2) * 0.5;
 	    lineVertices[i * 2 + 1] = Math.cos(currStep) * 0.5;
 	  }
 	  const lineGeometry = new Geometry(gl);
@@ -2297,6 +2553,9 @@
 	  });
 	  lineMesh = new Mesh(gl, {
 	    geometry: lineGeometry,
+	    uniforms: {
+	      texture: { type: UNIFORM_TYPE_INT, value: 0 },
+	    },
 	    vertexShaderSource: `
     attribute vec4 position;
     void main () {
@@ -2311,11 +2570,12 @@
 	  });
 	  lineMesh.drawMode = gl.LINE_LOOP;
 
-	  if (innerWidth < MOBILE_VIEWPORT) {
-	    lineMesh.setPosition({ y: -0.75 });
-	  } else {
-	    lineMesh.setPosition({ x: -0.75 });
-	  }
+	  // if (innerWidth < MOBILE_VIEWPORT) {
+	  //   lineMesh.setPosition({ y: -0.75 })
+	  // } else {
+	    
+	  // }
+	  lineMesh.setPosition({ x: 0, z: 1 });
 	}
 
 	/* --------- Sphere Geometry --------- */
@@ -2337,14 +2597,18 @@
 	    });
 	  sphereMesh = new Mesh(gl, {
 	    geometry,
-	    vertexShaderSource: regularVertexShader,
-	    fragmentShaderSource: regularFragmentShader,
+	    uniforms: {
+	      texture: { type: UNIFORM_TYPE_INT, value: 0 },
+	    },
+	    vertexShaderSource: BASE_VERTEX_SHADER,
+	    fragmentShaderSource: REGULAR_RRAGMENT_SHADER,
 	  });
-	  if (innerWidth < MOBILE_VIEWPORT) {
-	    sphereMesh.setPosition({ y: 0.75 });
-	  } else {
-	    sphereMesh.setPosition({ x: 0.75 });
-	  }
+	  // if (innerWidth < MOBILE_VIEWPORT) {
+	  //   sphereMesh.setPosition({ y: 0.75 })
+	  // } else {
+	    
+	  // }
+	  sphereMesh.setPosition({ x: 3, z: 1 });
 	}
 
 	/* --------- Plane Geometry --------- */
@@ -2363,14 +2627,18 @@
 	    });
 	  planeMesh = new Mesh(gl, {
 	    geometry,
-	    vertexShaderSource: regularVertexShader,
-	    fragmentShaderSource: regularFragmentShader,
+	    uniforms: {
+	      texture: { type: UNIFORM_TYPE_INT, value: 0 },
+	    },
+	    vertexShaderSource: BASE_VERTEX_SHADER,
+	    fragmentShaderSource: REGULAR_RRAGMENT_SHADER,
 	  });
-	  if (innerWidth < MOBILE_VIEWPORT) {
-	    planeMesh.setPosition({ y: 2 });
-	  } else {
-	    planeMesh.setPosition({ x: 2 });
-	  }
+	  // if (innerWidth < MOBILE_VIEWPORT) {
+	  //   planeMesh.setPosition({ y: 2 })
+	  // } else {
+	    
+	  // }
+	  planeMesh.setPosition({ x: 3, z: -1 });
 	}
 
 	document.body.appendChild(canvas);
@@ -2378,20 +2646,31 @@
 	sizeCanvas();
 	window.addEventListener('resize', lodash_throttle(resize, 100));
 
-	function updateFrame() {
+	function updateFrame(ts) {
+	  ts /= 1000;
+
 	  stats.begin();
 
 	  gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 	  gl.clearColor(0.9, 0.9, 0.9, 1);
 	  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-	  boxMesh.use().setCamera(camera).draw();
+	  gl.activeTexture(gl.TEXTURE0);
+	  uvDebugTexture.bind();
 
-	  lineMesh.use().setCamera(camera).draw();
+	  const time = ts * 0.25;
 
-	  sphereMesh.use().setCamera(camera).draw();
+	  boxMesh.use().setRotation({ x: time, y: -time }).setCamera(camera).draw();
 
-	  planeMesh.use().setCamera(camera).draw();
+	  lineMesh.use().setRotation({ y: time, z: time }).setCamera(camera).draw();
+
+	  sphereMesh.use().setRotation({ z: time, x: -time }).setCamera(camera).draw();
+
+	  planeMesh.use().setRotation({ y: -time, z: time }).setCamera(camera).draw();
+
+	  torusMesh.use().setRotation({ x: -time, y: time }).setCamera(camera).draw();
+
+	  circleMesh.use().setRotation({ y: -time, z: -time }).setCamera(camera).draw();
 
 	  stats.end();
 

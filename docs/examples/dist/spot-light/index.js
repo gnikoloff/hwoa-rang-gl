@@ -5395,12 +5395,9 @@
 	    fragmentShaderSource: helperFragmentShader,
 	  });
 	  floorHelperMesh.drawMode = gl.LINES;
-	  floorHelperMesh.setRotation(
-	    {
-	      x: 1,
-	    },
-	    Math.PI / 2,
-	  );
+	  floorHelperMesh.setRotation({
+	    x: Math.PI / 2,
+	  });
 	}
 
 	gui
@@ -5427,13 +5424,13 @@
 	    //   z: cameraUpdateZ,
 	    // })
 	    lightPointerHelperMeshInner
-	      .setRotation({ x: 0, y: 1 }, (val * Math.PI) / 180)
+	      .setRotation({ x: 0, y: (val * Math.PI) / 180 })
 	      .setPosition({
 	        x: cameraPointerUpdateX,
 	        z: cameraPointerUpdateZ,
 	      });
 	    lightPointerHelperMeshOuter
-	      .setRotation({ x: 0, y: 1 }, (val * Math.PI) / 180)
+	      .setRotation({ x: 0, y: (val * Math.PI) / 180 })
 	      .setPosition({
 	        x: cameraPointerUpdateX,
 	        z: cameraPointerUpdateZ,
@@ -5479,13 +5476,14 @@
 	    //   z: Math.cos((val * Math.PI) / 180) * MOVEMENT_LIGHT_RADIUS * 2,
 	    // })
 	    lightPointerHelperMeshInner
-	      .setRotation({ x: 1, y: 0 }, -(val * Math.PI) / 180)
+	      // .setRotation({ x: 1, y: 0 }, -(val * Math.PI) / 180)
+	      .setRotation({ x: -(val * Math.PI) / 180, y: 0 })
 	      .setPosition({
 	        y: cameraUpdateY,
 	        z: cameraUpdateZ,
 	      });
 	    lightPointerHelperMeshOuter
-	      .setRotation({ x: 1, y: 0 }, -(val * Math.PI) / 180)
+	      .setRotation({ x: -(val * Math.PI) / 180, y: 0 })
 	      .setPosition({
 	        y: cameraPointerUpdateY,
 	        z: cameraPointerUpdateZ,
@@ -5620,12 +5618,9 @@
 	    .use()
 	    .setUniform('eyePosition', UNIFORM_TYPE_VEC3, camera.position)
 	    .setCamera(camera)
-	    .setRotation(
-	      {
-	        y: 1,
-	      },
-	      ts * 0.5,
-	    )
+	    .setRotation({
+	      y: ts * 0.5,
+	    })
 	    .draw();
 
 	  sphereMesh

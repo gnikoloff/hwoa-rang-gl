@@ -1945,7 +1945,7 @@
 	const dpr = Math.min(devicePixelRatio, 2);
 	const canvas = document.createElement('canvas');
 	const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-	const errorLogWrapper = document.getElementById('error-log');
+	document.getElementById('error-log');
 
 	getExtension(gl, 'GMAN_debug_helper');
 
@@ -1967,7 +1967,7 @@
 	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 	gl.enable(gl.DEPTH_TEST);
 
-	checkExtensionsSupport();
+	// checkExtensionsSupport()
 	document.body.appendChild(canvas);
 	requestAnimationFrame(updateFrame);
 	resize();
@@ -1976,6 +1976,14 @@
 	  swapRenderer
 	    .useProgram(BLUR_PROGRAM)
 	    .setUniform('uMouse', UNIFORM_TYPE_VEC2, [e.pageX, innerHeight - e.pageY]);
+	});
+	document.addEventListener('touchmove', (e) => {
+	  swapRenderer
+	    .useProgram(BLUR_PROGRAM)
+	    .setUniform('uMouse', UNIFORM_TYPE_VEC2, [
+	      e.touches[0].pageX,
+	      innerHeight - e.touches[0].pageY,
+	    ]);
 	});
 
 	function updateFrame() {
@@ -2000,31 +2008,46 @@
 	  canvas.style.setProperty('width', `${innerWidth}px`);
 	  canvas.style.setProperty('height', `${innerHeight}px`);
 
-	  const initData = new Float32Array(innerWidth * innerHeight * 4);
+	  let initData;
+	  let texType;
+
+	  const ext = getExtension(gl, 'WEBGL_color_buffer_float');
+	  getExtension(gl, 'OES_texture_float');
+	  if (ext) {
+	    initData = new Float32Array(innerWidth * innerHeight * 4);
+	    texType = gl.FLOAT;
+	  } else {
+	    const ext = getExtension(gl, 'EXT_color_buffer_half_float');
+	    const ext2 = getExtension(gl, 'OES_texture_half_float');
+	    if (ext) {
+	      initData = new Float32Array(innerWidth * innerHeight * 4);
+	      texType = ext2.HALF_FLOAT_OES;
+	    } else {
+	      initData = new Uint8Array(innerWidth * innerHeight * 4);
+	      texType = gl.UNSIGNED_BYTE;
+	    }
+	  }
+
 	  for (var i = 0; i < initData.length; i++) {
 	    initData[i] = (Math.random() - 0.5) * 255;
 	  }
 
 	  swapRenderer
-	    .createTexture(BLUR1, innerWidth, innerHeight, initData)
+	    .createTexture(
+	      BLUR1,
+	      innerWidth,
+	      innerHeight,
+	      initData,
+	      gl.NEAREST,
+	      texType,
+	    )
 	    .createFramebuffer(BLUR1, innerWidth, innerHeight)
 
-	    .createTexture(BLUR2, innerWidth, innerHeight)
+	    .createTexture(BLUR2, innerWidth, innerHeight, null, gl.NEAREST, texType)
 	    .createFramebuffer(BLUR2, innerWidth, innerHeight)
 
 	    .useProgram(BLUR_PROGRAM)
 	    .setUniform('uWindow', UNIFORM_TYPE_VEC2, [innerWidth, innerHeight]);
-	}
-
-	function checkExtensionsSupport() {
-	  // check we can use floating point textures
-	  const ext1 = getExtension(gl, 'OES_texture_float');
-	  if (!ext1) {
-	    errorLogWrapper.style.display = 'flex';
-	    errorLogWrapper.innerHTML += `
-    <p>⚠️ Need OES_texture_float</p>
-  `;
-	  }
 	}
 
 }());

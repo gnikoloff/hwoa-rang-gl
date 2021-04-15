@@ -2478,10 +2478,13 @@
 	  meshes.push(mesh);
 
 	  const tex = new Texture(gl, {
-	    minFilter: gl.LINEAR,
+	    minFilter: gl.LINEAR_MIPMAP_LINEAR,
 	    magFilter: gl.LINEAR,
-	  });
-	  tex.bind().setIsFlip().fromImage(createNumCanvas(i)).unbind();
+	  })
+	    .bind()
+	    .setIsFlip()
+	    .fromImage(createNumCanvas(i))
+	    .generateMipmap();
 
 	  textures.push(tex);
 	}

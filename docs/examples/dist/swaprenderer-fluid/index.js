@@ -2946,6 +2946,254 @@
 
 	var lodash_throttle = throttle;
 
+	/**
+	 * Common utilities
+	 * @module glMatrix
+	 */
+	var ARRAY_TYPE = typeof Float32Array !== 'undefined' ? Float32Array : Array;
+	if (!Math.hypot) Math.hypot = function () {
+	  var y = 0,
+	      i = arguments.length;
+
+	  while (i--) {
+	    y += arguments[i] * arguments[i];
+	  }
+
+	  return Math.sqrt(y);
+	};
+
+	/**
+	 * 4x4 Matrix<br>Format: column-major, when typed out it looks like row-major<br>The matrices are being post multiplied.
+	 * @module mat4
+	 */
+
+	/**
+	 * Creates a new identity mat4
+	 *
+	 * @returns {mat4} a new 4x4 matrix
+	 */
+
+	function create() {
+	  var out = new ARRAY_TYPE(16);
+
+	  if (ARRAY_TYPE != Float32Array) {
+	    out[1] = 0;
+	    out[2] = 0;
+	    out[3] = 0;
+	    out[4] = 0;
+	    out[6] = 0;
+	    out[7] = 0;
+	    out[8] = 0;
+	    out[9] = 0;
+	    out[11] = 0;
+	    out[12] = 0;
+	    out[13] = 0;
+	    out[14] = 0;
+	  }
+
+	  out[0] = 1;
+	  out[5] = 1;
+	  out[10] = 1;
+	  out[15] = 1;
+	  return out;
+	}
+	/**
+	 * Set a mat4 to the identity matrix
+	 *
+	 * @param {mat4} out the receiving matrix
+	 * @returns {mat4} out
+	 */
+
+	function identity(out) {
+	  out[0] = 1;
+	  out[1] = 0;
+	  out[2] = 0;
+	  out[3] = 0;
+	  out[4] = 0;
+	  out[5] = 1;
+	  out[6] = 0;
+	  out[7] = 0;
+	  out[8] = 0;
+	  out[9] = 0;
+	  out[10] = 1;
+	  out[11] = 0;
+	  out[12] = 0;
+	  out[13] = 0;
+	  out[14] = 0;
+	  out[15] = 1;
+	  return out;
+	}
+	/**
+	 * Translate a mat4 by the given vector
+	 *
+	 * @param {mat4} out the receiving matrix
+	 * @param {ReadonlyMat4} a the matrix to translate
+	 * @param {ReadonlyVec3} v vector to translate by
+	 * @returns {mat4} out
+	 */
+
+	function translate(out, a, v) {
+	  var x = v[0],
+	      y = v[1],
+	      z = v[2];
+	  var a00, a01, a02, a03;
+	  var a10, a11, a12, a13;
+	  var a20, a21, a22, a23;
+
+	  if (a === out) {
+	    out[12] = a[0] * x + a[4] * y + a[8] * z + a[12];
+	    out[13] = a[1] * x + a[5] * y + a[9] * z + a[13];
+	    out[14] = a[2] * x + a[6] * y + a[10] * z + a[14];
+	    out[15] = a[3] * x + a[7] * y + a[11] * z + a[15];
+	  } else {
+	    a00 = a[0];
+	    a01 = a[1];
+	    a02 = a[2];
+	    a03 = a[3];
+	    a10 = a[4];
+	    a11 = a[5];
+	    a12 = a[6];
+	    a13 = a[7];
+	    a20 = a[8];
+	    a21 = a[9];
+	    a22 = a[10];
+	    a23 = a[11];
+	    out[0] = a00;
+	    out[1] = a01;
+	    out[2] = a02;
+	    out[3] = a03;
+	    out[4] = a10;
+	    out[5] = a11;
+	    out[6] = a12;
+	    out[7] = a13;
+	    out[8] = a20;
+	    out[9] = a21;
+	    out[10] = a22;
+	    out[11] = a23;
+	    out[12] = a00 * x + a10 * y + a20 * z + a[12];
+	    out[13] = a01 * x + a11 * y + a21 * z + a[13];
+	    out[14] = a02 * x + a12 * y + a22 * z + a[14];
+	    out[15] = a03 * x + a13 * y + a23 * z + a[15];
+	  }
+
+	  return out;
+	}
+	/**
+	 * Scales the mat4 by the dimensions in the given vec3 not using vectorization
+	 *
+	 * @param {mat4} out the receiving matrix
+	 * @param {ReadonlyMat4} a the matrix to scale
+	 * @param {ReadonlyVec3} v the vec3 to scale the matrix by
+	 * @returns {mat4} out
+	 **/
+
+	function scale(out, a, v) {
+	  var x = v[0],
+	      y = v[1],
+	      z = v[2];
+	  out[0] = a[0] * x;
+	  out[1] = a[1] * x;
+	  out[2] = a[2] * x;
+	  out[3] = a[3] * x;
+	  out[4] = a[4] * y;
+	  out[5] = a[5] * y;
+	  out[6] = a[6] * y;
+	  out[7] = a[7] * y;
+	  out[8] = a[8] * z;
+	  out[9] = a[9] * z;
+	  out[10] = a[10] * z;
+	  out[11] = a[11] * z;
+	  out[12] = a[12];
+	  out[13] = a[13];
+	  out[14] = a[14];
+	  out[15] = a[15];
+	  return out;
+	}
+
+	/**
+	 * 3 Dimensional Vector
+	 * @module vec3
+	 */
+
+	/**
+	 * Creates a new, empty vec3
+	 *
+	 * @returns {vec3} a new 3D vector
+	 */
+
+	function create$1() {
+	  var out = new ARRAY_TYPE(3);
+
+	  if (ARRAY_TYPE != Float32Array) {
+	    out[0] = 0;
+	    out[1] = 0;
+	    out[2] = 0;
+	  }
+
+	  return out;
+	}
+	/**
+	 * Set the components of a vec3 to the given values
+	 *
+	 * @param {vec3} out the receiving vector
+	 * @param {Number} x X component
+	 * @param {Number} y Y component
+	 * @param {Number} z Z component
+	 * @returns {vec3} out
+	 */
+
+	function set(out, x, y, z) {
+	  out[0] = x;
+	  out[1] = y;
+	  out[2] = z;
+	  return out;
+	}
+	/**
+	 * Perform some operation over an array of vec3s.
+	 *
+	 * @param {Array} a the array of vectors to iterate over
+	 * @param {Number} stride Number of elements between the start of each vec3. If 0 assumes tightly packed
+	 * @param {Number} offset Number of elements to skip at the beginning of the array
+	 * @param {Number} count Number of vec3s to iterate over. If 0 iterates over entire array
+	 * @param {Function} fn Function to call for each vector in the array
+	 * @param {Object} [arg] additional argument to pass to fn
+	 * @returns {Array} a
+	 * @function
+	 */
+
+	(function () {
+	  var vec = create$1();
+	  return function (a, stride, offset, count, fn, arg) {
+	    var i, l;
+
+	    if (!stride) {
+	      stride = 3;
+	    }
+
+	    if (!offset) {
+	      offset = 0;
+	    }
+
+	    if (count) {
+	      l = Math.min(count * stride + offset, a.length);
+	    } else {
+	      l = a.length;
+	    }
+
+	    for (i = offset; i < l; i += stride) {
+	      vec[0] = a[i];
+	      vec[1] = a[i + 1];
+	      vec[2] = a[i + 2];
+	      fn(vec, vec, arg);
+	      a[i] = vec[0];
+	      a[i + 1] = vec[1];
+	      a[i + 2] = vec[2];
+	    }
+
+	    return a;
+	  };
+	}());
+
 	/*! *****************************************************************************
 	Copyright (c) Microsoft Corporation.
 
@@ -3270,7 +3518,7 @@
 	 */
 	// Configuration Constants
 	var EPSILON = 0.000001;
-	var ARRAY_TYPE = typeof Float32Array !== 'undefined' ? Float32Array : Array;
+	var ARRAY_TYPE$1 = typeof Float32Array !== 'undefined' ? Float32Array : Array;
 	if (!Math.hypot) Math.hypot = function () {
 	  var y = 0,
 	      i = arguments.length;
@@ -3293,10 +3541,10 @@
 	 * @returns {mat4} a new 4x4 matrix
 	 */
 
-	function create() {
-	  var out = new ARRAY_TYPE(16);
+	function create$2() {
+	  var out = new ARRAY_TYPE$1(16);
 
-	  if (ARRAY_TYPE != Float32Array) {
+	  if (ARRAY_TYPE$1 != Float32Array) {
 	    out[1] = 0;
 	    out[2] = 0;
 	    out[3] = 0;
@@ -3324,7 +3572,7 @@
 	 * @returns {mat4} out
 	 */
 
-	function identity(out) {
+	function identity$1(out) {
 	  out[0] = 1;
 	  out[1] = 0;
 	  out[2] = 0;
@@ -3352,7 +3600,7 @@
 	 * @returns {mat4} out
 	 */
 
-	function translate(out, a, v) {
+	function translate$1(out, a, v) {
 	  var x = v[0],
 	      y = v[1],
 	      z = v[2];
@@ -3407,7 +3655,7 @@
 	 * @returns {mat4} out
 	 **/
 
-	function scale(out, a, v) {
+	function scale$1(out, a, v) {
 	  var x = v[0],
 	      y = v[1],
 	      z = v[2];
@@ -3609,7 +3857,7 @@
 	  var centerz = center[2];
 
 	  if (Math.abs(eyex - centerx) < EPSILON && Math.abs(eyey - centery) < EPSILON && Math.abs(eyez - centerz) < EPSILON) {
-	    return identity(out);
+	    return identity$1(out);
 	  }
 
 	  z0 = eyex - centerx;
@@ -3681,10 +3929,10 @@
 	 * @returns {vec3} a new 3D vector
 	 */
 
-	function create$1() {
-	  var out = new ARRAY_TYPE(3);
+	function create$1$1() {
+	  var out = new ARRAY_TYPE$1(3);
 
-	  if (ARRAY_TYPE != Float32Array) {
+	  if (ARRAY_TYPE$1 != Float32Array) {
 	    out[0] = 0;
 	    out[1] = 0;
 	    out[2] = 0;
@@ -3702,7 +3950,7 @@
 	 * @returns {vec3} out
 	 */
 
-	function set(out, x, y, z) {
+	function set$1(out, x, y, z) {
 	  out[0] = x;
 	  out[1] = y;
 	  out[2] = z;
@@ -3746,7 +3994,7 @@
 	 */
 
 	(function () {
-	  var vec = create$1();
+	  var vec = create$1$1();
 	  return function (a, stride, offset, count, fn, arg) {
 	    var i, l;
 
@@ -3787,16 +4035,16 @@
 	class Mesh {
 	    constructor(gl, params) {
 	        _position.set(this, [0, 0, 0]);
-	        _positionVec3.set(this, create$1());
+	        _positionVec3.set(this, create$1$1());
 	        _scale.set(this, [1, 1, 1]);
-	        _scaleVec3.set(this, create$1());
+	        _scaleVec3.set(this, create$1$1());
 	        _rotationAxis.set(this, [0, 0, 0]);
-	        _rotationAxisVec3.set(this, create$1());
+	        _rotationAxisVec3.set(this, create$1$1());
 	        _rotationAngle.set(this, 0);
 	        _gl$2.set(this, void 0);
 	        _geometry.set(this, void 0);
 	        this.modelMatrixNeedsUpdate = false;
-	        this.modelMatrix = create();
+	        this.modelMatrix = create$2();
 	        /**
 	         * DrawMode
 	         * @default gl.TRIANGLES
@@ -3809,7 +4057,7 @@
 	        this.vaoExtension = getExtension(gl, 'OES_vertex_array_object');
 	        this.vao = this.vaoExtension.createVertexArrayOES();
 	        this.hasIndices = geometry.attributes.has(INDEX_ATTRIB_NAME);
-	        set(__classPrivateFieldGet(this, _scaleVec3), __classPrivateFieldGet(this, _scale)[0], __classPrivateFieldGet(this, _scale)[1], __classPrivateFieldGet(this, _scale)[2]);
+	        set$1(__classPrivateFieldGet(this, _scaleVec3), __classPrivateFieldGet(this, _scale)[0], __classPrivateFieldGet(this, _scale)[1], __classPrivateFieldGet(this, _scale)[2]);
 	        this.vaoExtension.bindVertexArrayOES(this.vao);
 	        geometry.attributes.forEach(({ size, type, normalized, stride, offset, buffer }, key) => {
 	            if (key === INDEX_ATTRIB_NAME) {
@@ -3862,7 +4110,7 @@
 	    setPosition(position) {
 	        const { x = __classPrivateFieldGet(this, _position)[0], y = __classPrivateFieldGet(this, _position)[1], z = __classPrivateFieldGet(this, _position)[2], } = position;
 	        __classPrivateFieldSet(this, _position, [x, y, z]);
-	        set(__classPrivateFieldGet(this, _positionVec3), x, y, z);
+	        set$1(__classPrivateFieldGet(this, _positionVec3), x, y, z);
 	        this.modelMatrixNeedsUpdate = true;
 	        return this;
 	    }
@@ -3873,7 +4121,7 @@
 	    setScale(scale) {
 	        const { x = __classPrivateFieldGet(this, _scale)[0], y = __classPrivateFieldGet(this, _scale)[1], z = __classPrivateFieldGet(this, _scale)[2] } = scale;
 	        __classPrivateFieldSet(this, _scale, [x, y, z]);
-	        set(__classPrivateFieldGet(this, _scaleVec3), x, y, z);
+	        set$1(__classPrivateFieldGet(this, _scaleVec3), x, y, z);
 	        this.modelMatrixNeedsUpdate = true;
 	        return this;
 	    }
@@ -3884,7 +4132,7 @@
 	    setRotation(rotation, rotationAngle) {
 	        const { x = __classPrivateFieldGet(this, _rotationAxis)[0], y = __classPrivateFieldGet(this, _rotationAxis)[1], z = __classPrivateFieldGet(this, _rotationAxis)[2], } = rotation;
 	        __classPrivateFieldSet(this, _rotationAxis, [x, y, z]);
-	        set(__classPrivateFieldGet(this, _rotationAxisVec3), x, y, z);
+	        set$1(__classPrivateFieldGet(this, _rotationAxisVec3), x, y, z);
 	        __classPrivateFieldSet(this, _rotationAngle, rotationAngle);
 	        this.modelMatrixNeedsUpdate = true;
 	        return this;
@@ -3894,10 +4142,10 @@
 	     * @returns {this}
 	     */
 	    updateModelMatrix() {
-	        identity(this.modelMatrix);
-	        translate(this.modelMatrix, this.modelMatrix, __classPrivateFieldGet(this, _positionVec3));
+	        identity$1(this.modelMatrix);
+	        translate$1(this.modelMatrix, this.modelMatrix, __classPrivateFieldGet(this, _positionVec3));
 	        rotate(this.modelMatrix, this.modelMatrix, __classPrivateFieldGet(this, _rotationAngle), __classPrivateFieldGet(this, _rotationAxisVec3));
-	        scale(this.modelMatrix, this.modelMatrix, __classPrivateFieldGet(this, _scaleVec3));
+	        scale$1(this.modelMatrix, this.modelMatrix, __classPrivateFieldGet(this, _scaleVec3));
 	        this.program.setUniform(MODEL_MATRIX_UNIFORM_NAME, UNIFORM_TYPE_MATRIX4X4, this.modelMatrix);
 	        return this;
 	    }
@@ -3954,7 +4202,7 @@
 	        __classPrivateFieldSet(this, _instanceExtension, getExtension(gl, 'ANGLE_instanced_arrays'));
 	        this.instanceCount = instanceCount;
 	        const instanceMatrixLocation = this.program.getAttribLocation(INSTANCED_OFFSET_MODEL_MATRIX);
-	        const identityMat = create();
+	        const identityMat = create$2();
 	        const itemsPerInstance = 16;
 	        const bytesPerMatrix = itemsPerInstance * Float32Array.BYTES_PER_ELEMENT;
 	        const matrixData = new Float32Array(itemsPerInstance * instanceCount);
@@ -4294,8 +4542,8 @@
 	    constructor(fieldOfView, aspect, near, far) {
 	        this.position = [0, 0, 0];
 	        this.lookAtPosition = [0, 0, 0];
-	        this.projectionMatrix = create();
-	        this.viewMatrix = create();
+	        this.projectionMatrix = create$2();
+	        this.viewMatrix = create$2();
 	        this.zoom = 1;
 	        this.fieldOfView = fieldOfView;
 	        this.aspect = aspect;
@@ -4330,8 +4578,8 @@
 	        this.zoom = 1;
 	        this.position = [0, 0, 0];
 	        this.lookAtPosition = [0, 0, 0];
-	        this.projectionMatrix = create();
-	        this.viewMatrix = create();
+	        this.projectionMatrix = create$2();
+	        this.viewMatrix = create$2();
 	        this.left = left;
 	        this.right = right;
 	        this.top = top;
@@ -4601,7 +4849,7 @@
 	    let ii = 0;
 	    const te = tStart + tLength;
 	    const grid = [];
-	    const n = create$1();
+	    const n = create$1$1();
 	    for (let iy = 0; iy <= hSegs; iy++) {
 	        const vRow = [];
 	        const v = iy / hSegs;
@@ -4615,7 +4863,7 @@
 	            position[i * 3] = x;
 	            position[i * 3 + 1] = y;
 	            position[i * 3 + 2] = z;
-	            set(n, x, y, z);
+	            set$1(n, x, y, z);
 	            normalize(n, n);
 	            normal[i * 3] = n[0];
 	            normal[i * 3 + 1] = n[1];
@@ -4785,489 +5033,27 @@
 	}
 	_gl$6 = new WeakMap(), _framebuffers = new WeakMap(), _programs = new WeakMap(), _textures = new WeakMap(), _camera = new WeakMap(), _activeProgram = new WeakMap();
 
-	/**
-	 * Common utilities
-	 * @module glMatrix
-	 */
-	var ARRAY_TYPE$1 = typeof Float32Array !== 'undefined' ? Float32Array : Array;
-	if (!Math.hypot) Math.hypot = function () {
-	  var y = 0,
-	      i = arguments.length;
+	var baseVert = "#define GLSLIFY 1\nattribute vec4 position;uniform vec2 px;varying vec2 uv;varying vec2 vL;varying vec2 vR;varying vec2 vT;varying vec2 vB;void main(){gl_Position=projectionMatrix*viewMatrix*modelMatrix*position;uv=vec2(0.5)+(gl_Position.xy)*0.5;vL=uv-vec2(px.x,0.0);vR=uv+vec2(px.x,0.0);vT=uv+vec2(0.0,px.y);vB=uv-vec2(0.0,px.y);}"; // eslint-disable-line
 
-	  while (i--) {
-	    y += arguments[i] * arguments[i];
-	  }
+	var cursorVert = "#define GLSLIFY 1\nuniform vec2 cursor;uniform vec2 px;attribute vec4 position;varying vec2 vPosition;varying vec2 uv;void main(){gl_Position=projectionMatrix*viewMatrix*modelMatrix*position;vPosition=gl_Position.xy;uv=vec2(0.5)+(gl_Position.xy)*0.5;}"; // eslint-disable-line
 
-	  return Math.sqrt(y);
-	};
+	var advectFrag = "#define GLSLIFY 1\nuniform sampler2D source;uniform sampler2D velocity;uniform float dt;uniform float scale;uniform vec2 px1;varying vec2 uv;void main(){gl_FragColor=texture2D(source,uv-texture2D(velocity,uv).xy*dt*px1)*scale;}"; // eslint-disable-line
 
-	/**
-	 * 4x4 Matrix<br>Format: column-major, when typed out it looks like row-major<br>The matrices are being post multiplied.
-	 * @module mat4
-	 */
+	var divergenceFrag = "precision mediump sampler2D;\n#define GLSLIFY 1\nuniform sampler2D velocity;varying highp vec2 uv;varying highp vec2 vL;varying highp vec2 vR;varying highp vec2 vT;varying highp vec2 vB;void main(){float L=texture2D(velocity,vL).x;float R=texture2D(velocity,vR).x;float T=texture2D(velocity,vT).y;float B=texture2D(velocity,vB).y;vec2 C=texture2D(velocity,uv).xy;if(vL.x<0.0){L=-C.x;}if(vR.x>1.0){R=-C.x;}if(vT.y>1.0){T=-C.y;}if(vB.y<0.0){B=-C.y;}float div=0.5*(R-L+T-B);gl_FragColor=vec4(div,0.0,0.0,1.0);}"; // eslint-disable-line
 
-	/**
-	 * Creates a new identity mat4
-	 *
-	 * @returns {mat4} a new 4x4 matrix
-	 */
+	var jacobiFrag = "#define GLSLIFY 1\nuniform sampler2D pressure;uniform sampler2D divergence;uniform float alpha;uniform float beta;uniform vec2 px;varying vec2 uv;varying highp vec2 vL;varying highp vec2 vR;varying highp vec2 vT;varying highp vec2 vB;void main(){float x0=texture2D(pressure,vL).r;float x1=texture2D(pressure,vR).r;float y0=texture2D(pressure,vT).r;float y1=texture2D(pressure,vB).r;float d=texture2D(divergence,uv).r;float relaxed=(x0+x1+y0+y1+alpha*d)*beta;gl_FragColor=vec4(relaxed);}"; // eslint-disable-line
 
-	function create$2() {
-	  var out = new ARRAY_TYPE$1(16);
+	var subtractPressureGradientFrag = "#define GLSLIFY 1\nuniform sampler2D pressure;uniform sampler2D velocity;uniform float scale;uniform vec2 px;varying vec2 uv;void main(){float x0=texture2D(pressure,uv-vec2(px.x,0)).r;float x1=texture2D(pressure,uv+vec2(px.x,0)).r;float y0=texture2D(pressure,uv-vec2(0,px.y)).r;float y1=texture2D(pressure,uv+vec2(0,px.y)).r;vec2 v=texture2D(velocity,uv).xy;vec4 v2=vec4((v-(vec2(x1,y1)-vec2(x0,y0))*0.5)*scale,1.0,1.0);gl_FragColor=v2;}"; // eslint-disable-line
 
-	  if (ARRAY_TYPE$1 != Float32Array) {
-	    out[1] = 0;
-	    out[2] = 0;
-	    out[3] = 0;
-	    out[4] = 0;
-	    out[6] = 0;
-	    out[7] = 0;
-	    out[8] = 0;
-	    out[9] = 0;
-	    out[11] = 0;
-	    out[12] = 0;
-	    out[13] = 0;
-	    out[14] = 0;
-	  }
+	var clearFrag = "#define GLSLIFY 1\nuniform sampler2D pressure;uniform float value;varying vec2 uv;void main(){gl_FragColor=value*texture2D(pressure,uv);}"; // eslint-disable-line
 
-	  out[0] = 1;
-	  out[5] = 1;
-	  out[10] = 1;
-	  out[15] = 1;
-	  return out;
-	}
-	/**
-	 * Set a mat4 to the identity matrix
-	 *
-	 * @param {mat4} out the receiving matrix
-	 * @returns {mat4} out
-	 */
+	var curlShader = "#define GLSLIFY 1\nuniform sampler2D velocity;varying vec2 uv;varying vec2 vL;varying vec2 vR;varying vec2 vT;varying vec2 vB;void main(){float L=texture2D(velocity,vL).y;float R=texture2D(velocity,vR).y;float T=texture2D(velocity,vT).x;float B=texture2D(velocity,vB).x;float vorticity=R-L-T+B;gl_FragColor=vec4(0.5*vorticity,0.0,0.0,1.0);}"; // eslint-disable-line
 
-	function identity$1(out) {
-	  out[0] = 1;
-	  out[1] = 0;
-	  out[2] = 0;
-	  out[3] = 0;
-	  out[4] = 0;
-	  out[5] = 1;
-	  out[6] = 0;
-	  out[7] = 0;
-	  out[8] = 0;
-	  out[9] = 0;
-	  out[10] = 1;
-	  out[11] = 0;
-	  out[12] = 0;
-	  out[13] = 0;
-	  out[14] = 0;
-	  out[15] = 1;
-	  return out;
-	}
-	/**
-	 * Translate a mat4 by the given vector
-	 *
-	 * @param {mat4} out the receiving matrix
-	 * @param {ReadonlyMat4} a the matrix to translate
-	 * @param {ReadonlyVec3} v vector to translate by
-	 * @returns {mat4} out
-	 */
+	var vorticityFrag = "#define GLSLIFY 1\nuniform sampler2D velocity;uniform sampler2D uCurl;uniform float curl;uniform float dt;varying vec2 uv;varying vec2 vL;varying vec2 vR;varying vec2 vT;varying vec2 vB;void main(){float L=texture2D(uCurl,vL).x;float R=texture2D(uCurl,vR).x;float T=texture2D(uCurl,vT).x;float B=texture2D(uCurl,vB).x;float C=texture2D(uCurl,uv).x;vec2 force=0.5*vec2(abs(T)-abs(B),abs(R)-abs(L));force/=length(force)+0.0001;force*=curl*C;force.y*=-1.0;vec2 vel=texture2D(velocity,uv).xy;gl_FragColor=vec4(vel+force*dt,0.0,1.0);}"; // eslint-disable-line
 
-	function translate$1(out, a, v) {
-	  var x = v[0],
-	      y = v[1],
-	      z = v[2];
-	  var a00, a01, a02, a03;
-	  var a10, a11, a12, a13;
-	  var a20, a21, a22, a23;
+	var visFrag = "#define GLSLIFY 1\nuniform sampler2D velocity;uniform sampler2D pressure;uniform sampler2D sceneTexture;uniform float uAlpha;uniform vec2 px1;varying vec2 uv;void main(){vec2 vel=texture2D(velocity,uv).xy*0.5+vec2(0.5);float pre=0.5-texture2D(pressure,uv).x*0.5;vec4 color=vec4(vel,pre,0.0);vec4 baseColor=texture2D(sceneTexture,uv+vel*0.5-0.25);gl_FragColor=baseColor;}"; // eslint-disable-line
 
-	  if (a === out) {
-	    out[12] = a[0] * x + a[4] * y + a[8] * z + a[12];
-	    out[13] = a[1] * x + a[5] * y + a[9] * z + a[13];
-	    out[14] = a[2] * x + a[6] * y + a[10] * z + a[14];
-	    out[15] = a[3] * x + a[7] * y + a[11] * z + a[15];
-	  } else {
-	    a00 = a[0];
-	    a01 = a[1];
-	    a02 = a[2];
-	    a03 = a[3];
-	    a10 = a[4];
-	    a11 = a[5];
-	    a12 = a[6];
-	    a13 = a[7];
-	    a20 = a[8];
-	    a21 = a[9];
-	    a22 = a[10];
-	    a23 = a[11];
-	    out[0] = a00;
-	    out[1] = a01;
-	    out[2] = a02;
-	    out[3] = a03;
-	    out[4] = a10;
-	    out[5] = a11;
-	    out[6] = a12;
-	    out[7] = a13;
-	    out[8] = a20;
-	    out[9] = a21;
-	    out[10] = a22;
-	    out[11] = a23;
-	    out[12] = a00 * x + a10 * y + a20 * z + a[12];
-	    out[13] = a01 * x + a11 * y + a21 * z + a[13];
-	    out[14] = a02 * x + a12 * y + a22 * z + a[14];
-	    out[15] = a03 * x + a13 * y + a23 * z + a[15];
-	  }
-
-	  return out;
-	}
-	/**
-	 * Scales the mat4 by the dimensions in the given vec3 not using vectorization
-	 *
-	 * @param {mat4} out the receiving matrix
-	 * @param {ReadonlyMat4} a the matrix to scale
-	 * @param {ReadonlyVec3} v the vec3 to scale the matrix by
-	 * @returns {mat4} out
-	 **/
-
-	function scale$1(out, a, v) {
-	  var x = v[0],
-	      y = v[1],
-	      z = v[2];
-	  out[0] = a[0] * x;
-	  out[1] = a[1] * x;
-	  out[2] = a[2] * x;
-	  out[3] = a[3] * x;
-	  out[4] = a[4] * y;
-	  out[5] = a[5] * y;
-	  out[6] = a[6] * y;
-	  out[7] = a[7] * y;
-	  out[8] = a[8] * z;
-	  out[9] = a[9] * z;
-	  out[10] = a[10] * z;
-	  out[11] = a[11] * z;
-	  out[12] = a[12];
-	  out[13] = a[13];
-	  out[14] = a[14];
-	  out[15] = a[15];
-	  return out;
-	}
-
-	/**
-	 * 3 Dimensional Vector
-	 * @module vec3
-	 */
-
-	/**
-	 * Creates a new, empty vec3
-	 *
-	 * @returns {vec3} a new 3D vector
-	 */
-
-	function create$3() {
-	  var out = new ARRAY_TYPE$1(3);
-
-	  if (ARRAY_TYPE$1 != Float32Array) {
-	    out[0] = 0;
-	    out[1] = 0;
-	    out[2] = 0;
-	  }
-
-	  return out;
-	}
-	/**
-	 * Set the components of a vec3 to the given values
-	 *
-	 * @param {vec3} out the receiving vector
-	 * @param {Number} x X component
-	 * @param {Number} y Y component
-	 * @param {Number} z Z component
-	 * @returns {vec3} out
-	 */
-
-	function set$1(out, x, y, z) {
-	  out[0] = x;
-	  out[1] = y;
-	  out[2] = z;
-	  return out;
-	}
-	/**
-	 * Perform some operation over an array of vec3s.
-	 *
-	 * @param {Array} a the array of vectors to iterate over
-	 * @param {Number} stride Number of elements between the start of each vec3. If 0 assumes tightly packed
-	 * @param {Number} offset Number of elements to skip at the beginning of the array
-	 * @param {Number} count Number of vec3s to iterate over. If 0 iterates over entire array
-	 * @param {Function} fn Function to call for each vector in the array
-	 * @param {Object} [arg] additional argument to pass to fn
-	 * @returns {Array} a
-	 * @function
-	 */
-
-	(function () {
-	  var vec = create$3();
-	  return function (a, stride, offset, count, fn, arg) {
-	    var i, l;
-
-	    if (!stride) {
-	      stride = 3;
-	    }
-
-	    if (!offset) {
-	      offset = 0;
-	    }
-
-	    if (count) {
-	      l = Math.min(count * stride + offset, a.length);
-	    } else {
-	      l = a.length;
-	    }
-
-	    for (i = offset; i < l; i += stride) {
-	      vec[0] = a[i];
-	      vec[1] = a[i + 1];
-	      vec[2] = a[i + 2];
-	      fn(vec, vec, arg);
-	      a[i] = vec[0];
-	      a[i + 1] = vec[1];
-	      a[i + 2] = vec[2];
-	    }
-
-	    return a;
-	  };
-	}());
-
-	const advectFrag = `
-  uniform sampler2D source;
-  uniform sampler2D velocity;
-  uniform float dt;
-  uniform float scale;
-  uniform vec2 px1;
-  varying vec2 uv;
-
-  void main(){
-    gl_FragColor = texture2D(source, uv-texture2D(velocity, uv).xy * dt * px1) * scale;
-  }
-`;
-
-	const divergenceFrag = `
-
-  precision mediump sampler2D;
-  uniform sampler2D velocity;
-  
-  varying highp vec2 uv;
-  varying highp vec2 vL;
-  varying highp vec2 vR;
-  varying highp vec2 vT;
-  varying highp vec2 vB;
-
-  void main () {
-    float L = texture2D(velocity, vL).x;
-    float R = texture2D(velocity, vR).x;
-    float T = texture2D(velocity, vT).y;
-    float B = texture2D(velocity, vB).y;
-    vec2 C = texture2D(velocity, uv).xy;
-    
-    if (vL.x < 0.0) { L = -C.x; }
-    if (vR.x > 1.0) { R = -C.x; }
-    if (vT.y > 1.0) { T = -C.y; }
-    if (vB.y < 0.0) { B = -C.y; }
-    
-    float div = 0.5 * (R - L + T - B);
-    gl_FragColor = vec4(div, 0.0, 0.0, 1.0);
-  }
-`;
-
-	const jacobiFrag = `
-  uniform sampler2D pressure;
-  uniform sampler2D divergence;
-  uniform float alpha;
-  uniform float beta;
-  uniform vec2 px;
-  varying vec2 uv;
-
-  varying highp vec2 vL;
-  varying highp vec2 vR;
-  varying highp vec2 vT;
-  varying highp vec2 vB;
-
-  void main(){
-    float x0 = texture2D(pressure, vL).r;
-    float x1 = texture2D(pressure, vR).r;
-    float y0 = texture2D(pressure, vT).r;
-    float y1 = texture2D(pressure, vB).r;
-    float d = texture2D(divergence, uv).r;
-    
-    float relaxed = (x0 + x1 + y0 + y1 + alpha * d) * beta;
-    gl_FragColor = vec4(relaxed);
-  }
-`;
-
-	const subtractPressureGradientFrag = `
-  uniform sampler2D pressure;
-  uniform sampler2D velocity;
-  uniform float scale;
-  uniform vec2 px;
-  
-  varying vec2 uv;
-
-  void main(){
-    float x0 = texture2D(pressure, uv-vec2(px.x, 0)).r;
-    float x1 = texture2D(pressure, uv+vec2(px.x, 0)).r;
-    float y0 = texture2D(pressure, uv-vec2(0, px.y)).r;
-    float y1 = texture2D(pressure, uv+vec2(0, px.y)).r;
-    vec2 v = texture2D(velocity, uv).xy;
-    vec4 v2 = vec4((v-(vec2(x1, y1)-vec2(x0, y0))*0.5) * scale, 1.0, 1.0);
-  
-    gl_FragColor = v2;
-  }
-`;
-
-	const clearFrag = `
-  uniform sampler2D pressure;
-  uniform float value;
-
-  varying vec2 uv;
-  void main () {
-    gl_FragColor = value * texture2D(pressure, uv);
-  }
-`;
-
-	const curlShader = `
-  uniform sampler2D velocity;
-
-  varying vec2 uv;
-  varying vec2 vL;
-  varying vec2 vR;
-  varying vec2 vT;
-  varying vec2 vB;
-
-  void main () {
-    float L = texture2D(velocity, vL).y;
-    float R = texture2D(velocity, vR).y;
-    float T = texture2D(velocity, vT).x;
-    float B = texture2D(velocity, vB).x;
-    float vorticity = R - L - T + B;
-    gl_FragColor = vec4(0.5 * vorticity, 0.0, 0.0, 1.0);
-  }
-`;
-
-	const vorticityShader = `
-  uniform sampler2D velocity;
-  uniform sampler2D uCurl;
-  uniform float curl;
-  uniform float dt;
-
-  varying vec2 uv;
-  varying vec2 vL;
-  varying vec2 vR;
-  varying vec2 vT;
-  varying vec2 vB;
-
-  void main () {
-    float L = texture2D(uCurl, vL).x;
-    float R = texture2D(uCurl, vR).x;
-    float T = texture2D(uCurl, vT).x;
-    float B = texture2D(uCurl, vB).x;
-    float C = texture2D(uCurl, uv).x;
-    vec2 force = 0.5 * vec2(abs(T) - abs(B), abs(R) - abs(L));
-    force /= length(force) + 0.0001;
-    force *= curl * C;
-    force.y *= -1.0;
-    vec2 vel = texture2D(velocity, uv).xy;
-    gl_FragColor = vec4(vel + force * dt, 0.0, 1.0);
-  }
-`;
-
-	const visFrag = `
-  uniform sampler2D velocity;
-  uniform sampler2D pressure;
-
-  uniform sampler2D sceneTexture;
-
-  uniform float uAlpha;
-
-  uniform vec2 px1;
-  varying vec2 uv;
-  
-  void main(){
-    vec2 vel = texture2D(velocity, uv).xy * 0.5 + vec2(0.5);
-    float pre = 0.5 - texture2D(pressure, uv).x  * 0.5;
-
-    vec4 color = vec4(vel, pre, 0.0);
-    vec4 baseColor = texture2D(sceneTexture, uv + vel * 0.5 - 0.25);
-
-    gl_FragColor = baseColor;
-  }
-`;
-
-	const baseVert = `
-  attribute vec4 position;
-
-  uniform vec2 px;
-  varying vec2 uv;
-  varying vec2 vL;
-  varying vec2 vR;
-  varying vec2 vT;
-  varying vec2 vB;
-  
-  void main(){
-    gl_Position = projectionMatrix * viewMatrix * modelMatrix * position;
-
-    uv = vec2(0.5)+(gl_Position.xy)*0.5;
-    vL = uv - vec2(px.x, 0.0);
-    vR = uv + vec2(px.x, 0.0);
-    vT = uv + vec2(0.0, px.y);
-    vB = uv - vec2(0.0, px.y);
-  }
-`;
-
-	const cursorVert = `
-  uniform vec2 cursor;
-  uniform vec2 px;
-
-  attribute vec4 position;
-  
-  varying vec2 vPosition;
-  varying vec2 uv;
-  
-  void main(){
-    gl_Position = projectionMatrix * viewMatrix * modelMatrix * position;
-    vPosition = gl_Position.xy;
-    uv = vec2(0.5) + (gl_Position.xy) * 0.5;
-  }
-`;
-
-	const addForceFrag2 = `
-  uniform sampler2D uBase;
-  uniform vec2 velocity;
-  uniform vec2 cursor;
-  uniform vec2 px;
-
-  varying vec2 uv;
-  varying vec2 vPosition;
-  
-  float blendAdd(float base, float blend) {
-    return min(base+blend,1.0);
-  }
-  
-  vec3 blendAdd(vec3 base, vec3 blend) {
-    return min(base+blend,vec3(1.0));
-  }
-  
-  vec3 blendAdd(vec3 base, vec3 blend, float opacity) {
-    return (blendAdd(base, blend) * opacity + base * (1.0 - opacity));
-  }
-  
-  void main(){    
-    float dist = distance(cursor/px, vPosition/px);
-    vec3 color = texture2D(uBase, uv).rgb;
-    float dx = 2.0 * px.x;
-    float dy = 2.0 * px.y;
-    float marginX = 1.0 - dx;
-    float marginY = 1.0 - dy;
-    if(dist < 20. && length(dist) > 0. && uv.x < marginX && uv.x > dx && uv.y < marginY && uv.y > dy){
-        color = color - vec3(velocity.xy * 10., 0.0) * clamp(2.0 - dist/40., 0.0, 1.0);
-    }
-    gl_FragColor = vec4(color, 1.0);
-  }
-`;
+	var addForceFrag2 = "#define GLSLIFY 1\nuniform sampler2D uBase;uniform vec2 velocity;uniform vec2 cursor;uniform vec2 px;varying vec2 uv;varying vec2 vPosition;float blendAdd(float base,float blend){return min(base+blend,1.0);}vec3 blendAdd(vec3 base,vec3 blend){return min(base+blend,vec3(1.0));}vec3 blendAdd(vec3 base,vec3 blend,float opacity){return(blendAdd(base,blend)*opacity+base*(1.0-opacity));}void main(){float dist=distance(cursor/px,vPosition/px);vec3 color=texture2D(uBase,uv).rgb;float dx=2.0*px.x;float dy=2.0*px.y;float marginX=1.0-dx;float marginY=1.0-dy;if(dist<20.&&length(dist)>0.&&uv.x<marginX&&uv.x>dx&&uv.y<marginY&&uv.y>dy){color=color-vec3(velocity.xy*10.,0.0)*clamp(2.0-dist/40.,0.0,1.0);}gl_FragColor=vec4(color,1.0);}"; // eslint-disable-line
 
 	const ITERATIONS_COUNT = 20;
 
@@ -5323,7 +5109,7 @@
 	  canvas.getContext('webgl', params) ||
 	  canvas.getContext('experimental-webgl', params);
 
-	const errorLogWrapper = document.getElementById('error-log');
+	document.getElementById('error-log');
 
 	const gui = new GUI$1();
 
@@ -5406,8 +5192,8 @@
     `,
 	  });
 
-	  const transformMatrix = create$2();
-	  const transformVec = create$3();
+	  const transformMatrix = create();
+	  const transformVec = create$1();
 
 	  for (let i = 0; i < drawMesh.instanceCount; i++) {
 	    const randX = (Math.random() * 2 - 1) * 20;
@@ -5416,13 +5202,13 @@
 
 	    const randScale = 0.6 + Math.random() * 0.4;
 
-	    identity$1(transformMatrix);
+	    identity(transformMatrix);
 
-	    set$1(transformVec, randX, randY, randZ);
-	    translate$1(transformMatrix, transformMatrix, transformVec);
+	    set(transformVec, randX, randY, randZ);
+	    translate(transformMatrix, transformMatrix, transformVec);
 
-	    set$1(transformVec, randScale, randScale, randScale);
-	    scale$1(transformMatrix, transformMatrix, transformVec);
+	    set(transformVec, randScale, randScale, randScale);
+	    scale(transformMatrix, transformMatrix, transformVec);
 
 	    drawMesh.use().setMatrixAt(i, transformMatrix);
 	  }
@@ -5442,7 +5228,7 @@
 	  .createProgram(PROGRAM_DIVERGENCE, baseVert, divergenceFrag)
 	  .createProgram(PROGRAM_JACOBI, baseVert, jacobiFrag)
 	  .createProgram(PROGRAM_CURL, baseVert, curlShader)
-	  .createProgram(PROGRAM_VORTICITY, baseVert, vorticityShader)
+	  .createProgram(PROGRAM_VORTICITY, baseVert, vorticityFrag)
 	  .createProgram(PROGRAM_CLEAR, baseVert, clearFrag)
 	  .createProgram(
 	    PROGRAM_SUBTRACT_PRESSURE_GRADIENT,
@@ -5453,6 +5239,7 @@
 
 	gl.enable(gl.CULL_FACE);
 	gl.enable(gl.DEPTH_TEST);
+	gl.depthFunc(gl.LEQUAL);
 
 	checkExtensionsSupport();
 
@@ -5463,6 +5250,7 @@
 
 	document.body.addEventListener('mousemove', onMouseMove);
 	document.body.addEventListener('mouseenter', onMouseEnter);
+	document.body.addEventListener('touchmove', onTouchMove);
 
 	function onMouseEnter(e) {
 	  const ptX = e.clientX;
@@ -5477,6 +5265,16 @@
 	  lastMouse[1] = targetMouse[1];
 	}
 
+	function onTouchMove(e) {
+	  e.preventDefault();
+
+	  const ptX = e.touches[0].clientX;
+	  const ptY = e.touches[0].clientY;
+
+	  targetMouse[0] = (ptX / innerWidth) * 2 - 1;
+	  targetMouse[1] = (ptY / innerHeight) * -2 + 1;
+	}
+
 	function onMouseMove(e) {
 	  const ptX = e.clientX;
 	  const ptY = e.clientY;
@@ -5485,7 +5283,9 @@
 	  targetMouse[1] = (ptY / innerHeight) * -2 + 1;
 	}
 
-	function updateFrame() {
+	function updateFrame(ts) {
+	  ts /= 1000;
+
 	  lastMouse[0] = mouse[0];
 	  lastMouse[1] = mouse[1];
 
@@ -5500,13 +5300,21 @@
 
 	  stats.begin();
 
+	  gl.disable(gl.DEPTH_TEST);
 	  updateFluid();
 
 	  sceneFramebuffer.bind();
 	  gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-	  drawMesh.use().setCamera(camera).draw();
+	  gl.enable(gl.DEPTH_TEST);
+	  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	  drawMesh
+	    .use()
+	    .setRotation({ y: ts * 0.2 })
+	    .setCamera(camera)
+	    .draw();
 	  sceneFramebuffer.unbind();
 
+	  gl.disable(gl.DEPTH_TEST);
 	  swapRenderer
 	    .setSize(innerWidth * dpr, innerHeight * dpr)
 	    .useProgram(config.programMode)
@@ -5518,8 +5326,6 @@
 	}
 
 	function updateFluid() {
-	  gl.disable(gl.DEPTH_TEST);
-
 	  swapRenderer
 	    .setSize(bgWidth, bgHeight)
 
@@ -5669,13 +5475,13 @@
 
 	function checkExtensionsSupport() {
 	  // check we can use floating point textures
-	  const ext1 = getExtension(gl, 'OES_texture_float');
-	  if (!ext1) {
-	    errorLogWrapper.style.display = 'flex';
-	    errorLogWrapper.innerHTML += `
-    <p>⚠️ Need OES_texture_float</p>
-  `;
-	  }
+	  getExtension(gl, 'OES_texture_float');
+	  // if (!ext1) {
+	  //   errorLogWrapper.style.display = 'flex'
+	  //   errorLogWrapper.innerHTML += `
+	  //   <p>⚠️ Need OES_texture_float</p>
+	  // `
+	  // }
 	  hasFloatPointLinearFiltering = getExtension(gl, 'OES_texture_float_linear');
 	}
 

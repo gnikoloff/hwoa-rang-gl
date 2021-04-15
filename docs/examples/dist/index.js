@@ -66,6 +66,10 @@
   			{
   				label: "Spot Light",
   				id: "spot-light"
+  			},
+  			{
+  				label: "Deferred Shading",
+  				id: "deferred-shading"
   			}
   		]
   	},
