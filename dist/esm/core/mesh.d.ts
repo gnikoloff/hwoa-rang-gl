@@ -1,19 +1,18 @@
-import { mat4, ReadonlyVec3 } from 'gl-matrix';
+import { Transform } from './transform';
 import { Program } from './program';
+import { Geometry } from './geometry';
 import { PerspectiveCamera } from '../camera/perspective-camera';
 import { OrthographicCamera } from '../camera/orthographic-camera';
-import { MeshInterface, OES_vertex_array_objectInterface, UniformType } from '../types';
+import { UniformType } from './program';
 /**
  * Mesh class for holding the geometry, program and shaders for an object.
  *
  * @public
  */
-export declare class Mesh {
+export declare class Mesh extends Transform {
     #private;
-    protected modelMatrixNeedsUpdate: boolean;
     protected vaoExtension: OES_vertex_array_objectInterface;
     protected hasIndices: boolean;
-    modelMatrix: mat4;
     program: Program;
     vao: WebGLVertexArrayObjectOES;
     /**
@@ -22,8 +21,10 @@ export declare class Mesh {
      */
     drawMode: GLenum;
     constructor(gl: WebGLRenderingContext, params: MeshInterface);
-    get position(): ReadonlyVec3;
-    get scale(): ReadonlyVec3;
+    /**
+     * Binds the program
+     * @returns {this}
+     */
     use(): this;
     /**
      * Set uniform value. Query the uniform location if necessary and cache it in-memory for future use
@@ -33,38 +34,6 @@ export declare class Mesh {
      * @returns {this}
      */
     setUniform(uniformName: string, uniformType: UniformType, uniformValue: unknown): this;
-    /**
-     * Sets position
-     * @returns {this}
-     */
-    setPosition(position: {
-        x?: number;
-        y?: number;
-        z?: number;
-    }): this;
-    /**
-     * Sets scale
-     * @returns {this}
-     */
-    setScale(scale: {
-        x?: number;
-        y?: number;
-        z?: number;
-    }): this;
-    /**
-     * Sets rotation
-     * @returns {this}
-     */
-    setRotation(rotation: {
-        x?: number;
-        y?: number;
-        z?: number;
-    }, rotationAngle: number): this;
-    /**
-     * Update model matrix with scale, rotation and translation
-     * @returns {this}
-     */
-    updateModelMatrix(): this;
     /**
      * Assign camera projection matrix and view matrix to model uniforms
      * @param {PerspectiveCamera|OrthographicCamera} camera
@@ -81,3 +50,35 @@ export declare class Mesh {
      */
     delete(): void;
 }
+export interface MeshInterface {
+    geometry: Geometry;
+    /**
+     * Uniforms as object list
+     * @example
+     * ```
+     * { type: 'int', value: 1 }
+     * { type: 'vec4', value: [0, 1, 2, 3] }
+     * ```
+     * @defaultValue {}
+     */
+    uniforms?: Record<string, unknown>;
+    /**
+     * TODO
+     */
+    defines?: Record<string, unknown>;
+    /**
+     * Vertex shader program as string
+     */
+    vertexShaderSource: string;
+    /**
+     * Fragment shader program as string
+     */
+    fragmentShaderSource: string;
+}
+interface OES_vertex_array_objectInterface {
+    createVertexArrayOES(): WebGLVertexArrayObjectOES;
+    deleteVertexArrayOES(arrayObject: WebGLVertexArrayObjectOES | null): void;
+    isVertexArrayOES(arrayObject: WebGLVertexArrayObjectOES | null): boolean;
+    bindVertexArrayOES(arrayObject: WebGLVertexArrayObjectOES | null): void;
+}
+export {};

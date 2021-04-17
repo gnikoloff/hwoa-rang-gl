@@ -1,5 +1,6 @@
 export { Program } from './core/program';
 export { Geometry } from './core/geometry';
+export { Transform } from './core/transform';
 export { Mesh } from './core/mesh';
 export { InstancedMesh } from './core/instanced-mesh';
 export { Texture } from './core/texture';

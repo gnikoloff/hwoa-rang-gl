@@ -1,4 +1,3 @@
-import { TextureInterface } from '../types';
 /**
  * Texture class used to store image, video, canvas and data as typed arrays
  * @public
@@ -8,9 +7,9 @@ export declare class Texture {
     static isPowerOf2: (width: number, height: number) => boolean;
     constructor(gl: WebGLRenderingContext, { format, internalFormat, type, unpackAlignment, wrapS, wrapT, minFilter, magFilter, }?: TextureInterface);
     /**
-     * @returns {WebGLTexture}
+     * @returns {WebGLTexture|null}
      */
-    getTexture(): WebGLTexture;
+    getTexture(): WebGLTexture | null;
     /**
      * Binds the texture to gl.TEXTURE_2D
      * @returns {this}
@@ -55,7 +54,7 @@ export declare class Texture {
     /**
      * @returns {this}
      */
-    setIsFlip(): this;
+    setIsFlip(flip?: number): this;
     /**
      * @param {GLenum} name
      * @param params
@@ -86,4 +85,38 @@ export declare class Texture {
      */
     setAnisotropy(anisotropyLevel: number): this;
     delete(): void;
+}
+export interface TextureInterface {
+    /**
+     * @default gl.RGB
+     */
+    format?: GLenum;
+    /**
+     * @default gl.RGB
+     */
+    internalFormat?: GLenum;
+    /**
+     * @default gl.UNSIGNED_BYTE
+     */
+    type?: GLenum;
+    /**
+     * @default 1
+     */
+    unpackAlignment?: number;
+    /**
+     * @default gl.CLAMP_TO_EDGE
+     */
+    wrapS?: GLenum;
+    /**
+     * @default gl.CLAMP_TO_EDGE
+     */
+    wrapT?: GLenum;
+    /**
+     * @default gl.LINEAR
+     */
+    minFilter?: GLenum;
+    /**
+     * @default gl.LINEAR
+     */
+    magFilter?: GLenum;
 }

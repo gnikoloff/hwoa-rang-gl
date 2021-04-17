@@ -57,13 +57,17 @@
 
     /**
      * Create and compile WebGLShader
-     * @param {(WebGL1RenderingContext|WebGL2RenderingContext)} gl
+     * @param {WebGLRenderingContext)} gl
      * @param {GLenum} shaderType
      * @param {string} shaderSource
      * @returns {WebGLShader}
      */
     function compileShader(gl, shaderType, shaderSource) {
         const shader = gl.createShader(shaderType);
+        if (!shader) {
+            console.error('Failed to create WebGL shader');
+            return null;
+        }
         gl.shaderSource(shader, shaderSource);
         gl.compileShader(shader);
         if (gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
@@ -74,19 +78,29 @@
     ${gl.getShaderInfoLog(shader)}
   `);
         gl.deleteShader(shader);
-        return shader;
+        return null;
     }
     /**
      * Create and link WebGLProgram with provided shader strings
-     * @param {(WebGL1RenderingContext|WebGL2RenderingContext)} gl
+     * @param {(WebGLRenderingContext)} gl
      * @param {string} vertexShaderSource
      * @param {string} fragmentShaderSource
      * @returns {WebGLProgram}
      */
     function createProgram(gl, vertexShaderSource, fragmentShaderSource) {
         const vertexShader = compileShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+        if (!vertexShader) {
+            return null;
+        }
         const fragmentShader = compileShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
+        if (!fragmentShader) {
+            return null;
+        }
         const program = gl.createProgram();
+        if (!program) {
+            console.error('failed to create a WebGL program');
+            return null;
+        }
         gl.attachShader(program, vertexShader);
         gl.attachShader(program, fragmentShader);
         gl.linkProgram(program);
@@ -98,13 +112,12 @@
         if (gl.getProgramParameter(program, gl.LINK_STATUS)) {
             return program;
         }
-        console.error(gl.getProgramInfoLog(program));
         gl.deleteProgram(program);
-        return program;
+        return null;
     }
     /**
      * Create a ARRAY_BUFFER buffer
-     * @param {(WebGL1RenderingContext|WebGL2RenderingContext)} gl
+     * @param {WebGLRenderingContext)} gl
      * @param {ArrayBuffer} data - Typed array types that will be copied into the data store
      * @param {GLenum} [usage = gl.STATIC_DRAW] - A GLenum specifying the intended usage pattern of the data store for optimization purposes
      * @returns {WebGLBuffer}
@@ -117,7 +130,7 @@
     }
     /**
      * Create a ELEMENT_ARRAY_BUFFER buffer
-     * @param {(WebGL1RenderingContext|WebGL2RenderingContext)} gl
+     * @param {WebGLRenderingContext)} gl
      * @param {ArrayBuffer} data - Typed array types that will be copied into the data store
      * @param {GLenum} [usage=STATIC_DRAW] - A GLenum specifying the intended usage pattern of the data store for optimization purposes
      * @returns {WebGLBuffer}
@@ -131,7 +144,7 @@
     const cachedExtensions = new Map();
     /**
      * Obtains and returns a WebGL extension if available. Caches it in-memory for future use.
-     * @param {(WebGL1RenderingContext|WebGL2RenderingContext)} gl
+     * @param {WebGLRenderingContext)} gl
      * @param {string} extensionName
      */
     function getExtension(gl, extensionName) {
@@ -189,6 +202,10 @@
         setUniform(uniformName, uniformType, 
         // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
         uniformValue) {
+            if (!__classPrivateFieldGet(this, _program)) {
+                console.error('invalid program');
+                return null;
+            }
             let uniformLocation;
             if (__classPrivateFieldGet(this, _uniformLocations).has(uniformName)) {
                 uniformLocation = __classPrivateFieldGet(this, _uniformLocations).get(uniformName);
@@ -228,6 +245,10 @@
          * @returns {number} attribLocation
          */
         getAttribLocation(attribName) {
+            if (!__classPrivateFieldGet(this, _program)) {
+                console.error('invalid program');
+                return null;
+            }
             if (__classPrivateFieldGet(this, _attribLocations).has(attribName)) {
                 return __classPrivateFieldGet(this, _attribLocations).get(attribName);
             }
@@ -491,83 +512,135 @@
       return out;
     }
     /**
-     * Rotates a mat4 by the given angle around the given axis
+     * Rotates a matrix by the given angle around the X axis
      *
      * @param {mat4} out the receiving matrix
      * @param {ReadonlyMat4} a the matrix to rotate
      * @param {Number} rad the angle to rotate the matrix by
-     * @param {ReadonlyVec3} axis the axis to rotate around
      * @returns {mat4} out
      */
 
-    function rotate(out, a, rad, axis) {
-      var x = axis[0],
-          y = axis[1],
-          z = axis[2];
-      var len = Math.hypot(x, y, z);
-      var s, c, t;
-      var a00, a01, a02, a03;
-      var a10, a11, a12, a13;
-      var a20, a21, a22, a23;
-      var b00, b01, b02;
-      var b10, b11, b12;
-      var b20, b21, b22;
-
-      if (len < EPSILON) {
-        return null;
-      }
-
-      len = 1 / len;
-      x *= len;
-      y *= len;
-      z *= len;
-      s = Math.sin(rad);
-      c = Math.cos(rad);
-      t = 1 - c;
-      a00 = a[0];
-      a01 = a[1];
-      a02 = a[2];
-      a03 = a[3];
-      a10 = a[4];
-      a11 = a[5];
-      a12 = a[6];
-      a13 = a[7];
-      a20 = a[8];
-      a21 = a[9];
-      a22 = a[10];
-      a23 = a[11]; // Construct the elements of the rotation matrix
-
-      b00 = x * x * t + c;
-      b01 = y * x * t + z * s;
-      b02 = z * x * t - y * s;
-      b10 = x * y * t - z * s;
-      b11 = y * y * t + c;
-      b12 = z * y * t + x * s;
-      b20 = x * z * t + y * s;
-      b21 = y * z * t - x * s;
-      b22 = z * z * t + c; // Perform rotation-specific matrix multiplication
-
-      out[0] = a00 * b00 + a10 * b01 + a20 * b02;
-      out[1] = a01 * b00 + a11 * b01 + a21 * b02;
-      out[2] = a02 * b00 + a12 * b01 + a22 * b02;
-      out[3] = a03 * b00 + a13 * b01 + a23 * b02;
-      out[4] = a00 * b10 + a10 * b11 + a20 * b12;
-      out[5] = a01 * b10 + a11 * b11 + a21 * b12;
-      out[6] = a02 * b10 + a12 * b11 + a22 * b12;
-      out[7] = a03 * b10 + a13 * b11 + a23 * b12;
-      out[8] = a00 * b20 + a10 * b21 + a20 * b22;
-      out[9] = a01 * b20 + a11 * b21 + a21 * b22;
-      out[10] = a02 * b20 + a12 * b21 + a22 * b22;
-      out[11] = a03 * b20 + a13 * b21 + a23 * b22;
+    function rotateX(out, a, rad) {
+      var s = Math.sin(rad);
+      var c = Math.cos(rad);
+      var a10 = a[4];
+      var a11 = a[5];
+      var a12 = a[6];
+      var a13 = a[7];
+      var a20 = a[8];
+      var a21 = a[9];
+      var a22 = a[10];
+      var a23 = a[11];
 
       if (a !== out) {
-        // If the source and destination differ, copy the unchanged last row
+        // If the source and destination differ, copy the unchanged rows
+        out[0] = a[0];
+        out[1] = a[1];
+        out[2] = a[2];
+        out[3] = a[3];
         out[12] = a[12];
         out[13] = a[13];
         out[14] = a[14];
         out[15] = a[15];
-      }
+      } // Perform axis-specific matrix multiplication
 
+
+      out[4] = a10 * c + a20 * s;
+      out[5] = a11 * c + a21 * s;
+      out[6] = a12 * c + a22 * s;
+      out[7] = a13 * c + a23 * s;
+      out[8] = a20 * c - a10 * s;
+      out[9] = a21 * c - a11 * s;
+      out[10] = a22 * c - a12 * s;
+      out[11] = a23 * c - a13 * s;
+      return out;
+    }
+    /**
+     * Rotates a matrix by the given angle around the Y axis
+     *
+     * @param {mat4} out the receiving matrix
+     * @param {ReadonlyMat4} a the matrix to rotate
+     * @param {Number} rad the angle to rotate the matrix by
+     * @returns {mat4} out
+     */
+
+    function rotateY(out, a, rad) {
+      var s = Math.sin(rad);
+      var c = Math.cos(rad);
+      var a00 = a[0];
+      var a01 = a[1];
+      var a02 = a[2];
+      var a03 = a[3];
+      var a20 = a[8];
+      var a21 = a[9];
+      var a22 = a[10];
+      var a23 = a[11];
+
+      if (a !== out) {
+        // If the source and destination differ, copy the unchanged rows
+        out[4] = a[4];
+        out[5] = a[5];
+        out[6] = a[6];
+        out[7] = a[7];
+        out[12] = a[12];
+        out[13] = a[13];
+        out[14] = a[14];
+        out[15] = a[15];
+      } // Perform axis-specific matrix multiplication
+
+
+      out[0] = a00 * c - a20 * s;
+      out[1] = a01 * c - a21 * s;
+      out[2] = a02 * c - a22 * s;
+      out[3] = a03 * c - a23 * s;
+      out[8] = a00 * s + a20 * c;
+      out[9] = a01 * s + a21 * c;
+      out[10] = a02 * s + a22 * c;
+      out[11] = a03 * s + a23 * c;
+      return out;
+    }
+    /**
+     * Rotates a matrix by the given angle around the Z axis
+     *
+     * @param {mat4} out the receiving matrix
+     * @param {ReadonlyMat4} a the matrix to rotate
+     * @param {Number} rad the angle to rotate the matrix by
+     * @returns {mat4} out
+     */
+
+    function rotateZ(out, a, rad) {
+      var s = Math.sin(rad);
+      var c = Math.cos(rad);
+      var a00 = a[0];
+      var a01 = a[1];
+      var a02 = a[2];
+      var a03 = a[3];
+      var a10 = a[4];
+      var a11 = a[5];
+      var a12 = a[6];
+      var a13 = a[7];
+
+      if (a !== out) {
+        // If the source and destination differ, copy the unchanged last row
+        out[8] = a[8];
+        out[9] = a[9];
+        out[10] = a[10];
+        out[11] = a[11];
+        out[12] = a[12];
+        out[13] = a[13];
+        out[14] = a[14];
+        out[15] = a[15];
+      } // Perform axis-specific matrix multiplication
+
+
+      out[0] = a00 * c + a10 * s;
+      out[1] = a01 * c + a11 * s;
+      out[2] = a02 * c + a12 * s;
+      out[3] = a03 * c + a13 * s;
+      out[4] = a10 * c - a00 * s;
+      out[5] = a11 * c - a01 * s;
+      out[6] = a12 * c - a02 * s;
+      out[7] = a13 * c - a03 * s;
       return out;
     }
     /**
@@ -754,6 +827,22 @@
       return out;
     }
     /**
+     * Creates a new vec3 initialized with the given values
+     *
+     * @param {Number} x X component
+     * @param {Number} y Y component
+     * @param {Number} z Z component
+     * @returns {vec3} a new 3D vector
+     */
+
+    function fromValues(x, y, z) {
+      var out = new ARRAY_TYPE(3);
+      out[0] = x;
+      out[1] = y;
+      out[2] = z;
+      return out;
+    }
+    /**
      * Set the components of a vec3 to the given values
      *
      * @param {vec3} out the receiving vector
@@ -767,6 +856,21 @@
       out[0] = x;
       out[1] = y;
       out[2] = z;
+      return out;
+    }
+    /**
+     * Subtracts vector b from vector a
+     *
+     * @param {vec3} out the receiving vector
+     * @param {ReadonlyVec3} a the first operand
+     * @param {ReadonlyVec3} b the second operand
+     * @returns {vec3} out
+     */
+
+    function subtract(out, a, b) {
+      out[0] = a[0] - b[0];
+      out[1] = a[1] - b[1];
+      out[2] = a[2] - b[2];
       return out;
     }
     /**
@@ -815,6 +919,12 @@
       return out;
     }
     /**
+     * Alias for {@link vec3.subtract}
+     * @function
+     */
+
+    var sub = subtract;
+    /**
      * Perform some operation over an array of vec3s.
      *
      * @param {Array} a the array of vectors to iterate over
@@ -860,38 +970,171 @@
       };
     }());
 
-    var _position, _positionVec3, _scale, _scaleVec3, _rotationAxis, _rotationAxisVec3, _rotationAngle, _gl$2, _geometry;
+    /**
+     * 2 Dimensional Vector
+     * @module vec2
+     */
+
+    /**
+     * Creates a new, empty vec2
+     *
+     * @returns {vec2} a new 2D vector
+     */
+
+    function create$2() {
+      var out = new ARRAY_TYPE(2);
+
+      if (ARRAY_TYPE != Float32Array) {
+        out[0] = 0;
+        out[1] = 0;
+      }
+
+      return out;
+    }
+    /**
+     * Perform some operation over an array of vec2s.
+     *
+     * @param {Array} a the array of vectors to iterate over
+     * @param {Number} stride Number of elements between the start of each vec2. If 0 assumes tightly packed
+     * @param {Number} offset Number of elements to skip at the beginning of the array
+     * @param {Number} count Number of vec2s to iterate over. If 0 iterates over entire array
+     * @param {Function} fn Function to call for each vector in the array
+     * @param {Object} [arg] additional argument to pass to fn
+     * @returns {Array} a
+     * @function
+     */
+
+    (function () {
+      var vec = create$2();
+      return function (a, stride, offset, count, fn, arg) {
+        var i, l;
+
+        if (!stride) {
+          stride = 2;
+        }
+
+        if (!offset) {
+          offset = 0;
+        }
+
+        if (count) {
+          l = Math.min(count * stride + offset, a.length);
+        } else {
+          l = a.length;
+        }
+
+        for (i = offset; i < l; i += stride) {
+          vec[0] = a[i];
+          vec[1] = a[i + 1];
+          fn(vec, vec, arg);
+          a[i] = vec[0];
+          a[i + 1] = vec[1];
+        }
+
+        return a;
+      };
+    }());
+
+    /**
+     * Base transform class to handle vectors and matrices
+     *
+     * @public
+     */
+    class Transform {
+        constructor() {
+            this.position = fromValues(0, 0, 0);
+            this.rotation = fromValues(0, 0, 0);
+            this.scale = fromValues(1, 1, 1);
+            this.modelMatrix = create();
+            this.shouldUpdate = false;
+        }
+        /**
+         * @returns {this}
+         */
+        setPosition(position) {
+            const { x = this.position[0], y = this.position[1], z = this.position[2], } = position;
+            set(this.position, x, y, z);
+            this.shouldUpdate = true;
+            return this;
+        }
+        /**
+         * Sets scale
+         * @returns {this}
+         */
+        setScale(scale) {
+            const { x = this.scale[0], y = this.scale[1], z = this.scale[2] } = scale;
+            set(this.scale, x, y, z);
+            this.shouldUpdate = true;
+            return this;
+        }
+        /**
+         * Sets rotation
+         * @returns {this}
+         */
+        setRotation(rotation) {
+            const { x = this.rotation[0], y = this.rotation[1], z = this.rotation[2], } = rotation;
+            set(this.rotation, x, y, z);
+            this.shouldUpdate = true;
+            return this;
+        }
+        /**
+         * Update model matrix with scale, rotation and translation
+         * @returns {this}
+         */
+        updateModelMatrix() {
+            identity(this.modelMatrix);
+            translate(this.modelMatrix, this.modelMatrix, this.position);
+            rotateX(this.modelMatrix, this.modelMatrix, this.rotation[0]);
+            rotateY(this.modelMatrix, this.modelMatrix, this.rotation[1]);
+            rotateZ(this.modelMatrix, this.modelMatrix, this.rotation[2]);
+            scale(this.modelMatrix, this.modelMatrix, this.scale);
+            this.shouldUpdate = false;
+            return this;
+        }
+    }
+
+    var _gl$2, _geometry;
     /**
      * Mesh class for holding the geometry, program and shaders for an object.
      *
      * @public
      */
-    class Mesh {
+    class Mesh extends Transform {
         constructor(gl, params) {
-            _position.set(this, [0, 0, 0]);
-            _positionVec3.set(this, create$1());
-            _scale.set(this, [1, 1, 1]);
-            _scaleVec3.set(this, create$1());
-            _rotationAxis.set(this, [0, 0, 0]);
-            _rotationAxisVec3.set(this, create$1());
-            _rotationAngle.set(this, 0);
+            super();
             _gl$2.set(this, void 0);
             _geometry.set(this, void 0);
-            this.modelMatrixNeedsUpdate = false;
-            this.modelMatrix = create();
             /**
              * DrawMode
              * @default gl.TRIANGLES
              */
             this.drawMode = TRIANGLES;
-            const { geometry, uniforms = {}, vertexShaderSource, fragmentShaderSource, } = params;
+            const { geometry, uniforms = {}, defines = {} } = params;
+            let { vertexShaderSource, fragmentShaderSource } = params;
             __classPrivateFieldSet(this, _gl$2, gl);
-            __classPrivateFieldSet(this, _geometry, geometry);
-            this.program = new Program(gl, { vertexShaderSource, fragmentShaderSource });
+            __classPrivateFieldSet(this, _geometry, geometry
+            // Assign defines to both vertex and fragment shaders
+            );
+            // Assign defines to both vertex and fragment shaders
+            for (const [key, value] of Object.entries(defines)) {
+                vertexShaderSource = `
+        #define ${key} ${value}\n
+        ${vertexShaderSource}
+      `;
+                fragmentShaderSource = `
+        #define ${key} ${value}\n
+        ${fragmentShaderSource}
+      `;
+            }
+            // create mesh program and vertex array object
+            this.program = new Program(gl, {
+                vertexShaderSource,
+                fragmentShaderSource,
+            });
             this.vaoExtension = getExtension(gl, 'OES_vertex_array_object');
             this.vao = this.vaoExtension.createVertexArrayOES();
             this.hasIndices = geometry.attributes.has(INDEX_ATTRIB_NAME);
-            set(__classPrivateFieldGet(this, _scaleVec3), __classPrivateFieldGet(this, _scale)[0], __classPrivateFieldGet(this, _scale)[1], __classPrivateFieldGet(this, _scale)[2]);
+            // assign geometry attributes to mesh
             this.vaoExtension.bindVertexArrayOES(this.vao);
             geometry.attributes.forEach(({ size, type, normalized, stride, offset, buffer }, key) => {
                 if (key === INDEX_ATTRIB_NAME) {
@@ -899,7 +1142,7 @@
                     return;
                 }
                 const location = this.program.getAttribLocation(key);
-                if (location === -1) {
+                if (location == null || location === -1) {
                     return;
                 }
                 __classPrivateFieldGet(this, _gl$2).bindBuffer(__classPrivateFieldGet(this, _gl$2).ARRAY_BUFFER, buffer);
@@ -907,6 +1150,7 @@
                 __classPrivateFieldGet(this, _gl$2).enableVertexAttribArray(location);
             });
             this.vaoExtension.bindVertexArrayOES(null);
+            // assign uniforms to mesh
             this.program.bind();
             for (const [key, uniform] of Object.entries(uniforms)) {
                 // @ts-ignore
@@ -916,12 +1160,10 @@
             this.program.unbind();
             return this;
         }
-        get position() {
-            return __classPrivateFieldGet(this, _position);
-        }
-        get scale() {
-            return __classPrivateFieldGet(this, _scale);
-        }
+        /**
+         * Binds the program
+         * @returns {this}
+         */
         use() {
             this.program.bind();
             return this;
@@ -935,52 +1177,6 @@
          */
         setUniform(uniformName, uniformType, uniformValue) {
             this.program.setUniform(uniformName, uniformType, uniformValue);
-            return this;
-        }
-        /**
-         * Sets position
-         * @returns {this}
-         */
-        setPosition(position) {
-            const { x = __classPrivateFieldGet(this, _position)[0], y = __classPrivateFieldGet(this, _position)[1], z = __classPrivateFieldGet(this, _position)[2], } = position;
-            __classPrivateFieldSet(this, _position, [x, y, z]);
-            set(__classPrivateFieldGet(this, _positionVec3), x, y, z);
-            this.modelMatrixNeedsUpdate = true;
-            return this;
-        }
-        /**
-         * Sets scale
-         * @returns {this}
-         */
-        setScale(scale) {
-            const { x = __classPrivateFieldGet(this, _scale)[0], y = __classPrivateFieldGet(this, _scale)[1], z = __classPrivateFieldGet(this, _scale)[2] } = scale;
-            __classPrivateFieldSet(this, _scale, [x, y, z]);
-            set(__classPrivateFieldGet(this, _scaleVec3), x, y, z);
-            this.modelMatrixNeedsUpdate = true;
-            return this;
-        }
-        /**
-         * Sets rotation
-         * @returns {this}
-         */
-        setRotation(rotation, rotationAngle) {
-            const { x = __classPrivateFieldGet(this, _rotationAxis)[0], y = __classPrivateFieldGet(this, _rotationAxis)[1], z = __classPrivateFieldGet(this, _rotationAxis)[2], } = rotation;
-            __classPrivateFieldSet(this, _rotationAxis, [x, y, z]);
-            set(__classPrivateFieldGet(this, _rotationAxisVec3), x, y, z);
-            __classPrivateFieldSet(this, _rotationAngle, rotationAngle);
-            this.modelMatrixNeedsUpdate = true;
-            return this;
-        }
-        /**
-         * Update model matrix with scale, rotation and translation
-         * @returns {this}
-         */
-        updateModelMatrix() {
-            identity(this.modelMatrix);
-            translate(this.modelMatrix, this.modelMatrix, __classPrivateFieldGet(this, _positionVec3));
-            rotate(this.modelMatrix, this.modelMatrix, __classPrivateFieldGet(this, _rotationAngle), __classPrivateFieldGet(this, _rotationAxisVec3));
-            scale(this.modelMatrix, this.modelMatrix, __classPrivateFieldGet(this, _scaleVec3));
-            this.program.setUniform(MODEL_MATRIX_UNIFORM_NAME, UNIFORM_TYPE_MATRIX4X4, this.modelMatrix);
             return this;
         }
         /**
@@ -998,9 +1194,9 @@
          * @returns {this}
          */
         draw() {
-            if (this.modelMatrixNeedsUpdate) {
-                this.updateModelMatrix();
-                this.modelMatrixNeedsUpdate = false;
+            if (this.shouldUpdate) {
+                super.updateModelMatrix();
+                this.program.setUniform(MODEL_MATRIX_UNIFORM_NAME, UNIFORM_TYPE_MATRIX4X4, this.modelMatrix);
             }
             this.vaoExtension.bindVertexArrayOES(this.vao);
             if (this.hasIndices) {
@@ -1021,7 +1217,7 @@
             this.vaoExtension.deleteVertexArrayOES(this.vao);
         }
     }
-    _position = new WeakMap(), _positionVec3 = new WeakMap(), _scale = new WeakMap(), _scaleVec3 = new WeakMap(), _rotationAxis = new WeakMap(), _rotationAxisVec3 = new WeakMap(), _rotationAngle = new WeakMap(), _gl$2 = new WeakMap(), _geometry = new WeakMap();
+    _gl$2 = new WeakMap(), _geometry = new WeakMap();
 
     var _geometry$1, _gl$3, _instanceAttributes, _instanceExtension;
     class InstancedMesh extends Mesh {
@@ -1035,17 +1231,7 @@
             __classPrivateFieldSet(this, _geometry$1, geometry);
             __classPrivateFieldSet(this, _instanceExtension, getExtension(gl, 'ANGLE_instanced_arrays'));
             this.instanceCount = instanceCount;
-            const instanceMatrixLocation = this.program.getAttribLocation(INSTANCED_OFFSET_MODEL_MATRIX);
-            const identityMat = create();
-            const itemsPerInstance = 16;
-            const bytesPerMatrix = itemsPerInstance * Float32Array.BYTES_PER_ELEMENT;
-            const matrixData = new Float32Array(itemsPerInstance * instanceCount);
-            for (let i = 0; i < instanceCount; i++) {
-                for (let n = i * itemsPerInstance, j = 0; n < i * itemsPerInstance + itemsPerInstance; n++) {
-                    matrixData[n] = identityMat[j];
-                    j++;
-                }
-            }
+            // assign divisors to instanced attributes
             this.vaoExtension.bindVertexArrayOES(this.vao);
             geometry.attributes.forEach(({ instancedDivisor }, key) => {
                 if (instancedDivisor) {
@@ -1056,6 +1242,22 @@
                     __classPrivateFieldGet(this, _instanceExtension).vertexAttribDivisorANGLE(location, instancedDivisor);
                 }
             });
+            // initialize instance instanceModelMatrix attribute as identity matrix
+            const instanceMatrixLocation = this.program.getAttribLocation(INSTANCED_OFFSET_MODEL_MATRIX);
+            if (instanceMatrixLocation == null || instanceMatrixLocation === -1) {
+                console.error(`Can't query "${INSTANCED_OFFSET_MODEL_MATRIX}" mandatory instanced attribute`);
+                return this;
+            }
+            const identityMat = create();
+            const itemsPerInstance = 16;
+            const bytesPerMatrix = itemsPerInstance * Float32Array.BYTES_PER_ELEMENT;
+            const matrixData = new Float32Array(itemsPerInstance * instanceCount);
+            for (let i = 0; i < instanceCount; i++) {
+                for (let n = i * itemsPerInstance, j = 0; n < i * itemsPerInstance + itemsPerInstance; n++) {
+                    matrixData[n] = identityMat[j];
+                    j++;
+                }
+            }
             const matrixBuffer = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, matrixBuffer);
             gl.bufferData(gl.ARRAY_BUFFER, matrixData, gl.DYNAMIC_DRAW);
@@ -1075,7 +1277,6 @@
                 stride: 4 * itemsPerInstance,
                 instancedDivisor: 1,
             });
-            __classPrivateFieldSet(this, _instanceExtension, getExtension(gl, 'ANGLE_instanced_arrays'));
         }
         /**
          * @param {number} index - Instance index on which to apply the matrix
@@ -1094,9 +1295,9 @@
          * Draws the instanced mesh
          */
         draw() {
-            if (this.modelMatrixNeedsUpdate) {
-                this.updateModelMatrix();
-                this.modelMatrixNeedsUpdate = false;
+            if (this.shouldUpdate) {
+                super.updateModelMatrix();
+                this.program.setUniform(MODEL_MATRIX_UNIFORM_NAME, UNIFORM_TYPE_MATRIX4X4, this.modelMatrix);
             }
             this.program.bind();
             this.vaoExtension.bindVertexArrayOES(this.vao);
@@ -1158,7 +1359,7 @@
                 getExtension(gl, 'WEBKIT_EXT_texture_filter_anisotropic'));
         }
         /**
-         * @returns {WebGLTexture}
+         * @returns {WebGLTexture|null}
          */
         getTexture() {
             return __classPrivateFieldGet(this, _texture);
@@ -1242,8 +1443,8 @@
         /**
          * @returns {this}
          */
-        setIsFlip() {
-            this.setPixelStore(__classPrivateFieldGet(this, _gl$4).UNPACK_FLIP_Y_WEBGL, 1);
+        setIsFlip(flip = 1) {
+            this.setPixelStore(__classPrivateFieldGet(this, _gl$4).UNPACK_FLIP_Y_WEBGL, flip);
             return this;
         }
         /**
@@ -1352,7 +1553,6 @@
             const level = 0;
             const texture = this.texture.getTexture();
             __classPrivateFieldGet(this, _gl$5).framebufferTexture2D(__classPrivateFieldGet(this, _gl$5).FRAMEBUFFER, __classPrivateFieldGet(this, _gl$5).COLOR_ATTACHMENT0, __classPrivateFieldGet(this, _gl$5).TEXTURE_2D, texture, level);
-            this.unbind();
             if (__classPrivateFieldGet(this, _depth)) {
                 __classPrivateFieldSet(this, _depthBuffer, __classPrivateFieldGet(this, _gl$5).createRenderbuffer());
                 __classPrivateFieldGet(this, _gl$5).bindRenderbuffer(__classPrivateFieldGet(this, _gl$5).RENDERBUFFER, __classPrivateFieldGet(this, _depthBuffer));
@@ -1360,6 +1560,7 @@
                 __classPrivateFieldGet(this, _gl$5).framebufferRenderbuffer(__classPrivateFieldGet(this, _gl$5).FRAMEBUFFER, __classPrivateFieldGet(this, _gl$5).DEPTH_ATTACHMENT, __classPrivateFieldGet(this, _gl$5).RENDERBUFFER, __classPrivateFieldGet(this, _depthBuffer));
                 __classPrivateFieldGet(this, _gl$5).bindRenderbuffer(__classPrivateFieldGet(this, _gl$5).RENDERBUFFER, null);
             }
+            this.unbind();
             if (updateTexture) {
                 this.texture.bind().fromSize(width, height);
             }
@@ -1876,7 +2077,6 @@
     }
     OrthographicCamera.UP_VECTOR = [0, 1, 0];
 
-    // @ts-nocheck
     /**
      * @private
      */
@@ -1912,31 +2112,12 @@
             }
         }
     }
+
     /**
-     * Generates geometry data for a quad
-     * @param {PlaneInterface} params
+     * Generates geometry data for a box
+     * @param {Box} params
      * @returns {{ vertices, normal, uv, indices }}
      */
-    function createPlane(params = {}) {
-        const { width = 1, height = 1, widthSegments = 1, heightSegments = 1, } = params;
-        const wSegs = widthSegments;
-        const hSegs = heightSegments;
-        // Determine length of arrays
-        const num = (wSegs + 1) * (hSegs + 1);
-        const numIndices = wSegs * hSegs * 6;
-        // Generate empty arrays once
-        const position = new Float32Array(num * 3);
-        const normal = new Float32Array(num * 3);
-        const uv = new Float32Array(num * 2);
-        const index = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices);
-        buildPlane(position, normal, uv, index, width, height, 0, wSegs, hSegs);
-        return {
-            vertices: position,
-            normal,
-            uv,
-            indices: index,
-        };
-    }
     function createBox(params = {}) {
         const { width = 1, height = 1, depth = 1, widthSegments = 1, heightSegments = 1, depthSegments = 1, separateFaces = false, } = params;
         const wSegs = widthSegments;
@@ -2097,9 +2278,79 @@
             };
         }
     }
+
+    /**
+     * @description Generate circle geometry
+     * @param {Circle} params
+     * @returns {{ vertices, normal, uv, indices }}
+     */
+    function createCircle(params = {}) {
+        const { radius = 1, segments = 8, thetaStart = 0, thetaLength = Math.PI * 2, } = params;
+        const indices = [];
+        const vertices = [];
+        const normals = [];
+        const uvs = [];
+        // helper variables
+        const vertex = create$1();
+        const uv = create$2();
+        // center point
+        vertices.push(0, 0, 0);
+        normals.push(0, 0, 1);
+        uvs.push(0.5, 0.5);
+        for (let s = 0, i = 3; s <= segments; s++, i += 3) {
+            const segment = thetaStart + s / segments * thetaLength;
+            // vertex
+            vertex[0] = radius * Math.cos(segment);
+            vertex[1] = radius * Math.sin(segment);
+            vertices.push(...vertex);
+            // normal
+            normals.push(0, 0, 1);
+            // uvs
+            uv[0] = (vertices[i] / radius + 1) / 2;
+            uv[1] = (vertices[i + 1] / radius + 1) / 2;
+            uvs.push(uv[0], uv[1]);
+        }
+        // indices
+        for (let i = 1; i <= segments; i++) {
+            indices.push(i, i + 1, 0);
+        }
+        return {
+            indices: segments > 65536 ? new Uint32Array(indices) : new Uint16Array(indices),
+            vertices: new Float32Array(vertices),
+            normal: new Float32Array(normals),
+            uv: new Float32Array(uvs),
+        };
+    }
+
+    /**
+     * Generates geometry data for a quad
+     * @param {PlaneInterface} params
+     * @returns {{ vertices, normal, uv, indices }}
+     */
+    function createPlane(params = {}) {
+        const { width = 1, height = 1, widthSegments = 1, heightSegments = 1, } = params;
+        const wSegs = widthSegments;
+        const hSegs = heightSegments;
+        // Determine length of arrays
+        const num = (wSegs + 1) * (hSegs + 1);
+        const numIndices = wSegs * hSegs * 6;
+        // Generate empty arrays once
+        const position = new Float32Array(num * 3);
+        const normal = new Float32Array(num * 3);
+        const uv = new Float32Array(num * 2);
+        const index = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices);
+        buildPlane(position, normal, uv, index, width, height, 0, wSegs, hSegs);
+        return {
+            vertices: position,
+            normal,
+            uv,
+            indices: index,
+        };
+    }
+
     /**
      * Generates geometry data for a sphere
-     * @param {SphereInterface} params
+     * @param {Sphere} params
      * @returns {{ vertices, normal, uv, indices }}
      */
     function createSphere(params = {}) {
@@ -2174,14 +2425,85 @@
         };
     }
 
+    /**
+     * @description Generate torus geometry
+     * @param {Torus} params
+     * @returns {{ vertices, normal, uv, indices }}
+     */
+    function createTorus(params = {}) {
+        const { radius = 0.5, tube = 0.35, arc = Math.PI * 2, radialSegments: inputRadialSegments = 8, tubularSegments: inputTubularSegments = 6, } = params;
+        const radialSegments = Math.floor(inputRadialSegments);
+        const tubularSegments = Math.floor(inputTubularSegments);
+        const indices = [];
+        const vertices = [];
+        const normals = [];
+        const uvs = [];
+        const center = create$1();
+        const vertex = create$1();
+        const normal = create$1();
+        for (let j = 0; j <= radialSegments; j++) {
+            for (let i = 0; i <= tubularSegments; i++) {
+                const u = i / tubularSegments * arc;
+                const v = j / radialSegments * Math.PI * 2;
+                // vertex
+                vertex[0] = (radius + tube * Math.cos(v)) * Math.cos(u);
+                vertex[1] = (radius + tube * Math.cos(v)) * Math.sin(u);
+                vertex[2] = tube * Math.sin(v);
+                vertices.push(vertex[0], vertex[1], vertex[2]);
+                // normal
+                center[0] = radius * Math.cos(u);
+                center[1] = radius * Math.sin(u);
+                sub(normal, vertex, center);
+                normalize(normal, normal);
+                normals.push(normal[0], normal[1], normal[0]);
+                // uv
+                uvs.push(i / tubularSegments, j / radialSegments);
+            }
+        }
+        // generate indices
+        for (let j = 1; j <= radialSegments; j++) {
+            for (let i = 1; i <= tubularSegments; i++) {
+                // indices
+                const a = (tubularSegments + 1) * j + i - 1;
+                const b = (tubularSegments + 1) * (j - 1) + i - 1;
+                const c = (tubularSegments + 1) * (j - 1) + i;
+                const d = (tubularSegments + 1) * j + i;
+                // faces
+                indices.push(a, b, d);
+                indices.push(b, c, d);
+            }
+        }
+        const num = (radialSegments + 1) * (tubularSegments + 1);
+        return {
+            indices: num > 65536 ? new Uint32Array(indices) : new Uint16Array(indices),
+            vertices: new Float32Array(vertices),
+            normal: new Float32Array(normals),
+            uv: new Float32Array(uvs),
+        };
+    }
+
+    /**
+     * @namespace GeometryUtils
+     */
+    const GeometryUtils = {
+        createBox,
+        createCircle,
+        createPlane,
+        createSphere,
+        createTorus,
+    };
+
     var index = /*#__PURE__*/Object.freeze({
         __proto__: null,
-        createPlane: createPlane,
         createBox: createBox,
-        createSphere: createSphere
+        createCircle: createCircle,
+        createPlane: createPlane,
+        createSphere: createSphere,
+        createTorus: createTorus,
+        GeometryUtils: GeometryUtils
     });
 
-    var _gl$6, _framebuffers, _programs, _textures, _camera, _activeProgram;
+    var _gl$6, _framebuffers, _programs, _textures, _camera, _activeProgram, _textureType;
     class SwapRenderer {
         constructor(gl) {
             _gl$6.set(this, void 0);
@@ -2190,11 +2512,26 @@
             _textures.set(this, new Map());
             _camera.set(this, void 0);
             _activeProgram.set(this, void 0);
+            _textureType.set(this, void 0);
             __classPrivateFieldSet(this, _gl$6, gl);
             __classPrivateFieldSet(this, _camera, new OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0.1, 2));
             __classPrivateFieldGet(this, _camera).position = [0, 0, 1];
             __classPrivateFieldGet(this, _camera).lookAt([0, 0, 0]);
+            const ext = getExtension(gl, 'WEBGL_color_buffer_float');
             getExtension(gl, 'OES_texture_float');
+            if (ext) {
+                __classPrivateFieldSet(this, _textureType, gl.FLOAT);
+            }
+            else {
+                const ext = getExtension(gl, 'EXT_color_buffer_half_float');
+                const ext2 = getExtension(gl, 'OES_texture_half_float');
+                if (ext) {
+                    __classPrivateFieldSet(this, _textureType, ext2.HALF_FLOAT_OES);
+                }
+                else {
+                    __classPrivateFieldSet(this, _textureType, gl.UNSIGNED_BYTE);
+                }
+            }
         }
         getTexture(name) {
             const texture = __classPrivateFieldGet(this, _textures).get(name);
@@ -2204,9 +2541,9 @@
             __classPrivateFieldGet(this, _textures).set(name, texture);
             return this;
         }
-        createTexture(name, width, height, data, filtering = __classPrivateFieldGet(this, _gl$6).NEAREST) {
+        createTexture(name, width, height, data, filtering = __classPrivateFieldGet(this, _gl$6).NEAREST, inputType) {
             const texture = new Texture(__classPrivateFieldGet(this, _gl$6), {
-                type: __classPrivateFieldGet(this, _gl$6).FLOAT,
+                type: inputType || __classPrivateFieldGet(this, _textureType),
                 format: __classPrivateFieldGet(this, _gl$6).RGBA,
                 minFilter: filtering,
                 magFilter: filtering,
@@ -2303,7 +2640,7 @@
             return this;
         }
     }
-    _gl$6 = new WeakMap(), _framebuffers = new WeakMap(), _programs = new WeakMap(), _textures = new WeakMap(), _camera = new WeakMap(), _activeProgram = new WeakMap();
+    _gl$6 = new WeakMap(), _framebuffers = new WeakMap(), _programs = new WeakMap(), _textures = new WeakMap(), _camera = new WeakMap(), _activeProgram = new WeakMap(), _textureType = new WeakMap();
 
     exports.CameraController = CameraController;
     exports.Framebuffer = Framebuffer;
@@ -2325,6 +2662,7 @@
     exports.SwapRenderer = SwapRenderer;
     exports.TRIANGLES = TRIANGLES;
     exports.Texture = Texture;
+    exports.Transform = Transform;
     exports.UNIFORM_TYPE_FLOAT = UNIFORM_TYPE_FLOAT;
     exports.UNIFORM_TYPE_INT = UNIFORM_TYPE_INT;
     exports.UNIFORM_TYPE_MATRIX4X4 = UNIFORM_TYPE_MATRIX4X4;

@@ -1,5 +1,5 @@
 import { Mesh } from './mesh';
-import { InstancedMeshInterface } from '../types';
+import { MeshInterface } from './Mesh';
 export declare class InstancedMesh extends Mesh {
     #private;
     instanceCount: number;
@@ -14,3 +14,7 @@ export declare class InstancedMesh extends Mesh {
      */
     draw(): this;
 }
+interface InstancedMeshInterface extends MeshInterface {
+    instanceCount?: number;
+}
+export {};

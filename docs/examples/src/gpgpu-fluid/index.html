@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GPGPU Particles</title>
+  <style>
+    * { margin: 0; padding: 0; }
+    #error-log {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      font-family: monospace;
+    }
+    #info-log {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      padding: 4px 14px;
+      background: rgba(255, 255, 255, 0.82);
+      color: #111;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <div id="info-log"></div>
+  <div id="error-log"></div>
+  <script src="index.js"></script>
+</body>
+</html>
