@@ -38,8 +38,6 @@ const BOXES_ROW_Z_COUNT = 20
 const TOTAL_BOXES_COUNT = BOXES_ROW_X_COUNT * BOXES_ROW_Z_COUNT
 const DEBUG_QUAD_WIDTH = innerWidth * 0.125
 const DEBUG_QUAD_HEIGHT = innerHeight * 0.125
-const DEBUG_LABEL_WIDTH = 120
-const DEBUG_LABEL_HEIGHT = 24
 
 const CONFIG = {
   lightsCount: 12,
@@ -68,6 +66,7 @@ let fxaaMesh
 let debugPositionsMesh
 let debugNormalsMesh
 let debugUvsMesh
+let debugDepthMesh
 let webglDrawBuffersExtension
 let floatTexExtension
 let halfFloatTexExtension
@@ -438,6 +437,21 @@ const fxaaFramebuffer = new Framebuffer(gl, {
     x: accX,
     y: -innerHeight / 2 + DEBUG_QUAD_HEIGHT / 2 + 20,
   })
+
+  debugDepthMesh = new Mesh(gl, {
+    geometry,
+    defines: {
+      INCLUDE_UVS: 1,
+      IS_DEPTH_TEXTURE: 1,
+    },
+    vertexShaderSource: VERTEX_SHADER_BASE,
+    fragmentShaderSource: FRAGMENT_SHADER_BASE,
+  })
+  accX += DEBUG_QUAD_WIDTH + 10
+  debugDepthMesh.setPosition({
+    x: accX,
+    y: -innerHeight / 2 + DEBUG_QUAD_HEIGHT / 2 + 20,
+  })
 }
 
 gui
@@ -561,6 +575,10 @@ function updateFrame(ts) {
     gl.activeTexture(gl.TEXTURE0)
     textureColor.bind()
     debugUvsMesh.use().setCamera(orthoCamera).draw()
+
+    gl.activeTexture(gl.TEXTURE0)
+    depthTexture.bind()
+    debugDepthMesh.use().setCamera(orthoCamera).draw()
   }
 
   stats.end()

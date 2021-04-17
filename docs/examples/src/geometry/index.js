@@ -88,11 +88,9 @@ image.src = window.location.href.includes('github')
 
 /* --------- Circle Geometry --------- */
 {
-  const {
-    indices, vertices, uv
-  } = GeometryUtils.createCircle()
+  const { indices, vertices, uv } = GeometryUtils.createCircle()
   const geometry = new Geometry(gl)
-  
+
   geometry
     .addIndex({ typedArray: indices })
     .addAttribute('position', { typedArray: vertices, size: 3 })
@@ -110,9 +108,7 @@ image.src = window.location.href.includes('github')
 
 /* --------- Torus Geometry --------- */
 {
-  const {
-    indices, vertices, uv
-  } = GeometryUtils.createTorus()
+  const { indices, vertices, uv } = GeometryUtils.createTorus()
   const geometry = new Geometry(gl)
   geometry
     .addIndex({ typedArray: indices })
@@ -156,7 +152,7 @@ image.src = window.location.href.includes('github')
   // if (innerWidth < MOBILE_VIEWPORT) {
   //   boxMesh.setPosition({ y: -2 })
   // } else {
-    
+
   // }
 }
 
@@ -197,7 +193,7 @@ image.src = window.location.href.includes('github')
   // if (innerWidth < MOBILE_VIEWPORT) {
   //   lineMesh.setPosition({ y: -0.75 })
   // } else {
-    
+
   // }
   lineMesh.setPosition({ x: 0, z: 1 })
 }
@@ -230,7 +226,7 @@ image.src = window.location.href.includes('github')
   // if (innerWidth < MOBILE_VIEWPORT) {
   //   sphereMesh.setPosition({ y: 0.75 })
   // } else {
-    
+
   // }
   sphereMesh.setPosition({ x: 3, z: 1 })
 }
@@ -260,7 +256,7 @@ image.src = window.location.href.includes('github')
   // if (innerWidth < MOBILE_VIEWPORT) {
   //   planeMesh.setPosition({ y: 2 })
   // } else {
-    
+
   // }
   planeMesh.setPosition({ x: 3, z: -1 })
 }

@@ -2,7 +2,9 @@ precision highp float;
 
 uniform sampler2D texture;
 
-varying vec2 v_uv;
+#ifdef INCLUDE_UVS
+  varying vec2 v_uv;
+#endif
 
 #ifdef USE_FXAA
 
@@ -102,6 +104,11 @@ void main () {
     vec2 fragCoord = v_uv * resolution;
     gl_FragColor = applyFXAA(texture, fragCoord, resolution);
   #else
-    gl_FragColor = texture2D(texture, v_uv);
+    #ifdef IS_DEPTH_TEXTURE
+      vec3 depthColor = texture2D(texture, v_uv).rrr;
+      gl_FragColor = vec4(depthColor, 1.0);
+    #else
+      gl_FragColor = texture2D(texture, v_uv);
+    #endif
   #endif
 }
