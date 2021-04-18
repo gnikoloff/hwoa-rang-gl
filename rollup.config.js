@@ -9,22 +9,22 @@ const input = ['src/index.ts']
 
 export default {
   input,
-  output: process.env.EXAMPLES
-    ? {
-        file: pkg.main,
-        name: 'hwoaRangGL',
-        format: 'iife',
-        sourcemap: true,
-        file: 'docs/examples/library/index.js',
-      }
-    : [
-        { file: pkg.main, name: 'hwoaRangGL', format: 'umd', sourcemap: true },
-        { file: pkg.module, format: 'es', sourcemap: true },
-      ],
+  output: [
+    { file: pkg.main, name: 'hwoaRangGL', format: 'umd', sourcemap: true },
+    { file: pkg.module, format: 'es', sourcemap: true },
+  ],
   // Indicate here external modules you don't wanna include in your bundle (i.e.: 'lodash')
   external: [],
   watch: {
     include: 'src/**',
   },
-  plugins: [typescript(), commonjs(), nodeResolve(), sourcemaps()],
+  plugins: [
+    typescript({
+      useTsconfigDeclarationDir: true,
+      declarationDir: 'dist/src',
+    }),
+    commonjs(),
+    nodeResolve(),
+    sourcemaps(),
+  ],
 }
