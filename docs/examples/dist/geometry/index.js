@@ -2781,11 +2781,9 @@
 
 	/* --------- Circle Geometry --------- */
 	{
-	  const {
-	    indices, vertices, uv
-	  } = index.createCircle();
+	  const { indices, vertices, uv } = index.createCircle();
 	  const geometry = new Geometry(gl);
-	  
+
 	  geometry
 	    .addIndex({ typedArray: indices })
 	    .addAttribute('position', { typedArray: vertices, size: 3 })
@@ -2803,9 +2801,7 @@
 
 	/* --------- Torus Geometry --------- */
 	{
-	  const {
-	    indices, vertices, uv
-	  } = index.createTorus();
+	  const { indices, vertices, uv } = index.createTorus();
 	  const geometry = new Geometry(gl);
 	  geometry
 	    .addIndex({ typedArray: indices })
@@ -2849,7 +2845,7 @@
 	  // if (innerWidth < MOBILE_VIEWPORT) {
 	  //   boxMesh.setPosition({ y: -2 })
 	  // } else {
-	    
+
 	  // }
 	}
 
@@ -2890,7 +2886,7 @@
 	  // if (innerWidth < MOBILE_VIEWPORT) {
 	  //   lineMesh.setPosition({ y: -0.75 })
 	  // } else {
-	    
+
 	  // }
 	  lineMesh.setPosition({ x: 0, z: 1 });
 	}
@@ -2923,7 +2919,7 @@
 	  // if (innerWidth < MOBILE_VIEWPORT) {
 	  //   sphereMesh.setPosition({ y: 0.75 })
 	  // } else {
-	    
+
 	  // }
 	  sphereMesh.setPosition({ x: 3, z: 1 });
 	}
@@ -2953,7 +2949,7 @@
 	  // if (innerWidth < MOBILE_VIEWPORT) {
 	  //   planeMesh.setPosition({ y: 2 })
 	  // } else {
-	    
+
 	  // }
 	  planeMesh.setPosition({ x: 3, z: -1 });
 	}

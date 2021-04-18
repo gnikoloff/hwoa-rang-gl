@@ -6089,7 +6089,7 @@
 	    vertexShaderSource: CHECKERED_VERTEX_SHADER,
 	    fragmentShaderSource: CHECKERED_FRAGMENT_SHADER,
 	  });
-	  planeMesh.setRotation({ x: 1 }, Math.PI / 2).setPosition({ y: -1.5 });
+	  planeMesh.setRotation({ x: -Math.PI / 2 }).setPosition({ y: -1.5 });
 	}
 
 	/* ---- Cube Mesh ---- */
