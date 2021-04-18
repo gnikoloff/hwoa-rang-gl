@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Docs</title>
+  <title>hwoa-rang-gl</title>
   <style>
     :root {
       --border-color: rgba(0, 0, 0, 0.12);
@@ -38,6 +38,13 @@
     .hero-unit {
       width: 100%;
     }
+    .subheading {
+      display: flex;
+      align-items: baseline;
+    }
+    .npm-link {
+      text-decoration: none;
+    }
   </style>
 </head>
 <body>
@@ -49,12 +56,40 @@
     />
     <header class="app-header">
       <h1>hwoa-rang-gl</h1>
-      <h2>webgl library</h2>
-      <a href="https://github.com/gnikoloff/hwoa-rang-gl">Source code</a>
+      <div class="subheading">
+        <h2>webgl library</h2>&nbsp;&nbsp;&nbsp;
+        <a href="https://github.com/gnikoloff/hwoa-rang-gl">Source code</a>
+      </div>
+      <a
+        class="npm-link"
+        href="https://www.npmjs.com/package/hwoa-rang-gl"
+        target="_blank"
+      >
+        <img src="https://img.shields.io/npm/v/hwoa-rang-gl" />
+      </a>
+      <a
+        class="npm-link"
+        href="https://www.npmjs.com/package/hwoa-rang-gl"
+        target="_blank"
+      >
+        <img src="https://img.shields.io/npm/l/hwoa-rang-gl" />
+      </a>
+      <a
+        class="npm-link"
+        href="https://bundlephobia.com/result?p=hwoa-rang-gl@0.0.3"
+        target="_blank"
+      >
+        <img src="https://badgen.net/bundlephobia/minzip/hwoa-rang-gl" alt="size" />
+      </a>
+      <a
+        class="npm-link"
+      >
+        <img src="https://badgen.net/npm/types/hwoa-rang-gl" alt="size" />
+      </a>
     </header>
 
     <h3>Install</h3>
-    <code>npm i -save hwoa-rang-gl</code>
+    <code>npm i hwoa-rang-gl</code>
 
     <h3>API Documentation</h3>
     <a href="docs">hwoa-rang-gl/docs</a>
@@ -67,6 +102,9 @@
 
     <h3>Tools used</h3>
     <ul>
+      <li>
+        <a href="https://www.typescriptlang.org/">Typescript</a>
+      </li>
       <li>
         <a href="https://glmatrix.net/">glMatrix</a>
       </li>
@@ -114,5 +152,14 @@
     </ul>
 
   </article>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-194827080-3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-194827080-3');
+  </script>
 </body>
 </html>
