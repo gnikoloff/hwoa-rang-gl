@@ -38,16 +38,14 @@ export default [
     ],
   },
   ...exampleInputs.map((input) => ({
-    input: `examples-src/${input}`,
+    input: `src/${input}`,
     output: {
       dir: `dist/${input}`,
       format: 'iife',
     },
     plugins: [
       copy({
-        targets: [
-          { src: `examples-src/${input}/index.html`, dest: `dist/${input}` },
-        ],
+        targets: [{ src: `src/${input}/index.html`, dest: `dist/${input}` }],
       }),
       ...sharedPlugins,
     ],
