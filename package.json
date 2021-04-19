@@ -1,9 +1,13 @@
 {
   "name": "hwoa-rang-gl",
-  "version": "0.0.1",
-  "description": "Small webgl libary for personal needs",
+  "version": "0.0.3",
+  "description": "WebGL libary",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
+  "types": "dist/@types",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "lint": "eslint src",
     "watch": "rollup -c -w",
