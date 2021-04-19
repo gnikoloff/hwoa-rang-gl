@@ -78,7 +78,8 @@
   		group: "framebuffer",
   		children: [
   			{
-  				label: "Shadow"
+  				label: "Shadow",
+  				id: "shadow"
   			},
   			{
   				label: "Godrays",

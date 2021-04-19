@@ -88,13 +88,13 @@
 					<a name="compileshader" class="tsd-anchor"></a>
 					<h3>compile<wbr>Shader</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">compile<wbr>Shader<span class="tsd-signature-symbol">(</span>gl<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WebGLRenderingContext</span>, shaderType<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">GLenum</span>, shaderSource<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WebGLShader</span></li>
+						<li class="tsd-signature tsd-kind-icon">compile<wbr>Shader<span class="tsd-signature-symbol">(</span>gl<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WebGLRenderingContext</span>, shaderType<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">GLenum</span>, shaderSource<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WebGLShader</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/3b36800/src/utils/gl-utils.ts#L10">utils/gl-utils.ts:10</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/utils/gl-utils.ts#L10">utils/gl-utils.ts:10</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -114,7 +114,7 @@
 									<h5>shaderSource: <span class="tsd-signature-type">string</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">WebGLShader</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">WebGLShader</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -122,13 +122,13 @@
 					<a name="createbuffer" class="tsd-anchor"></a>
 					<h3>create<wbr>Buffer</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">create<wbr>Buffer<span class="tsd-signature-symbol">(</span>gl<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WebGLRenderingContext</span>, data<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Float32Array</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Float64Array</span>, usage<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">GLenum</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WebGLBuffer</span></li>
+						<li class="tsd-signature tsd-kind-icon">create<wbr>Buffer<span class="tsd-signature-symbol">(</span>gl<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WebGLRenderingContext</span>, data<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Float32Array</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Float64Array</span>, usage<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">GLenum</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WebGLBuffer</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/3b36800/src/utils/gl-utils.ts#L77">utils/gl-utils.ts:77</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/utils/gl-utils.ts#L94">utils/gl-utils.ts:94</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -151,7 +151,7 @@
 									<h5>usage: <span class="tsd-signature-type">GLenum</span><span class="tsd-signature-symbol"> = ...</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">WebGLBuffer</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">WebGLBuffer</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -159,13 +159,13 @@
 					<a name="createindexbuffer" class="tsd-anchor"></a>
 					<h3>create<wbr>Index<wbr>Buffer</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">create<wbr>Index<wbr>Buffer<span class="tsd-signature-symbol">(</span>gl<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WebGLRenderingContext</span>, indices<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Uint16Array</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Uint32Array</span>, usage<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">GLenum</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WebGLBuffer</span></li>
+						<li class="tsd-signature tsd-kind-icon">create<wbr>Index<wbr>Buffer<span class="tsd-signature-symbol">(</span>gl<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WebGLRenderingContext</span>, indices<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Uint16Array</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Uint32Array</span>, usage<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">GLenum</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WebGLBuffer</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/3b36800/src/utils/gl-utils.ts#L96">utils/gl-utils.ts:96</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/utils/gl-utils.ts#L113">utils/gl-utils.ts:113</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -185,7 +185,7 @@
 									<h5>usage: <span class="tsd-signature-type">GLenum</span><span class="tsd-signature-symbol"> = ...</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">WebGLBuffer</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">WebGLBuffer</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -193,13 +193,13 @@
 					<a name="createprogram" class="tsd-anchor"></a>
 					<h3>create<wbr>Program</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">create<wbr>Program<span class="tsd-signature-symbol">(</span>gl<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WebGLRenderingContext</span>, vertexShaderSource<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, fragmentShaderSource<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WebGLProgram</span></li>
+						<li class="tsd-signature tsd-kind-icon">create<wbr>Program<span class="tsd-signature-symbol">(</span>gl<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WebGLRenderingContext</span>, vertexShaderSource<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, fragmentShaderSource<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WebGLProgram</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/3b36800/src/utils/gl-utils.ts#L36">utils/gl-utils.ts:36</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/utils/gl-utils.ts#L40">utils/gl-utils.ts:40</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -219,7 +219,7 @@
 									<h5>fragmentShaderSource: <span class="tsd-signature-type">string</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">WebGLProgram</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">WebGLProgram</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -233,7 +233,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/3b36800/src/utils/gl-utils.ts#L113">utils/gl-utils.ts:113</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/utils/gl-utils.ts#L130">utils/gl-utils.ts:130</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -292,13 +292,34 @@
 						<a href="core_texture.html">core/texture</a>
 					</li>
 					<li class=" tsd-kind-module">
+						<a href="core_transform.html">core/transform</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="extra_swap_renderer.html">extra/swap-<wbr>renderer</a>
+					</li>
+					<li class=" tsd-kind-module">
 						<a href="geometry_utils.html">geometry-<wbr>utils</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="index.html">index</a>
+						<a href="geometry_utils_build_plane.html">geometry-<wbr>utils/build-<wbr>plane</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="types.html">types</a>
+						<a href="geometry_utils_create_box.html">geometry-<wbr>utils/create-<wbr>box</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="geometry_utils_create_circle.html">geometry-<wbr>utils/create-<wbr>circle</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="geometry_utils_create_plane.html">geometry-<wbr>utils/create-<wbr>plane</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="geometry_utils_create_sphere.html">geometry-<wbr>utils/create-<wbr>sphere</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="geometry_utils_create_torus.html">geometry-<wbr>utils/create-<wbr>torus</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="index.html">index</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="utils_gl_constants.html">utils/gl-<wbr>constants</a>
