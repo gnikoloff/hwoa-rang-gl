@@ -1857,19 +1857,22 @@
 	_gl$4 = new WeakMap(), _texture = new WeakMap(), _width = new WeakMap(), _height = new WeakMap(), _format = new WeakMap(), _internalFormat = new WeakMap(), _type = new WeakMap(), _anisotropyExtension = new WeakMap();
 	Texture.isPowerOf2 = (width, height) => isPowerOf2(width) && isPowerOf2(height);
 
-	var _gl$5, _buffer, _depthBuffer, _width$1, _height$1, _depth;
+	var _gl$5, _buffer, _depthBuffer, _width$1, _height$1, _depth, _useDepthRenderBuffer;
 	class Framebuffer {
-	    constructor(gl, { inputTexture, width = gl.canvas.width, height = gl.canvas.height, wrapS = gl.CLAMP_TO_EDGE, wrapT = gl.CLAMP_TO_EDGE, minFilter = gl.NEAREST, magFilter = gl.NEAREST, format = gl.RGBA, internalFormat = format, type = gl.UNSIGNED_BYTE, depth = true, } = {}) {
+	    constructor(gl, params = {}) {
 	        _gl$5.set(this, void 0);
 	        _buffer.set(this, void 0);
 	        _depthBuffer.set(this, void 0);
 	        _width$1.set(this, void 0);
 	        _height$1.set(this, void 0);
 	        _depth.set(this, void 0);
+	        _useDepthRenderBuffer.set(this, void 0);
+	        const { inputTexture, width = gl.canvas.width, height = gl.canvas.height, wrapS = gl.CLAMP_TO_EDGE, wrapT = gl.CLAMP_TO_EDGE, minFilter = gl.NEAREST, magFilter = gl.NEAREST, format = gl.RGBA, internalFormat = format, type = gl.UNSIGNED_BYTE, depth = true, useDepthRenderBuffer = true, } = params;
 	        __classPrivateFieldSet(this, _gl$5, gl);
 	        __classPrivateFieldSet(this, _width$1, width);
 	        __classPrivateFieldSet(this, _height$1, height);
 	        __classPrivateFieldSet(this, _depth, depth);
+	        __classPrivateFieldSet(this, _useDepthRenderBuffer, useDepthRenderBuffer);
 	        if (inputTexture) {
 	            this.texture = inputTexture;
 	        }
@@ -1903,11 +1906,28 @@
 	        const texture = this.texture.getTexture();
 	        __classPrivateFieldGet(this, _gl$5).framebufferTexture2D(__classPrivateFieldGet(this, _gl$5).FRAMEBUFFER, __classPrivateFieldGet(this, _gl$5).COLOR_ATTACHMENT0, __classPrivateFieldGet(this, _gl$5).TEXTURE_2D, texture, level);
 	        if (__classPrivateFieldGet(this, _depth)) {
-	            __classPrivateFieldSet(this, _depthBuffer, __classPrivateFieldGet(this, _gl$5).createRenderbuffer());
-	            __classPrivateFieldGet(this, _gl$5).bindRenderbuffer(__classPrivateFieldGet(this, _gl$5).RENDERBUFFER, __classPrivateFieldGet(this, _depthBuffer));
-	            __classPrivateFieldGet(this, _gl$5).renderbufferStorage(__classPrivateFieldGet(this, _gl$5).RENDERBUFFER, __classPrivateFieldGet(this, _gl$5).DEPTH_COMPONENT16, width, height);
-	            __classPrivateFieldGet(this, _gl$5).framebufferRenderbuffer(__classPrivateFieldGet(this, _gl$5).FRAMEBUFFER, __classPrivateFieldGet(this, _gl$5).DEPTH_ATTACHMENT, __classPrivateFieldGet(this, _gl$5).RENDERBUFFER, __classPrivateFieldGet(this, _depthBuffer));
-	            __classPrivateFieldGet(this, _gl$5).bindRenderbuffer(__classPrivateFieldGet(this, _gl$5).RENDERBUFFER, null);
+	            if (__classPrivateFieldGet(this, _useDepthRenderBuffer)) {
+	                __classPrivateFieldSet(this, _depthBuffer, __classPrivateFieldGet(this, _gl$5).createRenderbuffer());
+	                __classPrivateFieldGet(this, _gl$5).bindRenderbuffer(__classPrivateFieldGet(this, _gl$5).RENDERBUFFER, __classPrivateFieldGet(this, _depthBuffer));
+	                __classPrivateFieldGet(this, _gl$5).renderbufferStorage(__classPrivateFieldGet(this, _gl$5).RENDERBUFFER, __classPrivateFieldGet(this, _gl$5).DEPTH_COMPONENT16, width, height);
+	                __classPrivateFieldGet(this, _gl$5).framebufferRenderbuffer(__classPrivateFieldGet(this, _gl$5).FRAMEBUFFER, __classPrivateFieldGet(this, _gl$5).DEPTH_ATTACHMENT, __classPrivateFieldGet(this, _gl$5).RENDERBUFFER, __classPrivateFieldGet(this, _depthBuffer));
+	                __classPrivateFieldGet(this, _gl$5).bindRenderbuffer(__classPrivateFieldGet(this, _gl$5).RENDERBUFFER, null);
+	            }
+	            else {
+	                const depthTextureExt = getExtension(__classPrivateFieldGet(this, _gl$5), 'WEBGL_depth_texture');
+	                if (!depthTextureExt) {
+	                    console.error('Missing extension WEBGL_depth_texture');
+	                }
+	                this.depthTexture = new Texture(__classPrivateFieldGet(this, _gl$5), {
+	                    format: __classPrivateFieldGet(this, _gl$5).DEPTH_COMPONENT,
+	                    type: __classPrivateFieldGet(this, _gl$5).UNSIGNED_SHORT,
+	                    minFilter: __classPrivateFieldGet(this, _gl$5).LINEAR,
+	                    magFilter: __classPrivateFieldGet(this, _gl$5).LINEAR,
+	                })
+	                    .bind()
+	                    .fromSize(__classPrivateFieldGet(this, _width$1), __classPrivateFieldGet(this, _height$1));
+	                __classPrivateFieldGet(this, _gl$5).framebufferTexture2D(__classPrivateFieldGet(this, _gl$5).FRAMEBUFFER, __classPrivateFieldGet(this, _gl$5).DEPTH_ATTACHMENT, __classPrivateFieldGet(this, _gl$5).TEXTURE_2D, this.depthTexture.getTexture(), 0);
+	            }
 	        }
 	        this.unbind();
 	        if (updateTexture) {
@@ -1926,10 +1946,13 @@
 	    }
 	    delete() {
 	        this.texture.delete();
+	        if (this.depthTexture) {
+	            this.depthTexture.delete();
+	        }
 	        __classPrivateFieldGet(this, _gl$5).deleteFramebuffer(__classPrivateFieldGet(this, _buffer));
 	    }
 	}
-	_gl$5 = new WeakMap(), _buffer = new WeakMap(), _depthBuffer = new WeakMap(), _width$1 = new WeakMap(), _height$1 = new WeakMap(), _depth = new WeakMap();
+	_gl$5 = new WeakMap(), _buffer = new WeakMap(), _depthBuffer = new WeakMap(), _width$1 = new WeakMap(), _height$1 = new WeakMap(), _depth = new WeakMap(), _useDepthRenderBuffer = new WeakMap();
 
 	class DampedAction {
 	    constructor() {

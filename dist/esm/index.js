@@ -2550,14 +2550,42 @@ class SwapRenderer {
             }
         }
     }
+    /**
+     * @returns {Texture}
+     */
     getTexture(name) {
         const texture = __classPrivateFieldGet(this, _textures).get(name);
         return texture;
     }
+    /**
+     * Add external texture
+     * @param {string} name Name for referencing later
+     * @param {Texture} texture
+     * @returns {this}
+     */
     addTexture(name, texture) {
         __classPrivateFieldGet(this, _textures).set(name, texture);
         return this;
     }
+    /**
+     * Add external framebuffer
+     * @param {string} name Name for referencing later
+     * @param {Framebuffer} framebuffer
+     * @returns
+     */
+    addFramebuffer(name, framebuffer) {
+        __classPrivateFieldGet(this, _framebuffers).set(name, framebuffer);
+        return this;
+    }
+    /**
+     * @param {string} name Name for referencing later
+     * @param {number} width
+     * @param {number} height
+     * @param {Float32Array} data
+     * @param {GLenum} filtering
+     * @param {GLenum} inputType
+     * @returns {this}
+     */
     createTexture(name, width, height, data, filtering = __classPrivateFieldGet(this, _gl$6).NEAREST, inputType) {
         const texture = new Texture(__classPrivateFieldGet(this, _gl$6), {
             type: inputType || __classPrivateFieldGet(this, _textureType),
@@ -2576,10 +2604,12 @@ class SwapRenderer {
         this.addTexture(name, texture);
         return this;
     }
-    addFramebuffer(name, framebuffer) {
-        __classPrivateFieldGet(this, _framebuffers).set(name, framebuffer);
-        return this;
-    }
+    /**
+     * @param {string} name Name for referencing later
+     * @param {number} width
+     * @param {number} height
+     * @returns {this}
+     */
     createFramebuffer(name, width, height) {
         const inputTexture = __classPrivateFieldGet(this, _textures).get(name);
         const framebuffer = new Framebuffer(__classPrivateFieldGet(this, _gl$6), {
@@ -2591,6 +2621,12 @@ class SwapRenderer {
         this.addFramebuffer(name, framebuffer);
         return this;
     }
+    /**
+     * @param {string} programName
+     * @param {string} vertexShaderSource
+     * @param {string} fragmentShaderSource
+     * @returns {this}
+     */
     createProgram(programName, vertexShaderSource, fragmentShaderSource) {
         const { indices, vertices, uv } = createPlane();
         const geometry = new Geometry(__classPrivateFieldGet(this, _gl$6));
@@ -2606,19 +2642,43 @@ class SwapRenderer {
         __classPrivateFieldGet(this, _programs).set(programName, mesh);
         return this;
     }
+    /**
+     * Binds a program for use
+     * @param {string} programName
+     * @returns {this}
+     */
     useProgram(programName) {
         __classPrivateFieldSet(this, _activeProgram, __classPrivateFieldGet(this, _programs).get(programName));
         __classPrivateFieldGet(this, _activeProgram).use();
         return this;
     }
+    /**
+     * Sets a uniform to the active program
+     * @param {string} uniformName
+     * @param {string} uniformType
+     * @param {string} uniformValue
+     * @returns {this}
+     */
     setUniform(uniformName, uniformType, uniformValue) {
         __classPrivateFieldGet(this, _activeProgram).setUniform(uniformName, uniformType, uniformValue);
         return this;
     }
+    /**
+     * Set gl viewport size
+     * @param {number} width
+     * @param {number} height
+     * @returns {this}
+     */
     setSize(width, height) {
         __classPrivateFieldGet(this, _gl$6).viewport(0, 0, width, height);
         return this;
     }
+    /**
+     * Renders a program with specific inputs to output framebuffer
+     * @param {String[]} inputNameArr - Name of input framebuffers
+     * @param outputName - Name of output framebuffer. "null" to render to device screen
+     * @returns
+     */
     run(inputNameArr, outputName) {
         let framebuffer;
         if (outputName) {
@@ -2640,6 +2700,12 @@ class SwapRenderer {
         }
         return this;
     }
+    /**
+     * Swap programs
+     * @param {string} name1
+     * @param {string} name2
+     * @returns {this}
+     */
     swap(name1, name2) {
         const tex1 = __classPrivateFieldGet(this, _textures).get(name1);
         const tex2 = __classPrivateFieldGet(this, _textures).get(name2);
@@ -2651,9 +2717,24 @@ class SwapRenderer {
         __classPrivateFieldGet(this, _framebuffers).set(name2, fbo1);
         return this;
     }
+    /**
+     * @returns {this}
+     */
     reset() {
         __classPrivateFieldGet(this, _framebuffers).clear();
         __classPrivateFieldGet(this, _programs).clear();
+        return this;
+    }
+    /**
+     * @returns {this}
+     */
+    delete() {
+        for (const framebuffer of Object.values(__classPrivateFieldGet(this, _framebuffers))) {
+            framebuffer.delete();
+        }
+        for (const program of Object.values(__classPrivateFieldGet(this, _programs))) {
+            program.delete();
+        }
         return this;
     }
 }

@@ -5847,16 +5847,16 @@
 	const STEP_VAL = 0.05;
 
 	const OPTIONS = {
-	  posX: 0.55,
-	  posY: -1.4,
-	  posZ: -8.8,
-	  targetX: -1.4,
-	  targetY: -20,
-	  targetZ: 3.5,
+	  posX: 1.15,
+	  posY: 7.3,
+	  posZ: -4.4,
+	  targetX: -3.7,
+	  targetY: -11,
+	  targetZ: 13,
 	  projectionScaleX: 1.3,
 	  projectionScaleY: 1.3,
 	  perspective: true,
-	  fieldOfView: 18.25,
+	  fieldOfView: 18.1,
 	};
 
 	const stats = new stats_min();
@@ -5896,6 +5896,7 @@
 	  set(projectionTarget, targetX, targetY, targetZ);
 
 	  lookAt(textureWorldMatrix, projectionPos, projectionTarget, UP_VECTOR);
+	  invert(textureWorldMatrix, textureWorldMatrix);
 
 	  const near = 0.1;
 	  const far = 200;
@@ -6017,7 +6018,7 @@
 	  0.1,
 	  100,
 	);
-	camera.position = [-7.9, 7.26, -13.1];
+	camera.position = [-4.9, 8, -16.45];
 	camera.lookAt([0, 0, 0]);
 
 	new CameraController(camera, canvas);

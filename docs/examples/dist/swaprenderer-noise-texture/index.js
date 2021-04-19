@@ -1741,19 +1741,22 @@
 	_gl$4 = new WeakMap(), _texture = new WeakMap(), _width = new WeakMap(), _height = new WeakMap(), _format = new WeakMap(), _internalFormat = new WeakMap(), _type = new WeakMap(), _anisotropyExtension = new WeakMap();
 	Texture.isPowerOf2 = (width, height) => isPowerOf2(width) && isPowerOf2(height);
 
-	var _gl$5, _buffer, _depthBuffer, _width$1, _height$1, _depth;
+	var _gl$5, _buffer, _depthBuffer, _width$1, _height$1, _depth, _useDepthRenderBuffer;
 	class Framebuffer {
-	    constructor(gl, { inputTexture, width = gl.canvas.width, height = gl.canvas.height, wrapS = gl.CLAMP_TO_EDGE, wrapT = gl.CLAMP_TO_EDGE, minFilter = gl.NEAREST, magFilter = gl.NEAREST, format = gl.RGBA, internalFormat = format, type = gl.UNSIGNED_BYTE, depth = true, } = {}) {
+	    constructor(gl, params = {}) {
 	        _gl$5.set(this, void 0);
 	        _buffer.set(this, void 0);
 	        _depthBuffer.set(this, void 0);
 	        _width$1.set(this, void 0);
 	        _height$1.set(this, void 0);
 	        _depth.set(this, void 0);
+	        _useDepthRenderBuffer.set(this, void 0);
+	        const { inputTexture, width = gl.canvas.width, height = gl.canvas.height, wrapS = gl.CLAMP_TO_EDGE, wrapT = gl.CLAMP_TO_EDGE, minFilter = gl.NEAREST, magFilter = gl.NEAREST, format = gl.RGBA, internalFormat = format, type = gl.UNSIGNED_BYTE, depth = true, useDepthRenderBuffer = true, } = params;
 	        __classPrivateFieldSet(this, _gl$5, gl);
 	        __classPrivateFieldSet(this, _width$1, width);
 	        __classPrivateFieldSet(this, _height$1, height);
 	        __classPrivateFieldSet(this, _depth, depth);
+	        __classPrivateFieldSet(this, _useDepthRenderBuffer, useDepthRenderBuffer);
 	        if (inputTexture) {
 	            this.texture = inputTexture;
 	        }
@@ -1787,11 +1790,28 @@
 	        const texture = this.texture.getTexture();
 	        __classPrivateFieldGet(this, _gl$5).framebufferTexture2D(__classPrivateFieldGet(this, _gl$5).FRAMEBUFFER, __classPrivateFieldGet(this, _gl$5).COLOR_ATTACHMENT0, __classPrivateFieldGet(this, _gl$5).TEXTURE_2D, texture, level);
 	        if (__classPrivateFieldGet(this, _depth)) {
-	            __classPrivateFieldSet(this, _depthBuffer, __classPrivateFieldGet(this, _gl$5).createRenderbuffer());
-	            __classPrivateFieldGet(this, _gl$5).bindRenderbuffer(__classPrivateFieldGet(this, _gl$5).RENDERBUFFER, __classPrivateFieldGet(this, _depthBuffer));
-	            __classPrivateFieldGet(this, _gl$5).renderbufferStorage(__classPrivateFieldGet(this, _gl$5).RENDERBUFFER, __classPrivateFieldGet(this, _gl$5).DEPTH_COMPONENT16, width, height);
-	            __classPrivateFieldGet(this, _gl$5).framebufferRenderbuffer(__classPrivateFieldGet(this, _gl$5).FRAMEBUFFER, __classPrivateFieldGet(this, _gl$5).DEPTH_ATTACHMENT, __classPrivateFieldGet(this, _gl$5).RENDERBUFFER, __classPrivateFieldGet(this, _depthBuffer));
-	            __classPrivateFieldGet(this, _gl$5).bindRenderbuffer(__classPrivateFieldGet(this, _gl$5).RENDERBUFFER, null);
+	            if (__classPrivateFieldGet(this, _useDepthRenderBuffer)) {
+	                __classPrivateFieldSet(this, _depthBuffer, __classPrivateFieldGet(this, _gl$5).createRenderbuffer());
+	                __classPrivateFieldGet(this, _gl$5).bindRenderbuffer(__classPrivateFieldGet(this, _gl$5).RENDERBUFFER, __classPrivateFieldGet(this, _depthBuffer));
+	                __classPrivateFieldGet(this, _gl$5).renderbufferStorage(__classPrivateFieldGet(this, _gl$5).RENDERBUFFER, __classPrivateFieldGet(this, _gl$5).DEPTH_COMPONENT16, width, height);
+	                __classPrivateFieldGet(this, _gl$5).framebufferRenderbuffer(__classPrivateFieldGet(this, _gl$5).FRAMEBUFFER, __classPrivateFieldGet(this, _gl$5).DEPTH_ATTACHMENT, __classPrivateFieldGet(this, _gl$5).RENDERBUFFER, __classPrivateFieldGet(this, _depthBuffer));
+	                __classPrivateFieldGet(this, _gl$5).bindRenderbuffer(__classPrivateFieldGet(this, _gl$5).RENDERBUFFER, null);
+	            }
+	            else {
+	                const depthTextureExt = getExtension(__classPrivateFieldGet(this, _gl$5), 'WEBGL_depth_texture');
+	                if (!depthTextureExt) {
+	                    console.error('Missing extension WEBGL_depth_texture');
+	                }
+	                this.depthTexture = new Texture(__classPrivateFieldGet(this, _gl$5), {
+	                    format: __classPrivateFieldGet(this, _gl$5).DEPTH_COMPONENT,
+	                    type: __classPrivateFieldGet(this, _gl$5).UNSIGNED_SHORT,
+	                    minFilter: __classPrivateFieldGet(this, _gl$5).LINEAR,
+	                    magFilter: __classPrivateFieldGet(this, _gl$5).LINEAR,
+	                })
+	                    .bind()
+	                    .fromSize(__classPrivateFieldGet(this, _width$1), __classPrivateFieldGet(this, _height$1));
+	                __classPrivateFieldGet(this, _gl$5).framebufferTexture2D(__classPrivateFieldGet(this, _gl$5).FRAMEBUFFER, __classPrivateFieldGet(this, _gl$5).DEPTH_ATTACHMENT, __classPrivateFieldGet(this, _gl$5).TEXTURE_2D, this.depthTexture.getTexture(), 0);
+	            }
 	        }
 	        this.unbind();
 	        if (updateTexture) {
@@ -1810,10 +1830,13 @@
 	    }
 	    delete() {
 	        this.texture.delete();
+	        if (this.depthTexture) {
+	            this.depthTexture.delete();
+	        }
 	        __classPrivateFieldGet(this, _gl$5).deleteFramebuffer(__classPrivateFieldGet(this, _buffer));
 	    }
 	}
-	_gl$5 = new WeakMap(), _buffer = new WeakMap(), _depthBuffer = new WeakMap(), _width$1 = new WeakMap(), _height$1 = new WeakMap(), _depth = new WeakMap();
+	_gl$5 = new WeakMap(), _buffer = new WeakMap(), _depthBuffer = new WeakMap(), _width$1 = new WeakMap(), _height$1 = new WeakMap(), _depth = new WeakMap(), _useDepthRenderBuffer = new WeakMap();
 
 	class OrthographicCamera {
 	    constructor(left, right, top, bottom, near, far) {
@@ -1944,14 +1967,42 @@
 	            }
 	        }
 	    }
+	    /**
+	     * @returns {Texture}
+	     */
 	    getTexture(name) {
 	        const texture = __classPrivateFieldGet(this, _textures).get(name);
 	        return texture;
 	    }
+	    /**
+	     * Add external texture
+	     * @param {string} name Name for referencing later
+	     * @param {Texture} texture
+	     * @returns {this}
+	     */
 	    addTexture(name, texture) {
 	        __classPrivateFieldGet(this, _textures).set(name, texture);
 	        return this;
 	    }
+	    /**
+	     * Add external framebuffer
+	     * @param {string} name Name for referencing later
+	     * @param {Framebuffer} framebuffer
+	     * @returns
+	     */
+	    addFramebuffer(name, framebuffer) {
+	        __classPrivateFieldGet(this, _framebuffers).set(name, framebuffer);
+	        return this;
+	    }
+	    /**
+	     * @param {string} name Name for referencing later
+	     * @param {number} width
+	     * @param {number} height
+	     * @param {Float32Array} data
+	     * @param {GLenum} filtering
+	     * @param {GLenum} inputType
+	     * @returns {this}
+	     */
 	    createTexture(name, width, height, data, filtering = __classPrivateFieldGet(this, _gl$6).NEAREST, inputType) {
 	        const texture = new Texture(__classPrivateFieldGet(this, _gl$6), {
 	            type: inputType || __classPrivateFieldGet(this, _textureType),
@@ -1970,10 +2021,12 @@
 	        this.addTexture(name, texture);
 	        return this;
 	    }
-	    addFramebuffer(name, framebuffer) {
-	        __classPrivateFieldGet(this, _framebuffers).set(name, framebuffer);
-	        return this;
-	    }
+	    /**
+	     * @param {string} name Name for referencing later
+	     * @param {number} width
+	     * @param {number} height
+	     * @returns {this}
+	     */
 	    createFramebuffer(name, width, height) {
 	        const inputTexture = __classPrivateFieldGet(this, _textures).get(name);
 	        const framebuffer = new Framebuffer(__classPrivateFieldGet(this, _gl$6), {
@@ -1985,6 +2038,12 @@
 	        this.addFramebuffer(name, framebuffer);
 	        return this;
 	    }
+	    /**
+	     * @param {string} programName
+	     * @param {string} vertexShaderSource
+	     * @param {string} fragmentShaderSource
+	     * @returns {this}
+	     */
 	    createProgram(programName, vertexShaderSource, fragmentShaderSource) {
 	        const { indices, vertices, uv } = createPlane();
 	        const geometry = new Geometry(__classPrivateFieldGet(this, _gl$6));
@@ -2000,19 +2059,43 @@
 	        __classPrivateFieldGet(this, _programs).set(programName, mesh);
 	        return this;
 	    }
+	    /**
+	     * Binds a program for use
+	     * @param {string} programName
+	     * @returns {this}
+	     */
 	    useProgram(programName) {
 	        __classPrivateFieldSet(this, _activeProgram, __classPrivateFieldGet(this, _programs).get(programName));
 	        __classPrivateFieldGet(this, _activeProgram).use();
 	        return this;
 	    }
+	    /**
+	     * Sets a uniform to the active program
+	     * @param {string} uniformName
+	     * @param {string} uniformType
+	     * @param {string} uniformValue
+	     * @returns {this}
+	     */
 	    setUniform(uniformName, uniformType, uniformValue) {
 	        __classPrivateFieldGet(this, _activeProgram).setUniform(uniformName, uniformType, uniformValue);
 	        return this;
 	    }
+	    /**
+	     * Set gl viewport size
+	     * @param {number} width
+	     * @param {number} height
+	     * @returns {this}
+	     */
 	    setSize(width, height) {
 	        __classPrivateFieldGet(this, _gl$6).viewport(0, 0, width, height);
 	        return this;
 	    }
+	    /**
+	     * Renders a program with specific inputs to output framebuffer
+	     * @param {String[]} inputNameArr - Name of input framebuffers
+	     * @param outputName - Name of output framebuffer. "null" to render to device screen
+	     * @returns
+	     */
 	    run(inputNameArr, outputName) {
 	        let framebuffer;
 	        if (outputName) {
@@ -2034,6 +2117,12 @@
 	        }
 	        return this;
 	    }
+	    /**
+	     * Swap programs
+	     * @param {string} name1
+	     * @param {string} name2
+	     * @returns {this}
+	     */
 	    swap(name1, name2) {
 	        const tex1 = __classPrivateFieldGet(this, _textures).get(name1);
 	        const tex2 = __classPrivateFieldGet(this, _textures).get(name2);
@@ -2045,9 +2134,24 @@
 	        __classPrivateFieldGet(this, _framebuffers).set(name2, fbo1);
 	        return this;
 	    }
+	    /**
+	     * @returns {this}
+	     */
 	    reset() {
 	        __classPrivateFieldGet(this, _framebuffers).clear();
 	        __classPrivateFieldGet(this, _programs).clear();
+	        return this;
+	    }
+	    /**
+	     * @returns {this}
+	     */
+	    delete() {
+	        for (const framebuffer of Object.values(__classPrivateFieldGet(this, _framebuffers))) {
+	            framebuffer.delete();
+	        }
+	        for (const program of Object.values(__classPrivateFieldGet(this, _programs))) {
+	            program.delete();
+	        }
 	        return this;
 	    }
 	}
