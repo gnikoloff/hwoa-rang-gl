@@ -2,15 +2,17 @@
 
 # hwoa-rang-gl
 
-### Lightweight WebGL Library
-
-[Source code](https://github.com/gnikoloff/hwoa-rang-gl)
+### Lightweight WebGL Library written in Typescript
 
 [![](https://img.shields.io/npm/v/hwoa-rang-gl)](https://www.npmjs.com/package/hwoa-rang-gl) [![](https://img.shields.io/npm/l/hwoa-rang-gl) ](https://www.npmjs.com/package/hwoa-rang-gl) [![size](https://badgen.net/bundlephobia/minzip/hwoa-rang-gl)](https://bundlephobia.com/result?p=hwoa-rang-gl@0.0.3) ![size](https://badgen.net/npm/types/hwoa-rang-gl)
 
 ### Install
 
 `npm i hwoa-rang-gl`
+
+### Source code
+
+[hwoa-rang-gl/source](https://github.com/gnikoloff/hwoa-rang-gl)
 
 ### API Documentation
 

@@ -42,6 +42,9 @@ export class SwapRenderer {
     }
   }
 
+  /**
+   * @returns {Texture}
+   */
   getTexture(name: string): Texture {
     const texture = this.#textures.get(name)
     if (!texture) {
@@ -50,11 +53,37 @@ export class SwapRenderer {
     return texture
   }
 
+  /**
+   * Add external texture
+   * @param {string} name Name for referencing later
+   * @param {Texture} texture
+   * @returns {this}
+   */
   addTexture(name: string, texture: Texture): this {
     this.#textures.set(name, texture)
     return this
   }
 
+  /**
+   * Add external framebuffer
+   * @param {string} name Name for referencing later
+   * @param {Framebuffer} framebuffer
+   * @returns
+   */
+  addFramebuffer(name: string, framebuffer: Framebuffer): this {
+    this.#framebuffers.set(name, framebuffer)
+    return this
+  }
+
+  /**
+   * @param {string} name Name for referencing later
+   * @param {number} width
+   * @param {number} height
+   * @param {Float32Array} data
+   * @param {GLenum} filtering
+   * @param {GLenum} inputType
+   * @returns {this}
+   */
   createTexture(
     name: string,
     width: number,
@@ -80,11 +109,12 @@ export class SwapRenderer {
     return this
   }
 
-  addFramebuffer(name: string, framebuffer: Framebuffer): this {
-    this.#framebuffers.set(name, framebuffer)
-    return this
-  }
-
+  /**
+   * @param {string} name Name for referencing later
+   * @param {number} width
+   * @param {number} height
+   * @returns {this}
+   */
   createFramebuffer(name: string, width: number, height: number): this {
     const inputTexture = this.#textures.get(name)
     const framebuffer = new Framebuffer(this.#gl, {
@@ -97,6 +127,12 @@ export class SwapRenderer {
     return this
   }
 
+  /**
+   * @param {string} programName
+   * @param {string} vertexShaderSource
+   * @param {string} fragmentShaderSource
+   * @returns {this}
+   */
   createProgram(
     programName: string,
     vertexShaderSource: string,
@@ -118,12 +154,24 @@ export class SwapRenderer {
     return this
   }
 
+  /**
+   * Binds a program for use
+   * @param {string} programName
+   * @returns {this}
+   */
   useProgram(programName: string): this {
     this.#activeProgram = this.#programs.get(programName)
     this.#activeProgram.use()
     return this
   }
 
+  /**
+   * Sets a uniform to the active program
+   * @param {string} uniformName
+   * @param {string} uniformType
+   * @param {string} uniformValue
+   * @returns {this}
+   */
   setUniform(
     uniformName: string,
     uniformType: UniformType,
@@ -133,11 +181,23 @@ export class SwapRenderer {
     return this
   }
 
+  /**
+   * Set gl viewport size
+   * @param {number} width
+   * @param {number} height
+   * @returns {this}
+   */
   setSize(width: number, height: number): this {
     this.#gl.viewport(0, 0, width, height)
     return this
   }
 
+  /**
+   * Renders a program with specific inputs to output framebuffer
+   * @param {String[]} inputNameArr - Name of input framebuffers
+   * @param outputName - Name of output framebuffer. "null" to render to device screen
+   * @returns
+   */
   run(inputNameArr: string[], outputName: string): this {
     let framebuffer
     if (outputName) {
@@ -160,6 +220,12 @@ export class SwapRenderer {
     return this
   }
 
+  /**
+   * Swap programs
+   * @param {string} name1
+   * @param {string} name2
+   * @returns {this}
+   */
   swap(name1: string, name2: string): this {
     const tex1 = this.#textures.get(name1)
     const tex2 = this.#textures.get(name2)
@@ -174,9 +240,25 @@ export class SwapRenderer {
     return this
   }
 
+  /**
+   * @returns {this}
+   */
   reset(): this {
     this.#framebuffers.clear()
     this.#programs.clear()
+    return this
+  }
+
+  /**
+   * @returns {this}
+   */
+  delete(): this {
+    for (const framebuffer of Object.values(this.#framebuffers)) {
+      framebuffer.delete()
+    }
+    for (const program of Object.values(this.#programs)) {
+      program.delete()
+    }
     return this
   }
 }
