@@ -99,14 +99,26 @@ uniform sampler2D texture;
 
 #endif
 
+
+#ifdef IS_DEPTH_TEXTURE
+  const float near_plane = 0.1;
+  const float far_plane = 100.0;
+
+  float LinearizeDepth(float depth) {
+    float z = depth * 2.0 - 1.0; // Back to NDC 
+    return (2.0 * near_plane * far_plane) / (far_plane + near_plane - z * (far_plane - near_plane));
+  }
+#endif
+
 void main () {
   #ifdef USE_FXAA
     vec2 fragCoord = v_uv * resolution;
     gl_FragColor = applyFXAA(texture, fragCoord, resolution);
   #else
     #ifdef IS_DEPTH_TEXTURE
-      vec3 depthColor = texture2D(texture, v_uv).rrr;
-      gl_FragColor = vec4(depthColor, 1.0);
+      float depthValue = texture2D(texture, v_uv).r;
+      float debugDepth = LinearizeDepth(depthValue) / far_plane;
+      gl_FragColor = vec4(vec3(debugDepth), 1.0);
     #else
       gl_FragColor = texture2D(texture, v_uv);
     #endif
