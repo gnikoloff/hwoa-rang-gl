@@ -26,12 +26,19 @@ export class InstancedMesh extends Mesh {
     {
       geometry,
       uniforms,
+      defines,
       instanceCount = 1,
       vertexShaderSource,
       fragmentShaderSource,
     }: InstancedMeshInterface,
   ) {
-    super(gl, { geometry, uniforms, vertexShaderSource, fragmentShaderSource })
+    super(gl, {
+      geometry,
+      uniforms,
+      defines,
+      vertexShaderSource,
+      fragmentShaderSource,
+    })
 
     this.#gl = gl
     this.#geometry = geometry
