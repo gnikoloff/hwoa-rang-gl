@@ -40,9 +40,6 @@
         "id": "multi-texture"
       },
       {
-        "label": "Enviornment Map"
-      },
-      {
         "label": "Projection Mapping",
         "id": "projection-mapping"
       }
