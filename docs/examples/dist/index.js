@@ -43,9 +43,6 @@
   				id: "multi-texture"
   			},
   			{
-  				label: "Enviornment Map"
-  			},
-  			{
   				label: "Projection Mapping",
   				id: "projection-mapping"
   			}
@@ -70,6 +67,10 @@
   			{
   				label: "Deferred Shading",
   				id: "deferred-shading"
+  			},
+  			{
+  				label: "Shadow Map",
+  				id: "shadow"
   			}
   		]
   	},
@@ -77,10 +78,6 @@
   		label: "Framebuffer",
   		group: "framebuffer",
   		children: [
-  			{
-  				label: "Shadow",
-  				id: "shadow"
-  			},
   			{
   				label: "Godrays",
   				id: "godrays"

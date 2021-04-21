@@ -115,6 +115,7 @@
 	    if (gl.getProgramParameter(program, gl.LINK_STATUS)) {
 	        return program;
 	    }
+	    console.error('Error linking program', gl.getProgramInfoLog(program));
 	    gl.deleteProgram(program);
 	    return null;
 	}
@@ -1364,7 +1365,7 @@
 	                }
 	                this.depthTexture = new Texture(__classPrivateFieldGet(this, _gl$5), {
 	                    format: __classPrivateFieldGet(this, _gl$5).DEPTH_COMPONENT,
-	                    type: __classPrivateFieldGet(this, _gl$5).UNSIGNED_SHORT,
+	                    type: __classPrivateFieldGet(this, _gl$5).UNSIGNED_INT,
 	                    minFilter: __classPrivateFieldGet(this, _gl$5).LINEAR,
 	                    magFilter: __classPrivateFieldGet(this, _gl$5).LINEAR,
 	                })

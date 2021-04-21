@@ -2837,41 +2837,6 @@
 	  return out;
 	}
 	/**
-	 * Generates a orthogonal projection matrix with the given bounds
-	 *
-	 * @param {mat4} out mat4 frustum matrix will be written into
-	 * @param {number} left Left bound of the frustum
-	 * @param {number} right Right bound of the frustum
-	 * @param {number} bottom Bottom bound of the frustum
-	 * @param {number} top Top bound of the frustum
-	 * @param {number} near Near bound of the frustum
-	 * @param {number} far Far bound of the frustum
-	 * @returns {mat4} out
-	 */
-
-	function ortho(out, left, right, bottom, top, near, far) {
-	  var lr = 1 / (left - right);
-	  var bt = 1 / (bottom - top);
-	  var nf = 1 / (near - far);
-	  out[0] = -2 * lr;
-	  out[1] = 0;
-	  out[2] = 0;
-	  out[3] = 0;
-	  out[4] = 0;
-	  out[5] = -2 * bt;
-	  out[6] = 0;
-	  out[7] = 0;
-	  out[8] = 0;
-	  out[9] = 0;
-	  out[10] = 2 * nf;
-	  out[11] = 0;
-	  out[12] = (left + right) * lr;
-	  out[13] = (top + bottom) * bt;
-	  out[14] = (far + near) * nf;
-	  out[15] = 1;
-	  return out;
-	}
-	/**
 	 * Generates a look-at matrix with the given eye position, focal point, and up axis.
 	 * If you want a matrix that actually makes an object look at another object, you should use targetTo instead.
 	 *
@@ -2982,6 +2947,22 @@
 	    out[2] = 0;
 	  }
 
+	  return out;
+	}
+	/**
+	 * Creates a new vec3 initialized with the given values
+	 *
+	 * @param {Number} x X component
+	 * @param {Number} y Y component
+	 * @param {Number} z Z component
+	 * @returns {vec3} a new 3D vector
+	 */
+
+	function fromValues(x, y, z) {
+	  var out = new ARRAY_TYPE(3);
+	  out[0] = x;
+	  out[1] = y;
+	  out[2] = z;
 	  return out;
 	}
 	/**
@@ -3522,6 +3503,7 @@
 
 	const INDEX_ATTRIB_NAME = 'index';
 	const POSITION_ATTRIB_NAME = 'position';
+	const INSTANCED_OFFSET_MODEL_MATRIX = 'instanceModelMatrix';
 
 	const UNIFORM_TYPE_INT = 'int';
 	const UNIFORM_TYPE_FLOAT = 'float';
@@ -3590,6 +3572,7 @@
 	    if (gl.getProgramParameter(program, gl.LINK_STATUS)) {
 	        return program;
 	    }
+	    console.error('Error linking program', gl.getProgramInfoLog(program));
 	    gl.deleteProgram(program);
 	    return null;
 	}
@@ -4163,6 +4146,41 @@
 	  return out;
 	}
 	/**
+	 * Generates a orthogonal projection matrix with the given bounds
+	 *
+	 * @param {mat4} out mat4 frustum matrix will be written into
+	 * @param {number} left Left bound of the frustum
+	 * @param {number} right Right bound of the frustum
+	 * @param {number} bottom Bottom bound of the frustum
+	 * @param {number} top Top bound of the frustum
+	 * @param {number} near Near bound of the frustum
+	 * @param {number} far Far bound of the frustum
+	 * @returns {mat4} out
+	 */
+
+	function ortho(out, left, right, bottom, top, near, far) {
+	  var lr = 1 / (left - right);
+	  var bt = 1 / (bottom - top);
+	  var nf = 1 / (near - far);
+	  out[0] = -2 * lr;
+	  out[1] = 0;
+	  out[2] = 0;
+	  out[3] = 0;
+	  out[4] = 0;
+	  out[5] = -2 * bt;
+	  out[6] = 0;
+	  out[7] = 0;
+	  out[8] = 0;
+	  out[9] = 0;
+	  out[10] = 2 * nf;
+	  out[11] = 0;
+	  out[12] = (left + right) * lr;
+	  out[13] = (top + bottom) * bt;
+	  out[14] = (far + near) * nf;
+	  out[15] = 1;
+	  return out;
+	}
+	/**
 	 * Generates a look-at matrix with the given eye position, focal point, and up axis.
 	 * If you want a matrix that actually makes an object look at another object, you should use targetTo instead.
 	 *
@@ -4278,7 +4296,7 @@
 	 * @returns {vec3} a new 3D vector
 	 */
 
-	function fromValues(x, y, z) {
+	function fromValues$1(x, y, z) {
 	  var out = new ARRAY_TYPE$1(3);
 	  out[0] = x;
 	  out[1] = y;
@@ -4485,9 +4503,9 @@
 	 */
 	class Transform {
 	    constructor() {
-	        this.position = fromValues(0, 0, 0);
-	        this.rotation = fromValues(0, 0, 0);
-	        this.scale = fromValues(1, 1, 1);
+	        this.position = fromValues$1(0, 0, 0);
+	        this.rotation = fromValues$1(0, 0, 0);
+	        this.scale = fromValues$1(1, 1, 1);
 	        this.modelMatrix = create$2();
 	        this.shouldUpdate = false;
 	    }
@@ -4661,6 +4679,106 @@
 	    }
 	}
 	_gl$2 = new WeakMap(), _geometry = new WeakMap();
+
+	var _geometry$1, _gl$3, _instanceAttributes, _instanceExtension;
+	class InstancedMesh extends Mesh {
+	    constructor(gl, { geometry, uniforms, defines, instanceCount = 1, vertexShaderSource, fragmentShaderSource, }) {
+	        super(gl, {
+	            geometry,
+	            uniforms,
+	            defines,
+	            vertexShaderSource,
+	            fragmentShaderSource,
+	        });
+	        _geometry$1.set(this, void 0);
+	        _gl$3.set(this, void 0);
+	        _instanceAttributes.set(this, new Map());
+	        _instanceExtension.set(this, void 0);
+	        __classPrivateFieldSet(this, _gl$3, gl);
+	        __classPrivateFieldSet(this, _geometry$1, geometry);
+	        __classPrivateFieldSet(this, _instanceExtension, getExtension(gl, 'ANGLE_instanced_arrays'));
+	        this.instanceCount = instanceCount;
+	        // assign divisors to instanced attributes
+	        this.vaoExtension.bindVertexArrayOES(this.vao);
+	        geometry.attributes.forEach(({ instancedDivisor }, key) => {
+	            if (instancedDivisor) {
+	                const location = this.program.getAttribLocation(key);
+	                if (location === -1) {
+	                    return;
+	                }
+	                __classPrivateFieldGet(this, _instanceExtension).vertexAttribDivisorANGLE(location, instancedDivisor);
+	            }
+	        });
+	        // initialize instance instanceModelMatrix attribute as identity matrix
+	        const instanceMatrixLocation = this.program.getAttribLocation(INSTANCED_OFFSET_MODEL_MATRIX);
+	        if (instanceMatrixLocation == null || instanceMatrixLocation === -1) {
+	            console.error(`Can't query "${INSTANCED_OFFSET_MODEL_MATRIX}" mandatory instanced attribute`);
+	            return this;
+	        }
+	        const identityMat = create$2();
+	        const itemsPerInstance = 16;
+	        const bytesPerMatrix = itemsPerInstance * Float32Array.BYTES_PER_ELEMENT;
+	        const matrixData = new Float32Array(itemsPerInstance * instanceCount);
+	        for (let i = 0; i < instanceCount; i++) {
+	            for (let n = i * itemsPerInstance, j = 0; n < i * itemsPerInstance + itemsPerInstance; n++) {
+	                matrixData[n] = identityMat[j];
+	                j++;
+	            }
+	        }
+	        const matrixBuffer = gl.createBuffer();
+	        gl.bindBuffer(gl.ARRAY_BUFFER, matrixBuffer);
+	        gl.bufferData(gl.ARRAY_BUFFER, matrixData, gl.DYNAMIC_DRAW);
+	        for (let i = 0; i < 4; i++) {
+	            const location = instanceMatrixLocation + i;
+	            gl.enableVertexAttribArray(location);
+	            const offset = i * itemsPerInstance;
+	            gl.vertexAttribPointer(location, 4, gl.FLOAT, false, bytesPerMatrix, offset);
+	            __classPrivateFieldGet(this, _instanceExtension).vertexAttribDivisorANGLE(location, 1);
+	        }
+	        this.vaoExtension.bindVertexArrayOES(null);
+	        __classPrivateFieldGet(this, _instanceAttributes).set(INSTANCED_OFFSET_MODEL_MATRIX, {
+	            location: instanceMatrixLocation,
+	            typedArray: matrixData,
+	            buffer: matrixBuffer,
+	            size: 4,
+	            stride: 4 * itemsPerInstance,
+	            instancedDivisor: 1,
+	        });
+	    }
+	    /**
+	     * @param {number} index - Instance index on which to apply the matrix
+	     * @param {Float32Array|Float64Array} matrix - Matrix to control the instance scale, rotation and translation
+	     */
+	    setMatrixAt(index, matrix) {
+	        const itemsPerInstance = 16;
+	        const { buffer } = __classPrivateFieldGet(this, _instanceAttributes).get(INSTANCED_OFFSET_MODEL_MATRIX);
+	        this.vaoExtension.bindVertexArrayOES(this.vao);
+	        __classPrivateFieldGet(this, _gl$3).bindBuffer(__classPrivateFieldGet(this, _gl$3).ARRAY_BUFFER, buffer);
+	        __classPrivateFieldGet(this, _gl$3).bufferSubData(__classPrivateFieldGet(this, _gl$3).ARRAY_BUFFER, index * itemsPerInstance * Float32Array.BYTES_PER_ELEMENT, matrix);
+	        this.vaoExtension.bindVertexArrayOES(null);
+	        return this;
+	    }
+	    /**
+	     * Draws the instanced mesh
+	     */
+	    draw() {
+	        if (this.shouldUpdate) {
+	            super.updateModelMatrix();
+	            this.program.setUniform(MODEL_MATRIX_UNIFORM_NAME, UNIFORM_TYPE_MATRIX4X4, this.modelMatrix);
+	        }
+	        this.program.bind();
+	        this.vaoExtension.bindVertexArrayOES(this.vao);
+	        if (this.hasIndices) {
+	            __classPrivateFieldGet(this, _instanceExtension).drawElementsInstancedANGLE(this.drawMode, __classPrivateFieldGet(this, _geometry$1).vertexCount, __classPrivateFieldGet(this, _gl$3).UNSIGNED_SHORT, 0, this.instanceCount);
+	        }
+	        else {
+	            __classPrivateFieldGet(this, _instanceExtension).drawArraysInstancedANGLE(this.drawMode, 0, __classPrivateFieldGet(this, _geometry$1).vertexCount, this.instanceCount);
+	        }
+	        this.vaoExtension.bindVertexArrayOES(null);
+	        return this;
+	    }
+	}
+	_geometry$1 = new WeakMap(), _gl$3 = new WeakMap(), _instanceAttributes = new WeakMap(), _instanceExtension = new WeakMap();
 
 	/**
 	 * Clamp number to a given range
@@ -4920,7 +5038,7 @@
 	                }
 	                this.depthTexture = new Texture(__classPrivateFieldGet(this, _gl$5), {
 	                    format: __classPrivateFieldGet(this, _gl$5).DEPTH_COMPONENT,
-	                    type: __classPrivateFieldGet(this, _gl$5).UNSIGNED_SHORT,
+	                    type: __classPrivateFieldGet(this, _gl$5).UNSIGNED_INT,
 	                    minFilter: __classPrivateFieldGet(this, _gl$5).LINEAR,
 	                    magFilter: __classPrivateFieldGet(this, _gl$5).LINEAR,
 	                })
@@ -5412,6 +5530,43 @@
 	}
 	PerspectiveCamera.UP_VECTOR = [0, 1, 0];
 
+	class OrthographicCamera {
+	    constructor(left, right, top, bottom, near, far) {
+	        this.left = -1;
+	        this.right = 1;
+	        this.top = 1;
+	        this.bottom = -1;
+	        this.near = 0.1;
+	        this.far = 2000;
+	        this.zoom = 1;
+	        this.position = [0, 0, 0];
+	        this.lookAtPosition = [0, 0, 0];
+	        this.projectionMatrix = create$2();
+	        this.viewMatrix = create$2();
+	        this.left = left;
+	        this.right = right;
+	        this.top = top;
+	        this.bottom = bottom;
+	        this.near = near;
+	        this.far = far;
+	        this.updateProjectionMatrix();
+	    }
+	    updateViewMatrix() {
+	        lookAt$1(this.viewMatrix, this.position, this.lookAtPosition, OrthographicCamera.UP_VECTOR);
+	        return this;
+	    }
+	    updateProjectionMatrix() {
+	        ortho(this.projectionMatrix, this.left, this.right, this.bottom, this.top, this.near, this.far);
+	        return this;
+	    }
+	    lookAt(target) {
+	        this.lookAtPosition = target;
+	        this.updateViewMatrix();
+	        return this;
+	    }
+	}
+	OrthographicCamera.UP_VECTOR = [0, 1, 0];
+
 	/**
 	 * @private
 	 */
@@ -5838,7 +5993,17 @@
 	    GeometryUtils: GeometryUtils
 	});
 
-	const UP_VECTOR = [0, 1, 0];
+	var BASE_VERTEX_SHADER = "#define GLSLIFY 1\nattribute vec4 position;\n#ifdef IS_INSTANCED\nattribute mat4 instanceModelMatrix;\n#endif\n#ifdef USE_PROJECTED_TEXCOORD\nuniform mat4 textureMatrix;varying vec4 v_projectedTexcoord;\n#endif\n#ifdef USE_VARYINGS\nattribute vec2 uv;varying vec2 v_uv;\n#endif\nvoid main(){\n#ifdef IS_INSTANCED\nvec4 worldPosition=modelMatrix*instanceModelMatrix*position;\n#else\nvec4 worldPosition=modelMatrix*position;\n#endif\ngl_Position=projectionMatrix*viewMatrix*worldPosition;\n#ifdef USE_VARYINGS\nv_uv=uv;\n#endif\n#ifdef USE_PROJECTED_TEXCOORD\nv_projectedTexcoord=textureMatrix*worldPosition;\n#endif\n}"; // eslint-disable-line
+
+	var BASE_FRAGMENT_SHADER = "precision highp float;\n#define GLSLIFY 1\nuniform vec4 color;void main(){gl_FragColor=color;}"; // eslint-disable-line
+
+	var DEBUG_DEPTH_FRAGMENT_SHADER = "precision highp float;\n#define GLSLIFY 1\nuniform sampler2D depthTex;varying vec2 v_uv;const float near_plane=0.1;const float far_plane=50.0;float LinearizeDepth(float depth){float z=depth*2.0-1.0;return(2.0*near_plane*far_plane)/(far_plane+near_plane-z*(far_plane-near_plane));}void main(){float depth=texture2D(depthTex,v_uv).r;gl_FragColor=vec4(vec3(LinearizeDepth(depth)/far_plane),1.0);}"; // eslint-disable-line
+
+	var SHADED_VERTEX_SHADER = "#define GLSLIFY 1\nstruct SpotLightInfo{float shininess;vec3 lightColor;vec3 specularColor;vec3 worldPosition;vec3 lightDirection;float innerLimit;float outerLimit;};uniform SpotLightInfo SpotLight;uniform mat4 textureMatrix;uniform vec3 eyePosition;attribute vec4 position;attribute vec2 uv;attribute vec3 normal;\n#ifdef IS_INSTANCED\nattribute mat4 instanceModelMatrix;\n#endif\nvarying vec4 v_projectedTexcoord;varying vec2 v_uv;varying vec3 v_normal;varying vec3 v_surfaceToLight;varying vec3 v_surfaceToView;void main(){vec4 worldPosition;\n#ifdef IS_INSTANCED\nworldPosition=modelMatrix*instanceModelMatrix*position;\n#else\nworldPosition=modelMatrix*position;\n#endif\ngl_Position=projectionMatrix*viewMatrix*worldPosition;v_uv=uv;v_projectedTexcoord=textureMatrix*worldPosition;vec3 surfaceWorldPosition=worldPosition.xyz;v_surfaceToLight=SpotLight.worldPosition-surfaceWorldPosition;v_surfaceToView=eyePosition-surfaceWorldPosition;v_uv=uv;v_normal=mat3(modelMatrix)*normal;}"; // eslint-disable-line
+
+	var SHADED_FRAGMENT_SHADER = "#define GLSLIFY 1\nstruct SpotLightInfo{float shininess;vec3 lightColor;vec3 specularColor;vec3 worldPosition;vec3 lightDirection;float innerLimit;float outerLimit;};uniform SpotLightInfo SpotLight;uniform float shadowBias;uniform sampler2D projectedTexture;uniform vec3 eyePosition;varying vec4 v_projectedTexcoord;varying vec2 v_uv;varying vec3 v_normal;varying vec3 v_surfaceToLight;varying vec3 v_surfaceToView;void main(){vec3 projectedTexcoord=v_projectedTexcoord.xyz/v_projectedTexcoord.w;float currentDepth=projectedTexcoord.z+shadowBias;bool inRange=projectedTexcoord.x>=0.0&&projectedTexcoord.x<=1.0&&projectedTexcoord.y>=0.0&&projectedTexcoord.y<=1.0;vec4 texColor=vec4(vec3(0.25),1.0);float projectedDepth=texture2D(projectedTexture,projectedTexcoord.xy).r;float shadowLight=(inRange&&projectedDepth<=currentDepth)? 0.0 : 1.0;vec3 normal=normalize(v_normal);vec3 surfaceToLightDirection=normalize(v_surfaceToLight);vec3 surfaceToViewDirection=normalize(v_surfaceToView);vec3 halfVector=normalize(surfaceToLightDirection+surfaceToViewDirection);float dotFromDirection=dot(surfaceToLightDirection,-SpotLight.lightDirection);float limitRange=SpotLight.innerLimit-SpotLight.outerLimit;float inLight=clamp((dotFromDirection-SpotLight.outerLimit)/limitRange,0.0,1.0);float light=inLight*dot(normal,surfaceToLightDirection);float specular=inLight*pow(dot(normal,halfVector),SpotLight.shininess);gl_FragColor=vec4(texColor.rgb*SpotLight.lightColor*light*shadowLight+specular*SpotLight.specularColor*shadowLight,texColor.a);}"; // eslint-disable-line
+
+	// debugger
 
 	// prettier-ignore
 	const CUBE_VERTICES = [
@@ -5870,110 +6035,48 @@
 	  2, 6,
 	];
 
-	// prettier-ignore
-	const CHECKERBOARD_TEXTURE_DATA = [
-	  0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC,
-	  0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF,
-	  0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC,
-	  0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF,
-	  0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC,
-	  0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF,
-	  0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC,
-	  0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF,
-	];
-
-	const CUBE_VERTEX_SHADER = `
-  attribute vec4 position;
-  void main() {
-    gl_Position = projectionMatrix * viewMatrix * modelMatrix * position;
-  }
-`;
-
-	const CUBE_FRAGMENT_SHADER = `
-  uniform vec4 color;
-  void main() {
-    gl_FragColor = color;
-  }
-`;
-
-	const CHECKERED_VERTEX_SHADER = `
-  uniform mat4 textureMatrix;
-
-  attribute vec4 position;
-  attribute vec2 uv;
-
-  varying vec4 v_projectedTexcoord;
-  varying vec2 v_uv;
-
-  void main () {
-    vec4 worldPosition = modelMatrix * position;
-
-    gl_Position = projectionMatrix * viewMatrix * worldPosition;
-
-    v_uv = uv;
-    v_projectedTexcoord = textureMatrix * worldPosition;
-  }
-`;
-
-	const CHECKERED_FRAGMENT_SHADER = `
-  uniform vec4 colorMult;
-  uniform sampler2D texture;
-  uniform sampler2D projectedTexture;
-  
-  varying vec4 v_projectedTexcoord;
-  varying vec2 v_uv;
-
-  void main () {
-    // gl_FragColor = texture2D(texture, v_uv) * colorMult;
-
-    vec3 projectedTexcoord = v_projectedTexcoord.xyz / v_projectedTexcoord.w;
-    bool inRange = 
-        projectedTexcoord.x >= 0.0 &&
-        projectedTexcoord.x <= 1.0 &&
-        projectedTexcoord.y >= 0.0 &&
-        projectedTexcoord.y <= 1.0;
-    
-    vec4 projectedTexColor = texture2D(projectedTexture, vec2(projectedTexcoord.x, 1.0 - projectedTexcoord.y));
-    vec4 texColor = texture2D(texture, v_uv) * colorMult;
-  
-    float projectedAmount = inRange ? 1.0 : 0.0;
-    gl_FragColor = mix(texColor, projectedTexColor, projectedAmount);
-  }
-`;
-
 	const STEP_VAL = 0.05;
+	const MESHES_COUNT = 20;
 
 	const OPTIONS = {
-	  posX: 0.55,
-	  posY: -1.4,
-	  posZ: -8.8,
-	  targetX: -1.4,
-	  targetY: -20,
-	  targetZ: 3.5,
+	  isDebug: false,
+	  posX: 0.1,
+	  posY: 9,
+	  posZ: 0,
+	  targetX: 0,
+	  targetY: 0,
+	  targetZ: 0,
 	  projectionScaleX: 1.3,
 	  projectionScaleY: 1.3,
-	  perspective: true,
-	  fieldOfView: 18.25,
+	  fieldOfView: 120,
+	  shadowBias: -0.006,
 	};
 
 	const stats = new stats_min();
 	document.body.appendChild(stats.domElement);
 
 	const gui = new GUI$1();
+	gui.close();
 
 	const dpr = Math.min(devicePixelRatio, 2);
 	const canvas = document.createElement('canvas');
 	const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
 
-	let sphereMesh;
-	let planeMesh;
+	const renderMeshes = [];
+	const colorMeshes = [];
+
+	getExtension(gl, 'GMAN_debug_helper');
+
 	let cubeMesh;
 	// let projectedTexture
 	let depthFramebuffer;
+	let depthDebugMesh;
 
 	const lightWorldMatrix = create();
 	const lightProjectionMatrix = create();
 	const cubeWorldMatrix = create();
+	const emptyMatrix = create();
+	const textureMatrix = create();
 
 	const projectionPos = create$1();
 	const projectionTarget = create$1();
@@ -5987,41 +6090,36 @@
 	  targetZ = OPTIONS.targetZ,
 	  projectionScaleX = OPTIONS.projectionScaleX,
 	  projectionScaleY = OPTIONS.projectionScaleY,
-	  perspective: perspective$1 = OPTIONS.perspective,
 	  fieldOfView = OPTIONS.fieldOfView,
+	  shadowBias = OPTIONS.shadowBias,
 	} = {}) => {
 	  set(projectionPos, posX, posY, posZ);
 	  set(projectionTarget, targetX, targetY, targetZ);
 
-	  lookAt(lightWorldMatrix, projectionPos, projectionTarget, UP_VECTOR);
+	  identity(textureMatrix);
+
+	  lookAt(
+	    lightWorldMatrix,
+	    projectionPos,
+	    projectionTarget,
+	    PerspectiveCamera.UP_VECTOR,
+	  );
+	  invert(lightWorldMatrix, lightWorldMatrix);
 
 	  const near = 0.1;
 	  const far = 200;
 
-	  if (perspective$1) {
-	    perspective(
-	      lightProjectionMatrix,
-	      (fieldOfView * Math.PI) / 180,
-	      projectionScaleX / projectionScaleY,
-	      near,
-	      far,
-	    );
-	  } else {
-	    ortho(
-	      lightProjectionMatrix,
-	      -projectionScaleX / 2,
-	      projectionScaleX / 2,
-	      -projectionScaleY / 2,
-	      projectionScaleY / 2,
-	      near,
-	      far,
-	    );
-	  }
+	  perspective(
+	    lightProjectionMatrix,
+	    (fieldOfView * Math.PI) / 180,
+	    projectionScaleX / projectionScaleY,
+	    near,
+	    far,
+	  );
 
 	  const textureWorldMatrixInv = create();
 	  invert(textureWorldMatrixInv, lightWorldMatrix);
 
-	  const textureMatrix = create();
 	  const transformVec = create$1();
 	  set(transformVec, 0.5, 0.5, 0.5);
 	  translate(textureMatrix, textureMatrix, transformVec);
@@ -6029,17 +6127,17 @@
 	  mul(textureMatrix, textureMatrix, lightProjectionMatrix);
 	  mul(textureMatrix, textureMatrix, textureWorldMatrixInv);
 
-	  sphereMesh
-	    .use()
-	    .setUniform('textureMatrix', UNIFORM_TYPE_MATRIX4X4, textureMatrix);
-	  planeMesh
-	    .use()
-	    .setUniform('textureMatrix', UNIFORM_TYPE_MATRIX4X4, textureMatrix);
+	  renderMeshes.forEach((mesh) =>
+	    mesh
+	      .use()
+	      .setUniform('shadowBias', UNIFORM_TYPE_FLOAT, shadowBias)
+	      .setUniform('textureMatrix', UNIFORM_TYPE_MATRIX4X4, textureMatrix),
+	  );
 
-	  const textureProjectionMatrixInv = create();
-	  invert(textureProjectionMatrixInv, lightProjectionMatrix);
+	  const lightProjectionMatrixInv = create();
+	  invert(lightProjectionMatrixInv, lightProjectionMatrix);
 
-	  mul(cubeWorldMatrix, lightWorldMatrix, textureProjectionMatrixInv);
+	  mul(cubeWorldMatrix, lightWorldMatrix, lightProjectionMatrixInv);
 
 	  cubeMesh
 	    .use()
@@ -6047,6 +6145,7 @@
 	    .setUniform('modelMatrix', UNIFORM_TYPE_MATRIX4X4, cubeWorldMatrix);
 	};
 
+	gui.add(OPTIONS, 'isDebug');
 	gui
 	  .add(OPTIONS, 'posX')
 	  .min(-20)
@@ -6084,23 +6183,16 @@
 	  .step(STEP_VAL)
 	  .onChange(updateTexMatrix);
 	gui
-	  .add(OPTIONS, 'projectionScaleX')
-	  .min(0.1)
-	  .max(5)
-	  .step(0.1)
-	  .onChange(updateTexMatrix);
-	gui
-	  .add(OPTIONS, 'projectionScaleY')
-	  .min(0.1)
-	  .max(5)
-	  .step(0.1)
-	  .onChange(updateTexMatrix);
-	gui.add(OPTIONS, 'perspective').onChange(updateTexMatrix);
-	gui
 	  .add(OPTIONS, 'fieldOfView')
 	  .min(1)
 	  .max(180)
 	  .step(STEP_VAL)
+	  .onChange(updateTexMatrix);
+	gui
+	  .add(OPTIONS, 'shadowBias')
+	  .min(-0.01)
+	  .max(-0.01)
+	  .step(0.001)
 	  .onChange(updateTexMatrix);
 
 	gl.enable(gl.BLEND);
@@ -6115,39 +6207,72 @@
 	  0.1,
 	  100,
 	);
-	camera.position = [-7.9, 7.26, -13.1];
+	camera.position = [-15.25, 13.25, -19.25];
 	camera.lookAt([0, 0, 0]);
+
+	const orthoCamera = new OrthographicCamera(
+	  -innerWidth / 2,
+	  innerWidth / 2,
+	  innerHeight / 2,
+	  -innerHeight / 2,
+	  0.1,
+	  4,
+	);
+	orthoCamera.position = [0, 0, 2];
+	orthoCamera.lookAt([0, 0, 0]);
 
 	new CameraController(camera, canvas);
 
-	const checkeredTexture = new Texture(gl, {
-	  format: gl.LUMINANCE,
-	  magFilter: gl.NEAREST,
-	  minFilter: gl.NEAREST,
-	});
-	checkeredTexture
-	  .bind()
-	  .fromData(new Uint8Array(CHECKERBOARD_TEXTURE_DATA), 8, 8);
-
 	const sharedUniforms = {
-	  texture: { type: UNIFORM_TYPE_INT, value: 0 },
-	  projectedTexture: { type: UNIFORM_TYPE_INT, value: 1 },
+	  projectedTexture: { type: UNIFORM_TYPE_INT, value: 0 },
 	  textureMatrix: { type: UNIFORM_TYPE_MATRIX4X4, value: lightWorldMatrix },
+	  shadowBias: { type: UNIFORM_TYPE_FLOAT, value: OPTIONS.shadowBias },
+	  eyePosition: { type: UNIFORM_TYPE_VEC3, value: camera.position },
+	  'SpotLight.worldPosition': {
+	    type: UNIFORM_TYPE_VEC3,
+	    value: [OPTIONS.posX, OPTIONS.posY, OPTIONS.posZ],
+	  },
+	  'SpotLight.shininess': { type: UNIFORM_TYPE_FLOAT, value: 40 },
+	  'SpotLight.lightColor': {
+	    type: UNIFORM_TYPE_VEC3,
+	    value: [1, 1, 1],
+	  },
+	  'SpotLight.specularColor': {
+	    type: UNIFORM_TYPE_VEC3,
+	    value: [0.4, 0.4, 0.4],
+	  },
+	  'SpotLight.lightDirection': {
+	    type: UNIFORM_TYPE_VEC3,
+	    value: [OPTIONS.targetX, OPTIONS.targetY, OPTIONS.targetZ],
+	  },
+	  'SpotLight.innerLimit': {
+	    type: UNIFORM_TYPE_FLOAT,
+	    value: ((OPTIONS.fieldOfView / 2 - 10) * Math.PI) / 180,
+	  },
+	  'SpotLight.outerLimit': {
+	    type: UNIFORM_TYPE_FLOAT,
+	    value: ((OPTIONS.fieldOfView / 2) * Math.PI) / 180,
+	  },
 	};
+
+	// Math.cos(degToRad())
+	// Math.cos(degToRad(settings.fieldOfView / 2))
 
 	/* ---- Depth Framebuffer ---- */
 	{
 	  depthFramebuffer = new Framebuffer(gl, {
+	    width: innerWidth,
+	    height: innerHeight,
 	    useDepthRenderBuffer: false,
 	  });
 	}
 
 	/* ---- Sphere mesh ---- */
 	{
-	  const { indices, vertices, uv } = index.createSphere({
-	    radius: 2,
-	    widthSegments: 12,
-	    heightSegments: 5,
+	  const { indices, vertices, uv, normal } = index.createSphere({
+	    radius: 1,
+	    widthSegments: 20,
+	    heightSegments: 20,
 	  });
 	  const geometry = new Geometry(gl);
 	  geometry
@@ -6161,22 +6286,65 @@
 	    .addAttribute('uv', {
 	      typedArray: uv,
 	      size: 2,
+	    })
+	    .addAttribute('normal', {
+	      typedArray: normal,
+	      size: 3,
 	    });
-	  sphereMesh = new Mesh(gl, {
+
+	  const renderMesh = new InstancedMesh(gl, {
+	    geometry,
+	    uniforms: sharedUniforms,
+	    instanceCount: MESHES_COUNT,
+	    defines: {
+	      IS_INSTANCED: 1,
+	    },
+	    vertexShaderSource: SHADED_VERTEX_SHADER,
+	    fragmentShaderSource: SHADED_FRAGMENT_SHADER,
+	  });
+
+	  renderMeshes.push(renderMesh);
+
+	  const colorMesh = new InstancedMesh(gl, {
 	    geometry,
 	    uniforms: {
-	      ...sharedUniforms,
-	      colorMult: { type: UNIFORM_TYPE_VEC4, value: [1, 0, 0, 1] },
+	      color: { type: UNIFORM_TYPE_VEC4, value: [1, 0.5, 0.5, 1] },
 	    },
-	    vertexShaderSource: CHECKERED_VERTEX_SHADER,
-	    fragmentShaderSource: CHECKERED_FRAGMENT_SHADER,
+	    defines: {
+	      IS_INSTANCED: 1,
+	    },
+	    instanceCount: MESHES_COUNT,
+	    vertexShaderSource: BASE_VERTEX_SHADER,
+	    fragmentShaderSource: BASE_FRAGMENT_SHADER,
 	  });
-	  sphereMesh.setPosition({ y: 3 });
+
+	  colorMeshes.push(colorMesh);
+
+	  const matrix = create();
+	  const transform = fromValues(0, 0, 0);
+
+	  for (let i = 0; i < MESHES_COUNT; i++) {
+	    const randX = (Math.random() * 2 - 1) * 6;
+	    const randY = Math.random() * 4;
+	    const randZ = (Math.random() * 2 - 1) * 6;
+
+	    const randScale = Math.random();
+
+	    identity(matrix);
+
+	    set(transform, randX, randY, randZ);
+	    translate(matrix, matrix, transform);
+	    set(transform, randScale, randScale, randScale);
+	    scale(matrix, matrix, transform);
+
+	    renderMesh.setMatrixAt(i, matrix);
+	    colorMesh.setMatrixAt(i, matrix);
+	  }
 	}
 
 	/* ---- Plane mesh ---- */
 	{
-	  const { indices, vertices, uv } = index.createPlane({
+	  const { indices, vertices, uv, normal } = index.createPlane({
 	    width: 40,
 	    height: 40,
 	  });
@@ -6184,17 +6352,61 @@
 	  geometry
 	    .addIndex({ typedArray: indices })
 	    .addAttribute('position', { typedArray: vertices, size: 3 })
-	    .addAttribute('uv', { typedArray: uv, size: 2 });
-	  planeMesh = new Mesh(gl, {
+	    .addAttribute('uv', { typedArray: uv, size: 2 })
+	    .addAttribute('normal', { typedArray: normal, size: 3 });
+
+	  let mesh = new Mesh(gl, {
+	    geometry,
+	    uniforms: sharedUniforms,
+	    // defines: {
+	    //   USE_VARYINGS: 1,
+	    //   USE_PROJECTED_TEXCOORD: 1,
+	    // },
+	    vertexShaderSource: SHADED_VERTEX_SHADER,
+	    fragmentShaderSource: SHADED_FRAGMENT_SHADER,
+	  });
+	  mesh.setRotation({ x: -Math.PI / 2 }).setPosition({ y: -1.5 });
+	  renderMeshes.push(mesh);
+
+	  mesh = new Mesh(gl, {
 	    geometry,
 	    uniforms: {
-	      ...sharedUniforms,
-	      colorMult: { type: UNIFORM_TYPE_VEC4, value: [0, 0, 1, 1] },
+	      color: { type: UNIFORM_TYPE_VEC4, value: [1, 0.5, 0.5, 1] },
 	    },
-	    vertexShaderSource: CHECKERED_VERTEX_SHADER,
-	    fragmentShaderSource: CHECKERED_FRAGMENT_SHADER,
+	    defines: {},
+	    vertexShaderSource: BASE_VERTEX_SHADER,
+	    fragmentShaderSource: BASE_FRAGMENT_SHADER,
 	  });
-	  planeMesh.setRotation({ x: -Math.PI / 2 }).setPosition({ y: -1.5 });
+	  mesh.setRotation({ x: -Math.PI / 2 }).setPosition({ y: -1.5 });
+	  colorMeshes.push(mesh);
+	}
+
+	{
+	  const width = innerWidth * 0.2;
+	  const height = innerHeight * 0.2;
+	  const { indices, vertices, uv } = index.createPlane({
+	    width,
+	    height,
+	  });
+	  const geometry = new Geometry(gl)
+	    .addIndex({ typedArray: indices })
+	    .addAttribute('position', { typedArray: vertices, size: 3 })
+	    .addAttribute('uv', { typedArray: uv, size: 2 });
+	  depthDebugMesh = new Mesh(gl, {
+	    geometry,
+	    uniforms: {
+	      depthTex: { type: UNIFORM_TYPE_INT, value: 0 },
+	    },
+	    defines: {
+	      USE_VARYINGS: 1,
+	    },
+	    vertexShaderSource: BASE_VERTEX_SHADER,
+	    fragmentShaderSource: DEBUG_DEPTH_FRAGMENT_SHADER,
+	  });
+	  depthDebugMesh.setPosition({
+	    x: -innerWidth / 2 + width / 2 + 20,
+	    y: -innerHeight / 2 + height / 2 + 20,
+	  });
 	}
 
 	/* ---- Cube Mesh ---- */
@@ -6210,49 +6422,13 @@
 	    uniforms: {
 	      color: { type: UNIFORM_TYPE_VEC4, value: [0, 0, 0, 0.8] },
 	    },
-	    vertexShaderSource: CUBE_VERTEX_SHADER,
-	    fragmentShaderSource: CUBE_FRAGMENT_SHADER,
+	    vertexShaderSource: BASE_VERTEX_SHADER,
+	    fragmentShaderSource: BASE_FRAGMENT_SHADER,
 	  });
 	  cubeMesh.drawMode = gl.LINES;
+	  cubeMesh.name = 'cube';
+	  renderMeshes.push(cubeMesh);
 	}
-
-	// {
-	//   const w = 512
-	//   const h = 512
-	//   const texCanvas = document.createElement('canvas')
-	//   const ctx = texCanvas.getContext('2d')
-	//   texCanvas.width = w
-	//   texCanvas.height = h
-
-	//   ctx.fillStyle = '#e67e22'
-	//   ctx.fillRect(0, 0, w, h)
-
-	//   ctx.fillStyle = 'red'
-	//   ctx.strokeStyle = 'white'
-	//   ctx.lineWidth = 1
-
-	//   ctx.font = '170px Helvetica'
-	//   const lineHeight = 140
-	//   const startX = 20
-	//   const startY = 160
-
-	//   ctx.fillText('hwoa-', startX, startY)
-	//   // ctx.strokeText('hwoa', startX, startY)
-
-	//   ctx.fillText('rang-', startX, startY + lineHeight)
-	//   // ctx.strokeText('rang', startX, startY + lineHeight)
-
-	//   ctx.fillText('gl', startX, startY + lineHeight * 2)
-	//   // ctx.strokeText('gl', startX, startY + lineHeight * 2)
-
-	//   projectedTexture = new Texture(gl, {
-	//     minFilter: gl.LINEAR_MIPMAP_LINEAR,
-	//   })
-	//     .bind()
-	//     .fromImage(texCanvas)
-	//     .setIsFlip()
-	//     .generateMipmap()
-	// }
 
 	updateTexMatrix();
 	document.body.appendChild(canvas);
@@ -6260,31 +6436,75 @@
 	sizeCanvas();
 	window.addEventListener('resize', lodash_throttle(resize, 100));
 
-	function updateFrame() {
+	const viewMatrix = create();
+
+	function updateFrame(ts) {
+
 	  stats.begin();
 
+	  gl.clearColor(0.1, 0.1, 0.1, 1);
+
+	  depthFramebuffer.bind();
+	  gl.viewport(0, 0, innerWidth, innerHeight);
+	  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+	  identity(viewMatrix);
+	  invert(viewMatrix, lightWorldMatrix);
+
+	  colorMeshes.forEach((mesh) => {
+	    mesh
+	      .use()
+	      .setUniform(
+	        'projectionMatrix',
+	        UNIFORM_TYPE_MATRIX4X4,
+	        lightProjectionMatrix,
+	      )
+	      .setUniform('viewMatrix', UNIFORM_TYPE_MATRIX4X4, viewMatrix)
+	      .setUniform('textureMatrix', UNIFORM_TYPE_MATRIX4X4, emptyMatrix)
+	      .draw();
+	  });
+
+	  depthFramebuffer.unbind();
+
 	  gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-	  gl.clearColor(0.9, 0.9, 0.9, 1);
 	  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 	  gl.activeTexture(gl.TEXTURE0);
-	  checkeredTexture.bind();
+	  depthFramebuffer.depthTexture.bind();
 
-	  // if (projectedTexture) {
-	  //   gl.activeTexture(gl.TEXTURE0 + 1)
-	  //   projectedTexture.bind()
-	  // }
+	  const meshesToRender = OPTIONS.isDebug
+	    ? renderMeshes
+	    : renderMeshes.filter((mesh) => mesh.name !== 'cube');
 
-	  depthFramebuffer.bind();
+	  meshesToRender.forEach((mesh) => {
+	    mesh
+	      .use()
+	      .setUniform(
+	        'projectionMatrix',
+	        UNIFORM_TYPE_MATRIX4X4,
+	        camera.projectionMatrix,
+	      )
+	      .setUniform('viewMatrix', UNIFORM_TYPE_MATRIX4X4, camera.viewMatrix)
+	      .setUniform('textureMatrix', UNIFORM_TYPE_MATRIX4X4, textureMatrix)
+	      .setUniform('eyePosition', UNIFORM_TYPE_VEC3, camera.position)
+	      .setUniform('SpotLight.worldPosition', UNIFORM_TYPE_VEC3, [
+	        OPTIONS.posX,
+	        OPTIONS.posY,
+	        OPTIONS.posZ,
+	      ])
+	      // .setUniform('SpotLight.lightDirection', UNIFORM_TYPE_VEC3, [
+	      //   OPTIONS.targetX,
+	      //   OPTIONS.targetY,
+	      //   OPTIONS.targetZ,
+	      // ])
+	      .draw();
+	  });
 
-	  // gl.activeTexture(gl.TEXTURE1)
-	  // depthFramebuffer.depthTexture.bind()
-
-	  sphereMesh.use().setCamera(camera).draw();
-	  planeMesh.use().setCamera(camera).draw();
-	  cubeMesh.use().setCamera(camera).draw();
-
-	  depthFramebuffer.unbind();
+	  if (OPTIONS.isDebug) {
+	    gl.activeTexture(gl.TEXTURE0);
+	    depthFramebuffer.depthTexture.bind();
+	    depthDebugMesh.use().setCamera(orthoCamera).draw();
+	  }
 
 	  stats.end();
 

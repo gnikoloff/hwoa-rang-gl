@@ -963,6 +963,7 @@
 	    if (gl.getProgramParameter(program, gl.LINK_STATUS)) {
 	        return program;
 	    }
+	    console.error('Error linking program', gl.getProgramInfoLog(program));
 	    gl.deleteProgram(program);
 	    return null;
 	}
@@ -2016,8 +2017,14 @@
 
 	var _geometry$1, _gl$3, _instanceAttributes, _instanceExtension;
 	class InstancedMesh extends Mesh {
-	    constructor(gl, { geometry, uniforms, instanceCount = 1, vertexShaderSource, fragmentShaderSource, }) {
-	        super(gl, { geometry, uniforms, vertexShaderSource, fragmentShaderSource });
+	    constructor(gl, { geometry, uniforms, defines, instanceCount = 1, vertexShaderSource, fragmentShaderSource, }) {
+	        super(gl, {
+	            geometry,
+	            uniforms,
+	            defines,
+	            vertexShaderSource,
+	            fragmentShaderSource,
+	        });
 	        _geometry$1.set(this, void 0);
 	        _gl$3.set(this, void 0);
 	        _instanceAttributes.set(this, new Map());

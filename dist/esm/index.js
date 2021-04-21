@@ -106,6 +106,7 @@ function createProgram(gl, vertexShaderSource, fragmentShaderSource) {
     if (gl.getProgramParameter(program, gl.LINK_STATUS)) {
         return program;
     }
+    console.error('Error linking program', gl.getProgramInfoLog(program));
     gl.deleteProgram(program);
     return null;
 }
@@ -1215,8 +1216,14 @@ _gl$2 = new WeakMap(), _geometry = new WeakMap();
 
 var _geometry$1, _gl$3, _instanceAttributes, _instanceExtension;
 class InstancedMesh extends Mesh {
-    constructor(gl, { geometry, uniforms, instanceCount = 1, vertexShaderSource, fragmentShaderSource, }) {
-        super(gl, { geometry, uniforms, vertexShaderSource, fragmentShaderSource });
+    constructor(gl, { geometry, uniforms, defines, instanceCount = 1, vertexShaderSource, fragmentShaderSource, }) {
+        super(gl, {
+            geometry,
+            uniforms,
+            defines,
+            vertexShaderSource,
+            fragmentShaderSource,
+        });
         _geometry$1.set(this, void 0);
         _gl$3.set(this, void 0);
         _instanceAttributes.set(this, new Map());
@@ -1565,7 +1572,7 @@ class Framebuffer {
                 }
                 this.depthTexture = new Texture(__classPrivateFieldGet(this, _gl$5), {
                     format: __classPrivateFieldGet(this, _gl$5).DEPTH_COMPONENT,
-                    type: __classPrivateFieldGet(this, _gl$5).UNSIGNED_SHORT,
+                    type: __classPrivateFieldGet(this, _gl$5).UNSIGNED_INT,
                     minFilter: __classPrivateFieldGet(this, _gl$5).LINEAR,
                     magFilter: __classPrivateFieldGet(this, _gl$5).LINEAR,
                 })

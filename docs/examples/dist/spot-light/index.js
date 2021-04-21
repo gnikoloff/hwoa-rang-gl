@@ -3298,6 +3298,7 @@
 	    if (gl.getProgramParameter(program, gl.LINK_STATUS)) {
 	        return program;
 	    }
+	    console.error('Error linking program', gl.getProgramInfoLog(program));
 	    gl.deleteProgram(program);
 	    return null;
 	}
