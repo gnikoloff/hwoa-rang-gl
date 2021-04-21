@@ -67,6 +67,10 @@
       {
         "label": "Deferred Shading",
         "id": "deferred-shading"
+      },
+      {
+        "label": "Shadow Map",
+        "id": "shadow"
       }
     ]
   },
@@ -74,10 +78,6 @@
     "label": "Framebuffer",
     "group": "framebuffer",
     "children": [
-      {
-        "label": "Shadow",
-        "id": "shadow"
-      },
       {
         "label": "Godrays",
         "id": "godrays"
