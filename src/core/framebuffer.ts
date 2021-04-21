@@ -155,7 +155,7 @@ export class Framebuffer {
         }
         this.depthTexture = new Texture(this.#gl, {
           format: this.#gl.DEPTH_COMPONENT,
-          type: this.#gl.UNSIGNED_SHORT,
+          type: this.#gl.UNSIGNED_INT,
           minFilter: this.#gl.LINEAR,
           magFilter: this.#gl.LINEAR,
         })
