@@ -63,8 +63,8 @@ export function createBox(params: Box = {}) {
   const indices =
     num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices)
 
-  const i = 0
-  const ii = 0
+  let i = 0
+  let ii = 0
 
   {
     // RIGHT
