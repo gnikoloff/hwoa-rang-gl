@@ -13,6 +13,13 @@ export const UNIFORM_TYPE_VEC3 = 'vec3'
 export const UNIFORM_TYPE_VEC4 = 'vec4'
 export const UNIFORM_TYPE_MATRIX4X4 = 'mat4'
 
+export const CUBE_SIDE_FRONT = 'front'
+export const CUBE_SIDE_BACK = 'back'
+export const CUBE_SIDE_TOP = 'top'
+export const CUBE_SIDE_BOTTOM = 'bottom'
+export const CUBE_SIDE_LEFT = 'left'
+export const CUBE_SIDE_RIGHT = 'right'
+
 export const POINTS = 0x0000
 export const LINES = 0x0001
 export const TRIANGLES = 0x0004

@@ -8,6 +8,13 @@
 */
 
 import { vec3 } from 'gl-matrix'
+import {
+  CUBE_SIDE_BACK,
+  CUBE_SIDE_BOTTOM,
+  CUBE_SIDE_FRONT,
+  CUBE_SIDE_LEFT,
+  CUBE_SIDE_RIGHT,
+} from '../utils/gl-constants'
 import { normalizeNumber, triangleWave } from '../utils/math'
 import { VRot90 } from './create-rounded-box'
 
@@ -58,7 +65,7 @@ export const createRoundedBoxSeparateFace = ({
   }
   geo_rot_merge(geo, panel, VRot90.xp) // Front
   sidesData.push({
-    orientation: 'front',
+    orientation: CUBE_SIDE_FRONT,
     vertices: new Float32Array(geo.verts),
     normal: new Float32Array(geo.norm),
     uv: new Float32Array(geo.uv),
@@ -73,7 +80,7 @@ export const createRoundedBoxSeparateFace = ({
   }
   geo_rot_merge(geo, panel, VRot90.xp_yp) // Left
   sidesData.push({
-    orientation: 'left',
+    orientation: CUBE_SIDE_LEFT,
     vertices: new Float32Array(geo.verts),
     normal: new Float32Array(geo.norm),
     uv: new Float32Array(geo.uv),
@@ -88,7 +95,7 @@ export const createRoundedBoxSeparateFace = ({
   }
   geo_rot_merge(geo, panel, VRot90.xp_yp_yp) // Back
   sidesData.push({
-    orientation: 'back',
+    orientation: CUBE_SIDE_BACK,
     vertices: new Float32Array(geo.verts),
     normal: new Float32Array(geo.norm),
     uv: new Float32Array(geo.uv),
@@ -103,7 +110,7 @@ export const createRoundedBoxSeparateFace = ({
   }
   geo_rot_merge(geo, panel, VRot90.xp_yn) // Right
   sidesData.push({
-    orientation: 'right',
+    orientation: CUBE_SIDE_RIGHT,
     vertices: new Float32Array(geo.verts),
     normal: new Float32Array(geo.norm),
     uv: new Float32Array(geo.uv),
@@ -118,7 +125,7 @@ export const createRoundedBoxSeparateFace = ({
   }
   geo_rot_merge(geo, panel, VRot90.xp_xp) // Bottom
   sidesData.push({
-    orientation: 'bottom',
+    orientation: CUBE_SIDE_BOTTOM,
     vertices: new Float32Array(geo.verts),
     normal: new Float32Array(geo.norm),
     uv: new Float32Array(geo.uv),

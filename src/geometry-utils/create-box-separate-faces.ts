@@ -1,3 +1,11 @@
+import {
+  CUBE_SIDE_BACK,
+  CUBE_SIDE_BOTTOM,
+  CUBE_SIDE_FRONT,
+  CUBE_SIDE_LEFT,
+  CUBE_SIDE_RIGHT,
+  CUBE_SIDE_TOP,
+} from '../utils/gl-constants'
 import { buildPlane } from './build-plane'
 
 export interface Box {
@@ -79,7 +87,7 @@ export function createBoxSeparateFace(params: Box = {}) {
       ii,
     )
     sidesData.push({
-      orientation: 'right',
+      orientation: CUBE_SIDE_RIGHT,
       vertices,
       normal,
       uv,
@@ -114,7 +122,7 @@ export function createBoxSeparateFace(params: Box = {}) {
       ii,
     )
     sidesData.push({
-      orientation: 'left',
+      orientation: CUBE_SIDE_LEFT,
       vertices,
       normal,
       uv,
@@ -149,7 +157,7 @@ export function createBoxSeparateFace(params: Box = {}) {
       ii,
     )
     sidesData.push({
-      orientation: 'top',
+      orientation: CUBE_SIDE_TOP,
       vertices,
       normal,
       uv,
@@ -184,7 +192,7 @@ export function createBoxSeparateFace(params: Box = {}) {
       ii,
     )
     sidesData.push({
-      orientation: 'bottom',
+      orientation: CUBE_SIDE_BOTTOM,
       vertices,
       normal,
       uv,
@@ -219,7 +227,7 @@ export function createBoxSeparateFace(params: Box = {}) {
       ii,
     )
     sidesData.push({
-      orientation: 'back',
+      orientation: CUBE_SIDE_BACK,
       vertices,
       normal,
       uv,
@@ -254,7 +262,7 @@ export function createBoxSeparateFace(params: Box = {}) {
       ii,
     )
     sidesData.push({
-      orientation: 'front',
+      orientation: CUBE_SIDE_FRONT,
       vertices,
       normal,
       uv,
