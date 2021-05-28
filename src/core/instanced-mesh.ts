@@ -16,7 +16,6 @@ import { MeshInterface } from './Mesh'
 export class InstancedMesh extends Mesh {
   #geometry: Geometry
   #gl: WebGLRenderingContext
-  #instanceAttributes = new Map()
   #instanceExtension
 
   public instanceCount: number
@@ -107,8 +106,7 @@ export class InstancedMesh extends Mesh {
       this.#instanceExtension.vertexAttribDivisorANGLE(location, 1)
     }
     this.vaoExtension.bindVertexArrayOES(null)
-
-    this.#instanceAttributes.set(INSTANCED_OFFSET_MODEL_MATRIX, {
+    this.#geometry.attributes.set(INSTANCED_OFFSET_MODEL_MATRIX, {
       location: instanceMatrixLocation,
       typedArray: matrixData,
       buffer: matrixBuffer,
@@ -123,18 +121,14 @@ export class InstancedMesh extends Mesh {
    */
   setMatrixAt(index: number, matrix: Float32Array): this {
     const itemsPerInstance = 16
-    const { buffer } = this.#instanceAttributes.get(
+
+    this.updateGeometryAttribute(
       INSTANCED_OFFSET_MODEL_MATRIX,
-    )
-    this.vaoExtension.bindVertexArrayOES(this.vao)
-    this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, buffer)
-    this.#gl.bufferSubData(
-      this.#gl.ARRAY_BUFFER,
-      index * itemsPerInstance * Float32Array.BYTES_PER_ELEMENT,
+      index,
+      itemsPerInstance,
       matrix,
     )
 
-    this.vaoExtension.bindVertexArrayOES(null)
     return this
   }
   /**

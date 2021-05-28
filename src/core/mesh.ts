@@ -7,6 +7,7 @@ import { getExtension } from '../utils/gl-utils'
 
 import {
   INDEX_ATTRIB_NAME,
+  INSTANCED_OFFSET_MODEL_MATRIX,
   MODEL_MATRIX_UNIFORM_NAME,
   PROJECTION_MATRIX_UNIFORM_NAME,
   TRIANGLES,
@@ -106,6 +107,31 @@ export class Mesh extends Transform {
     )
     this.program.unbind()
 
+    return this
+  }
+
+  /**
+   *
+   * @param {string} key - Name of attribute. Must match attribute name in your GLSL program
+   * @param {number} index - Index to start updating your typed array from
+   * @param {number} size - How many items are to be updated
+   * @param {Float32Array} subTypeArray - The whole or partial array to update your attribute with
+   * @returns {this}
+   */
+  updateGeometryAttribute(
+    key: string,
+    index: number,
+    size: number,
+    subTypeArray: Float32Array,
+  ): this {
+    this.vaoExtension.bindVertexArrayOES(this.vao)
+    this.#geometry.updateAttribute(
+      INSTANCED_OFFSET_MODEL_MATRIX,
+      index,
+      size,
+      subTypeArray,
+    )
+    this.vaoExtension.bindVertexArrayOES(null)
     return this
   }
 
