@@ -125,12 +125,7 @@ export class Mesh extends Transform {
     subTypeArray: Float32Array,
   ): this {
     this.vaoExtension.bindVertexArrayOES(this.vao)
-    this.#geometry.updateAttribute(
-      INSTANCED_OFFSET_MODEL_MATRIX,
-      index,
-      size,
-      subTypeArray,
-    )
+    this.#geometry.updateAttribute(key, index, size, subTypeArray)
     this.vaoExtension.bindVertexArrayOES(null)
     return this
   }
