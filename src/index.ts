@@ -14,5 +14,6 @@ export { SwapRenderer } from './extra/swap-renderer'
 
 export * from './utils/gl-utils'
 export * from './utils/gl-constants'
+export * from './utils/math'
 
 export * as GeometryUtils from './geometry-utils'
