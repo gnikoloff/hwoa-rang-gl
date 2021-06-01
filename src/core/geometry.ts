@@ -107,6 +107,7 @@ export class Geometry {
     this.attributes.forEach(({ buffer }) => {
       this.#gl.deleteBuffer(buffer)
     })
+    this.attributes.clear()
   }
 }
 

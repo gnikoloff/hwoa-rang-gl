@@ -4,6 +4,7 @@ export { Transform } from './core/transform'
 export { Mesh } from './core/mesh'
 export { InstancedMesh } from './core/instanced-mesh'
 export { Texture } from './core/texture'
+export { CubeTexture } from './core/cube-texture'
 export { Framebuffer } from './core/framebuffer'
 
 export { CameraController } from './camera/camera-controller'
