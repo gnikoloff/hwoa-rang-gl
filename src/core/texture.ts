@@ -6,15 +6,16 @@ import { isPowerOf2 } from '../utils/math'
  * @public
  */
 export class Texture {
-  #gl!: WebGLRenderingContext
-  #texture!: WebGLTexture | null
+  protected gl!: WebGLRenderingContext
+  protected texture!: WebGLTexture | null
 
-  #width!: number
-  #height!: number
-  #format: number
-  #internalFormat: number
-  #type: number
-  #anisotropyExtension: EXT_texture_filter_anisotropic
+  protected width!: number
+  protected height!: number
+  protected format: number
+  protected internalFormat: number
+  protected type: number
+  protected anisotropyExtension: EXT_texture_filter_anisotropic
+  protected target: number
 
   static isPowerOf2 = (width: number, height: number): boolean =>
     isPowerOf2(width) && isPowerOf2(height)
@@ -31,14 +32,16 @@ export class Texture {
       wrapT = gl.CLAMP_TO_EDGE,
       minFilter = gl.LINEAR,
       magFilter = gl.LINEAR,
+      target = gl.TEXTURE_2D,
     }: TextureInterface = {},
   ) {
-    this.#gl = gl
-    this.#format = format
-    this.#internalFormat = internalFormat
-    this.#type = type
+    this.gl = gl
+    this.format = format
+    this.internalFormat = internalFormat
+    this.type = type
+    this.target = target
 
-    this.#texture = gl.createTexture()
+    this.texture = gl.createTexture()
 
     this.bind()
       .setPixelStore(gl.UNPACK_ALIGNMENT, unpackAlignment)
@@ -47,7 +50,7 @@ export class Texture {
       .setWrap(wrapS, wrapT)
       .unbind()
 
-    this.#anisotropyExtension =
+    this.anisotropyExtension =
       getExtension(gl, 'EXT_texture_filter_anisotropic') ||
       getExtension(gl, 'MOZ_EXT_texture_filter_anisotropic') ||
       getExtension(gl, 'WEBKIT_EXT_texture_filter_anisotropic')
@@ -57,15 +60,15 @@ export class Texture {
    * @returns {WebGLTexture|null}
    */
   getTexture(): WebGLTexture | null {
-    return this.#texture
+    return this.texture
   }
 
   /**
-   * Binds the texture to gl.TEXTURE_2D
+   * Binds the texture to the target
    * @returns {this}
    */
   bind(): this {
-    this.#gl.bindTexture(this.#gl.TEXTURE_2D, this.#texture)
+    this.gl.bindTexture(this.target, this.texture)
     return this
   }
 
@@ -74,7 +77,7 @@ export class Texture {
    * @returns {this}
    */
   unbind(): this {
-    this.#gl.bindTexture(this.#gl.TEXTURE_2D, null)
+    this.gl.bindTexture(this.target, null)
     return this
   }
 
@@ -89,15 +92,15 @@ export class Texture {
     width = image.width,
     height = image.height,
   ): this {
-    this.#width = width
-    this.#height = height
+    this.width = width
+    this.height = height
 
-    this.#gl.texImage2D(
-      this.#gl.TEXTURE_2D,
+    this.gl.texImage2D(
+      this.target,
       0,
-      this.#internalFormat,
-      this.#format,
-      this.#type,
+      this.internalFormat,
+      this.format,
+      this.type,
       image,
     )
     return this
@@ -112,17 +115,17 @@ export class Texture {
     if (!width || !height) {
       console.warn('Incomplete dimensions for creating empty texture')
     }
-    this.#width = width
-    this.#height = height
-    this.#gl.texImage2D(
-      this.#gl.TEXTURE_2D,
+    this.width = width
+    this.height = height
+    this.gl.texImage2D(
+      this.target,
       0,
-      this.#internalFormat,
-      this.#width,
-      this.#height,
+      this.internalFormat,
+      this.width,
+      this.height,
       0,
-      this.#format,
-      this.#type,
+      this.format,
+      this.type,
       null,
     )
 
@@ -139,18 +142,18 @@ export class Texture {
     if (!width || !height) {
       console.warn('Incomplete dimensions for creating texture from data array')
     }
-    this.#width = width
-    this.#height = height
+    this.width = width
+    this.height = height
 
-    this.#gl.texImage2D(
-      this.#gl.TEXTURE_2D,
+    this.gl.texImage2D(
+      this.target,
       0,
-      this.#internalFormat,
-      this.#width,
-      this.#height,
+      this.internalFormat,
+      this.width,
+      this.height,
       0,
-      this.#format,
-      this.#type,
+      this.format,
+      this.type,
       dataArray,
     )
     return this
@@ -160,7 +163,7 @@ export class Texture {
    * @returns {this}
    */
   generateMipmap(): this {
-    this.#gl.generateMipmap(this.#gl.TEXTURE_2D)
+    this.gl.generateMipmap(this.target)
     return this
   }
 
@@ -171,13 +174,13 @@ export class Texture {
    * @returns {this}
    */
   setFormat(
-    format = this.#gl.RGB,
-    internalFormat = this.#gl.RGB,
-    type = this.#gl.UNSIGNED_BYTE,
+    format = this.gl.RGB,
+    internalFormat = this.gl.RGB,
+    type = this.gl.UNSIGNED_BYTE,
   ): this {
-    this.#format = format
-    this.#internalFormat = internalFormat
-    this.#type = type
+    this.format = format
+    this.internalFormat = internalFormat
+    this.type = type
     return this
   }
 
@@ -185,7 +188,7 @@ export class Texture {
    * @returns {this}
    */
   setIsFlip(flip = 1): this {
-    this.setPixelStore(this.#gl.UNPACK_FLIP_Y_WEBGL, flip)
+    this.setPixelStore(this.gl.UNPACK_FLIP_Y_WEBGL, flip)
     return this
   }
 
@@ -195,7 +198,7 @@ export class Texture {
    * @returns {this}
    */
   setPixelStore(name: GLenum, params: GLenum): this {
-    this.#gl.pixelStorei(name, params)
+    this.gl.pixelStorei(name, params)
     return this
   }
 
@@ -203,12 +206,8 @@ export class Texture {
    * @param {GLenum} [filter = gl.LINEAR]
    * @returns {this}
    */
-  setMinFilter(filter = this.#gl.LINEAR): this {
-    this.#gl.texParameteri(
-      this.#gl.TEXTURE_2D,
-      this.#gl.TEXTURE_MIN_FILTER,
-      filter,
-    )
+  setMinFilter(filter = this.gl.LINEAR): this {
+    this.gl.texParameteri(this.target, this.gl.TEXTURE_MIN_FILTER, filter)
     return this
   }
 
@@ -216,12 +215,8 @@ export class Texture {
    * @param {GLenum} [filter = gl.LINEAR]
    * @returns {this}
    */
-  setMagFilter(filter = this.#gl.LINEAR): this {
-    this.#gl.texParameteri(
-      this.#gl.TEXTURE_2D,
-      this.#gl.TEXTURE_MAG_FILTER,
-      filter,
-    )
+  setMagFilter(filter = this.gl.LINEAR): this {
+    this.gl.texParameteri(this.target, this.gl.TEXTURE_MAG_FILTER, filter)
     return this
   }
 
@@ -231,12 +226,9 @@ export class Texture {
    * @param {GLenum} [wrapT = gl.CLAMP_TO_EDGE]
    * @returns {this}
    */
-  setWrap(
-    wrapS = this.#gl.CLAMP_TO_EDGE,
-    wrapT = this.#gl.CLAMP_TO_EDGE,
-  ): this {
-    this.#gl.texParameteri(this.#gl.TEXTURE_2D, this.#gl.TEXTURE_WRAP_S, wrapS)
-    this.#gl.texParameteri(this.#gl.TEXTURE_2D, this.#gl.TEXTURE_WRAP_T, wrapT)
+  setWrap(wrapS = this.gl.CLAMP_TO_EDGE, wrapT = this.gl.CLAMP_TO_EDGE): this {
+    this.gl.texParameteri(this.target, this.gl.TEXTURE_WRAP_S, wrapS)
+    this.gl.texParameteri(this.target, this.gl.TEXTURE_WRAP_T, wrapT)
     return this
   }
 
@@ -249,13 +241,13 @@ export class Texture {
     if (!anisotropyLevel) {
       return this
     }
-    if (this.#anisotropyExtension) {
-      const maxAnisotropySupported = this.#gl.getParameter(
-        this.#anisotropyExtension.MAX_TEXTURE_MAX_ANISOTROPY_EXT,
+    if (this.anisotropyExtension) {
+      const maxAnisotropySupported = this.gl.getParameter(
+        this.anisotropyExtension.MAX_TEXTURE_MAX_ANISOTROPY_EXT,
       )
-      this.#gl.texParameterf(
-        this.#gl.TEXTURE_2D,
-        this.#anisotropyExtension.TEXTURE_MAX_ANISOTROPY_EXT,
+      this.gl.texParameterf(
+        this.target,
+        this.anisotropyExtension.TEXTURE_MAX_ANISOTROPY_EXT,
         anisotropyLevel || maxAnisotropySupported,
       )
     } else {
@@ -265,7 +257,7 @@ export class Texture {
   }
 
   delete(): void {
-    this.#gl.deleteTexture(this.#texture)
+    this.gl.deleteTexture(this.texture)
   }
 }
 
@@ -311,4 +303,8 @@ export interface TextureInterface {
    * @default gl.LINEAR
    */
   magFilter?: GLenum
+  /**
+   * @default gl.TEXTURE_2D
+   */
+  target?: GLenum
 }
