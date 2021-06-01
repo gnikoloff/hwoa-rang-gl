@@ -26,6 +26,10 @@
 
 [hwoa-rang-gl/tutorials](https://gnikoloff.github.io/hwoa-rang-gl-tutorials/)
 
+### Used in:
+
+- [https://georgi-nikolov.com](https://georgi-nikolov.com)
+
 ### Tools used
 
 - [Typescript](https://www.typescriptlang.org/)
