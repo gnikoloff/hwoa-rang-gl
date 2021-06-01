@@ -4,6 +4,7 @@ export { Transform } from './core/transform'
 export { Mesh } from './core/mesh'
 export { InstancedMesh } from './core/instanced-mesh'
 export { Texture } from './core/texture'
+export { CubeTexture } from './core/cube-texture'
 export { Framebuffer } from './core/framebuffer'
 
 export { CameraController } from './camera/camera-controller'
@@ -14,5 +15,6 @@ export { SwapRenderer } from './extra/swap-renderer'
 
 export * from './utils/gl-utils'
 export * from './utils/gl-constants'
+export * from './utils/math'
 
 export * as GeometryUtils from './geometry-utils'

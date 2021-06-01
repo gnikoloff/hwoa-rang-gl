@@ -45,6 +45,29 @@
     .npm-link {
       text-decoration: none;
     }
+    .projects {
+      display: flex;
+      flex-wrap: wrap;
+    }
+    .project {
+      width: 100%;
+    }
+    
+    @media (min-width: 600px) {
+      .project {
+        width: calc(100% / 2);
+      } 
+    }
+
+    .project h5 {
+      margin: 0;
+      font-weight: 400;
+    }
+
+    .project img {
+      width: 100%;
+      margin-bottom: 0.5rem;
+    }
   </style>
 
   <!-- Primary Meta Tags -->
@@ -121,6 +144,16 @@
 
     <h3>Tutorials</h3>
     <a href="https://gnikoloff.github.io/hwoa-rang-gl-tutorials/">hwoa-rang-gl/tutorials</a>
+
+    <h3>Used in:</h3>
+    <div class="projects">
+      <div class="project">
+        <a target="_blank" href="https://georgi-nikolov.com">
+          <img src="https://georgi-nikolov.com/assets/georgi-nikolov-social-preview.png" />
+          <h5>https://georgi-nikolov.com</h5>
+        </a>
+      </div>
+    </div>
 
     <h3>Tools used</h3>
     <ul>
