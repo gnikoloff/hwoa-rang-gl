@@ -33,7 +33,7 @@ export interface Box {
  * @param {Box} params
  * @returns {{ vertices, normal, uv, indices }}
  */
-export declare function createBox(params?: Box): any[] | {
+export declare function createBox(params?: Box): {
     vertices: Float32Array;
     normal: Float32Array;
     uv: Float32Array;

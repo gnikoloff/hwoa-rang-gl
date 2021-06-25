@@ -3,15 +3,23 @@
  * @public
  */
 export declare class Texture {
-    #private;
+    protected gl: WebGLRenderingContext;
+    protected texture: WebGLTexture | null;
+    protected width: number;
+    protected height: number;
+    protected format: number;
+    protected internalFormat: number;
+    protected type: number;
+    protected anisotropyExtension: EXT_texture_filter_anisotropic;
+    protected target: number;
     static isPowerOf2: (width: number, height: number) => boolean;
-    constructor(gl: WebGLRenderingContext, { format, internalFormat, type, unpackAlignment, wrapS, wrapT, minFilter, magFilter, }?: TextureInterface);
+    constructor(gl: WebGLRenderingContext, { format, internalFormat, type, unpackAlignment, wrapS, wrapT, minFilter, magFilter, target, }?: TextureInterface);
     /**
      * @returns {WebGLTexture|null}
      */
     getTexture(): WebGLTexture | null;
     /**
-     * Binds the texture to gl.TEXTURE_2D
+     * Binds the texture to the target
      * @returns {this}
      */
     bind(): this;
@@ -119,4 +127,8 @@ export interface TextureInterface {
      * @default gl.LINEAR
      */
     magFilter?: GLenum;
+    /**
+     * @default gl.TEXTURE_2D
+     */
+    target?: GLenum;
 }

@@ -22,6 +22,15 @@ export declare class Mesh extends Transform {
     drawMode: GLenum;
     constructor(gl: WebGLRenderingContext, params: MeshInterface);
     /**
+     *
+     * @param {string} key - Name of attribute. Must match attribute name in your GLSL program
+     * @param {number} index - Index to start updating your typed array from
+     * @param {number} size - How many items are to be updated
+     * @param {Float32Array} subTypeArray - The whole or partial array to update your attribute with
+     * @returns {this}
+     */
+    updateGeometryAttribute(key: string, index: number, size: number, subTypeArray: Float32Array): this;
+    /**
      * Binds the program
      * @returns {this}
      */

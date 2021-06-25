@@ -24,6 +24,15 @@ export declare class Geometry {
      */
     addAttribute(key: string, params: WebGLArrayBufferInterface): this;
     /**
+     *
+     * @param {string} key - Name of attribute. Must match attribute name in your GLSL program
+     * @param {number} index - Index to start updating your typed array from
+     * @param {number} size - How many items are to be updated
+     * @param {Float32Array} subTypeArray - The whole or partial array to update your attribute with
+     * @returns {this}
+     */
+    updateAttribute(key: string, index: number, size: number, subTypeArray: Float32Array): this;
+    /**
      * @description Delete all buffers associated with this geometry
      */
     delete(): void;
