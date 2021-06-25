@@ -127,12 +127,19 @@ const cachedExtensions = new Map()
  * Obtains and returns a WebGL extension if available. Caches it in-memory for future use.
  * @param {WebGLRenderingContext)} gl
  * @param {string} extensionName
+ * @param {boolean} caching
  */
-export function getExtension(gl: WebGLRenderingContext, extensionName: string) {
-  if (cachedExtensions.has(extensionName)) {
+export function getExtension(
+  gl: WebGLRenderingContext,
+  extensionName: string,
+  caching: boolean = false,
+) {
+  if (caching && cachedExtensions.has(extensionName)) {
     return cachedExtensions.get(extensionName)
   }
   const extension = gl.getExtension(extensionName)
-  cachedExtensions.set(extensionName, extension)
+  if (caching) {
+    cachedExtensions.set(extensionName, extension)
+  }
   return extension
 }
