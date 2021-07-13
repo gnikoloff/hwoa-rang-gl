@@ -80,6 +80,11 @@
 				<ul class="tsd-hierarchy">
 					<li>
 						<span class="target">Texture</span>
+						<ul class="tsd-hierarchy">
+							<li>
+								<a href="core_cube_texture.cubetexture.html" class="tsd-signature-type" data-tsd-kind="Class">CubeTexture</a>
+							</li>
+						</ul>
 					</li>
 				</ul>
 			</section>
@@ -93,17 +98,18 @@
 								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="core_texture.texture.html#constructor" class="tsd-kind-icon">constructor</a></li>
 							</ul>
 						</section>
-						<section class="tsd-index-section tsd-is-private tsd-is-private-protected">
+						<section class="tsd-index-section tsd-is-private-protected">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="core_texture.texture.html#_anisotropyextension" class="tsd-kind-icon">#anisotropy<wbr>Extension</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="core_texture.texture.html#_format" class="tsd-kind-icon">#format</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="core_texture.texture.html#_gl" class="tsd-kind-icon">#gl</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="core_texture.texture.html#_height" class="tsd-kind-icon">#height</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="core_texture.texture.html#_internalformat" class="tsd-kind-icon">#internal<wbr>Format</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="core_texture.texture.html#_texture" class="tsd-kind-icon">#texture</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="core_texture.texture.html#_type" class="tsd-kind-icon">#type</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="core_texture.texture.html#_width" class="tsd-kind-icon">#width</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="core_texture.texture.html#anisotropyextension" class="tsd-kind-icon">anisotropy<wbr>Extension</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="core_texture.texture.html#format" class="tsd-kind-icon">format</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="core_texture.texture.html#gl" class="tsd-kind-icon">gl</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="core_texture.texture.html#height" class="tsd-kind-icon">height</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="core_texture.texture.html#internalformat" class="tsd-kind-icon">internal<wbr>Format</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="core_texture.texture.html#target" class="tsd-kind-icon">target</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="core_texture.texture.html#texture" class="tsd-kind-icon">texture</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="core_texture.texture.html#type" class="tsd-kind-icon">type</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="core_texture.texture.html#width" class="tsd-kind-icon">width</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
@@ -142,7 +148,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/texture.ts#L20">core/texture.ts:20</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/texture.ts#L21">core/texture.ts:21</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -159,85 +165,95 @@
 					</ul>
 				</section>
 			</section>
-			<section class="tsd-panel-group tsd-member-group tsd-is-private tsd-is-private-protected">
+			<section class="tsd-panel-group tsd-member-group tsd-is-private-protected">
 				<h2>Properties</h2>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
-					<a name="_anisotropyextension" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> #anisotropy<wbr>Extension</h3>
-					<div class="tsd-signature tsd-kind-icon">#anisotropy<wbr>Extension<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">EXT_texture_filter_anisotropic</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+					<a name="anisotropyextension" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> anisotropy<wbr>Extension</h3>
+					<div class="tsd-signature tsd-kind-icon">anisotropy<wbr>Extension<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">EXT_texture_filter_anisotropic</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/texture.ts#L17">core/texture.ts:17</a></li>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/texture.ts#L17">core/texture.ts:17</a></li>
 						</ul>
 					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
-					<a name="_format" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> #format</h3>
-					<div class="tsd-signature tsd-kind-icon">#format<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+					<a name="format" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> format</h3>
+					<div class="tsd-signature tsd-kind-icon">format<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/texture.ts#L14">core/texture.ts:14</a></li>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/texture.ts#L14">core/texture.ts:14</a></li>
 						</ul>
 					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
-					<a name="_gl" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> #gl</h3>
-					<div class="tsd-signature tsd-kind-icon">#gl<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">WebGLRenderingContext</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+					<a name="gl" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> gl</h3>
+					<div class="tsd-signature tsd-kind-icon">gl<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">WebGLRenderingContext</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/texture.ts#L9">core/texture.ts:9</a></li>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/texture.ts#L9">core/texture.ts:9</a></li>
 						</ul>
 					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
-					<a name="_height" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> #height</h3>
-					<div class="tsd-signature tsd-kind-icon">#height<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+					<a name="height" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> height</h3>
+					<div class="tsd-signature tsd-kind-icon">height<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/texture.ts#L13">core/texture.ts:13</a></li>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/texture.ts#L13">core/texture.ts:13</a></li>
 						</ul>
 					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
-					<a name="_internalformat" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> #internal<wbr>Format</h3>
-					<div class="tsd-signature tsd-kind-icon">#internal<wbr>Format<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+					<a name="internalformat" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> internal<wbr>Format</h3>
+					<div class="tsd-signature tsd-kind-icon">internal<wbr>Format<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/texture.ts#L15">core/texture.ts:15</a></li>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/texture.ts#L15">core/texture.ts:15</a></li>
 						</ul>
 					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
-					<a name="_texture" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> #texture</h3>
-					<div class="tsd-signature tsd-kind-icon">#texture<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">WebGLTexture</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+					<a name="target" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> target</h3>
+					<div class="tsd-signature tsd-kind-icon">target<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/texture.ts#L10">core/texture.ts:10</a></li>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/texture.ts#L18">core/texture.ts:18</a></li>
 						</ul>
 					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
-					<a name="_type" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> #type</h3>
-					<div class="tsd-signature tsd-kind-icon">#type<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+					<a name="texture" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> texture</h3>
+					<div class="tsd-signature tsd-kind-icon">texture<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">WebGLTexture</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/texture.ts#L16">core/texture.ts:16</a></li>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/texture.ts#L10">core/texture.ts:10</a></li>
 						</ul>
 					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
-					<a name="_width" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> #width</h3>
-					<div class="tsd-signature tsd-kind-icon">#width<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+					<a name="type" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> type</h3>
+					<div class="tsd-signature tsd-kind-icon">type<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/texture.ts#L12">core/texture.ts:12</a></li>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/texture.ts#L16">core/texture.ts:16</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+					<a name="width" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> width</h3>
+					<div class="tsd-signature tsd-kind-icon">width<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/texture.ts#L12">core/texture.ts:12</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -254,12 +270,12 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/texture.ts#L67">core/texture.ts:67</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/texture.ts#L70">core/texture.ts:70</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Binds the texture to gl.TEXTURE_2D</p>
+									<p>Binds the texture to the target</p>
 								</div>
 							</div>
 							<h4 class="tsd-returns-title">Returns <a href="core_texture.texture.html" class="tsd-signature-type" data-tsd-kind="Class">Texture</a></h4>
@@ -276,7 +292,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/texture.ts#L267">core/texture.ts:267</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/texture.ts#L259">core/texture.ts:259</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -293,7 +309,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/texture.ts#L138">core/texture.ts:138</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/texture.ts#L141">core/texture.ts:141</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -316,19 +332,19 @@
 					<a name="fromimage" class="tsd-anchor"></a>
 					<h3>from<wbr>Image</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">from<wbr>Image<span class="tsd-signature-symbol">(</span>image<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">HTMLImageElement</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">HTMLVideoElement</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">HTMLCanvasElement</span>, width<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, height<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="core_texture.texture.html" class="tsd-signature-type" data-tsd-kind="Class">Texture</a></li>
+						<li class="tsd-signature tsd-kind-icon">from<wbr>Image<span class="tsd-signature-symbol">(</span>image<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">HTMLImageElement</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">HTMLCanvasElement</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">HTMLVideoElement</span>, width<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, height<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="core_texture.texture.html" class="tsd-signature-type" data-tsd-kind="Class">Texture</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/texture.ts#L87">core/texture.ts:87</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/texture.ts#L90">core/texture.ts:90</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>image: <span class="tsd-signature-type">HTMLImageElement</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">HTMLVideoElement</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">HTMLCanvasElement</span></h5>
+									<h5>image: <span class="tsd-signature-type">HTMLImageElement</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">HTMLCanvasElement</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">HTMLVideoElement</span></h5>
 								</li>
 								<li>
 									<h5>width: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = ...</span></h5>
@@ -351,7 +367,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/texture.ts#L111">core/texture.ts:111</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/texture.ts#L114">core/texture.ts:114</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -377,7 +393,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/texture.ts#L162">core/texture.ts:162</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/texture.ts#L165">core/texture.ts:165</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="core_texture.texture.html" class="tsd-signature-type" data-tsd-kind="Class">Texture</a></h4>
@@ -394,7 +410,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/texture.ts#L59">core/texture.ts:59</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/texture.ts#L62">core/texture.ts:62</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">WebGLTexture</span></h4>
@@ -411,7 +427,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/texture.ts#L248">core/texture.ts:248</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/texture.ts#L240">core/texture.ts:240</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -434,7 +450,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/texture.ts#L173">core/texture.ts:173</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/texture.ts#L176">core/texture.ts:176</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -463,7 +479,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/texture.ts#L187">core/texture.ts:187</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/texture.ts#L190">core/texture.ts:190</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -486,7 +502,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/texture.ts#L219">core/texture.ts:219</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/texture.ts#L218">core/texture.ts:218</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -509,7 +525,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/texture.ts#L206">core/texture.ts:206</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/texture.ts#L209">core/texture.ts:209</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -532,7 +548,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/texture.ts#L197">core/texture.ts:197</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/texture.ts#L200">core/texture.ts:200</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -558,7 +574,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/texture.ts#L234">core/texture.ts:234</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/texture.ts#L229">core/texture.ts:229</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -584,7 +600,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/texture.ts#L76">core/texture.ts:76</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/texture.ts#L79">core/texture.ts:79</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -606,7 +622,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/texture.ts#L19">core/texture.ts:19</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/texture.ts#L20">core/texture.ts:20</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -630,74 +646,8 @@
 					<li class=" ">
 						<a href="../modules.html">Exports</a>
 					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/camera_camera_controller.html">camera/camera-<wbr>controller</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/camera_orthographic_camera.html">camera/orthographic-<wbr>camera</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/camera_perspective_camera.html">camera/perspective-<wbr>camera</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/core_framebuffer.html">core/framebuffer</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/core_geometry.html">core/geometry</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/core_instanced_mesh.html">core/instanced-<wbr>mesh</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/core_mesh.html">core/mesh</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/core_program.html">core/program</a>
-					</li>
 					<li class="current tsd-kind-module">
 						<a href="../modules/core_texture.html">core/texture</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/core_transform.html">core/transform</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/extra_swap_renderer.html">extra/swap-<wbr>renderer</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/geometry_utils.html">geometry-<wbr>utils</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/geometry_utils_build_plane.html">geometry-<wbr>utils/build-<wbr>plane</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/geometry_utils_create_box.html">geometry-<wbr>utils/create-<wbr>box</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/geometry_utils_create_circle.html">geometry-<wbr>utils/create-<wbr>circle</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/geometry_utils_create_plane.html">geometry-<wbr>utils/create-<wbr>plane</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/geometry_utils_create_sphere.html">geometry-<wbr>utils/create-<wbr>sphere</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/geometry_utils_create_torus.html">geometry-<wbr>utils/create-<wbr>torus</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/index.html">index</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/utils_gl_constants.html">utils/gl-<wbr>constants</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/utils_gl_utils.html">utils/gl-<wbr>utils</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/utils_math.html">utils/math</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/utils_shader_snippets.html">utils/shader-<wbr>snippets</a>
 					</li>
 				</ul>
 			</nav>
@@ -711,29 +661,32 @@
 							<li class=" tsd-kind-constructor tsd-parent-kind-class">
 								<a href="core_texture.texture.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="core_texture.texture.html#_anisotropyextension" class="tsd-kind-icon">#anisotropy<wbr>Extension</a>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+								<a href="core_texture.texture.html#anisotropyextension" class="tsd-kind-icon">anisotropy<wbr>Extension</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="core_texture.texture.html#_format" class="tsd-kind-icon">#format</a>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+								<a href="core_texture.texture.html#format" class="tsd-kind-icon">format</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="core_texture.texture.html#_gl" class="tsd-kind-icon">#gl</a>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+								<a href="core_texture.texture.html#gl" class="tsd-kind-icon">gl</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="core_texture.texture.html#_height" class="tsd-kind-icon">#height</a>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+								<a href="core_texture.texture.html#height" class="tsd-kind-icon">height</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="core_texture.texture.html#_internalformat" class="tsd-kind-icon">#internal<wbr>Format</a>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+								<a href="core_texture.texture.html#internalformat" class="tsd-kind-icon">internal<wbr>Format</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="core_texture.texture.html#_texture" class="tsd-kind-icon">#texture</a>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+								<a href="core_texture.texture.html#target" class="tsd-kind-icon">target</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="core_texture.texture.html#_type" class="tsd-kind-icon">#type</a>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+								<a href="core_texture.texture.html#texture" class="tsd-kind-icon">texture</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="core_texture.texture.html#_width" class="tsd-kind-icon">#width</a>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+								<a href="core_texture.texture.html#type" class="tsd-kind-icon">type</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+								<a href="core_texture.texture.html#width" class="tsd-kind-icon">width</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="core_texture.texture.html#bind" class="tsd-kind-icon">bind</a>
@@ -813,7 +766,7 @@
 				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
 			</ul>
 			<ul class="tsd-legend">
-				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>

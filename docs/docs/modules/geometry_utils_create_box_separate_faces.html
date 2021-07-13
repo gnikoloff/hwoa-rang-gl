@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>geometry-utils/create-circle | hwoa-rang-gl</title>
+	<title>geometry-utils/create-box-separate-faces | hwoa-rang-gl</title>
 	<meta name="description" content="Documentation for hwoa-rang-gl">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -55,10 +55,10 @@
 					<a href="../modules.html">hwoa-rang-gl</a>
 				</li>
 				<li>
-					<a href="geometry_utils_create_circle.html">geometry-utils/create-circle</a>
+					<a href="geometry_utils_create_box_separate_faces.html">geometry-utils/create-box-separate-faces</a>
 				</li>
 			</ul>
-			<h1>Module geometry-utils/create-circle</h1>
+			<h1>Module geometry-utils/create-box-separate-faces</h1>
 		</div>
 	</div>
 </header>
@@ -70,9 +70,15 @@
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
+							<h3>Interfaces</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/geometry_utils_create_box_separate_faces.box.html" class="tsd-kind-icon">Box</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-function tsd-parent-kind-module"><a href="geometry_utils_create_circle.html#createcircle" class="tsd-kind-icon">create<wbr>Circle</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="geometry_utils_create_box_separate_faces.html#createboxseparateface" class="tsd-kind-icon">create<wbr>Box<wbr>Separate<wbr>Face</a></li>
 							</ul>
 						</section>
 					</div>
@@ -81,46 +87,31 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Functions</h2>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
-					<a name="createcircle" class="tsd-anchor"></a>
-					<h3>create<wbr>Circle</h3>
+					<a name="createboxseparateface" class="tsd-anchor"></a>
+					<h3>create<wbr>Box<wbr>Separate<wbr>Face</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">create<wbr>Circle<span class="tsd-signature-symbol">(</span>params<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Circle</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>indices<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Uint16Array</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Uint32Array</span><span class="tsd-signature-symbol">; </span>normal<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Float32Array</span><span class="tsd-signature-symbol">; </span>uv<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Float32Array</span><span class="tsd-signature-symbol">; </span>vertices<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Float32Array</span><span class="tsd-signature-symbol"> }</span></li>
+						<li class="tsd-signature tsd-kind-icon">create<wbr>Box<wbr>Separate<wbr>Face<span class="tsd-signature-symbol">(</span>params<span class="tsd-signature-symbol">?: </span><a href="../interfaces/geometry_utils_create_box_separate_faces.box.html" class="tsd-signature-type" data-tsd-kind="Interface">Box</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/geometry-utils/create-circle.ts#L27">geometry-utils/create-circle.ts:27</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/geometry-utils/create-box-separate-faces.ts#L43">geometry-utils/create-box-separate-faces.ts:43</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
-								<dl class="tsd-comment-tags">
-									<dt>description</dt>
-									<dd><p>Generate circle geometry</p>
-									</dd>
-								</dl>
+								<div class="lead">
+									<p>Generates geometry data for a box</p>
+								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>params: <span class="tsd-signature-type">Circle</span><span class="tsd-signature-symbol"> = ...</span></h5>
+									<h5>params: <a href="../interfaces/geometry_utils_create_box_separate_faces.box.html" class="tsd-signature-type" data-tsd-kind="Interface">Box</a><span class="tsd-signature-symbol"> = ...</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">{ </span>indices<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Uint16Array</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Uint32Array</span><span class="tsd-signature-symbol">; </span>normal<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Float32Array</span><span class="tsd-signature-symbol">; </span>uv<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Float32Array</span><span class="tsd-signature-symbol">; </span>vertices<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Float32Array</span><span class="tsd-signature-symbol"> }</span></h4>
-							<ul class="tsd-parameters">
-								<li class="tsd-parameter">
-									<h5>indices<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Uint16Array</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Uint32Array</span></h5>
-								</li>
-								<li class="tsd-parameter">
-									<h5>normal<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Float32Array</span></h5>
-								</li>
-								<li class="tsd-parameter">
-									<h5>uv<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Float32Array</span></h5>
-								</li>
-								<li class="tsd-parameter">
-									<h5>vertices<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Float32Array</span></h5>
-								</li>
-							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h4>
+							<p>]}</p>
 						</li>
 					</ul>
 				</section>
@@ -133,14 +124,17 @@
 						<a href="../modules.html">Exports</a>
 					</li>
 					<li class="current tsd-kind-module">
-						<a href="geometry_utils_create_circle.html">geometry-<wbr>utils/create-<wbr>circle</a>
+						<a href="geometry_utils_create_box_separate_faces.html">geometry-<wbr>utils/create-<wbr>box-<wbr>separate-<wbr>faces</a>
 					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/geometry_utils_create_box_separate_faces.box.html" class="tsd-kind-icon">Box</a>
+					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
-						<a href="geometry_utils_create_circle.html#createcircle" class="tsd-kind-icon">create<wbr>Circle</a>
+						<a href="geometry_utils_create_box_separate_faces.html#createboxseparateface" class="tsd-kind-icon">create<wbr>Box<wbr>Separate<wbr>Face</a>
 					</li>
 				</ul>
 			</nav>

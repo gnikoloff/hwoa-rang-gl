@@ -74,6 +74,9 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="utils_math.html#clamp" class="tsd-kind-icon">clamp</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="utils_math.html#ispowerof2" class="tsd-kind-icon">is<wbr>Power<wbr>Of2</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="utils_math.html#mapnumberrange" class="tsd-kind-icon">map<wbr>Number<wbr>Range</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="utils_math.html#normalizenumber" class="tsd-kind-icon">normalize<wbr>Number</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="utils_math.html#trianglewave" class="tsd-kind-icon">triangle<wbr>Wave</a></li>
 							</ul>
 						</section>
 					</div>
@@ -91,7 +94,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/utils/math.ts#L8">utils/math.ts:8</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/utils/math.ts#L8">utils/math.ts:8</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -125,7 +128,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/utils/math.ts#L16">utils/math.ts:16</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/utils/math.ts#L35">utils/math.ts:35</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -143,6 +146,98 @@
 						</li>
 					</ul>
 				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="mapnumberrange" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> map<wbr>Number<wbr>Range</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">map<wbr>Number<wbr>Range<span class="tsd-signature-symbol">(</span>val<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, inMin<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, inMax<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, outMin<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, outMax<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/utils/math.ts#L20">utils/math.ts:20</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>val: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5>inMin: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5>inMax: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5>outMin: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5>outMax: <span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="normalizenumber" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> normalize<wbr>Number</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">normalize<wbr>Number<span class="tsd-signature-symbol">(</span>min<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, max<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, val<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/utils/math.ts#L45">utils/math.ts:45</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Normalizes a number</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>min: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5>max: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5>val: <span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="trianglewave" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> triangle<wbr>Wave</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">triangle<wbr>Wave<span class="tsd-signature-symbol">(</span>t<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/utils/math.ts#L56">utils/math.ts:56</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>t: <span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						</li>
+					</ul>
+				</section>
 			</section>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
@@ -151,74 +246,8 @@
 					<li class=" ">
 						<a href="../modules.html">Exports</a>
 					</li>
-					<li class=" tsd-kind-module">
-						<a href="camera_camera_controller.html">camera/camera-<wbr>controller</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="camera_orthographic_camera.html">camera/orthographic-<wbr>camera</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="camera_perspective_camera.html">camera/perspective-<wbr>camera</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="core_framebuffer.html">core/framebuffer</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="core_geometry.html">core/geometry</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="core_instanced_mesh.html">core/instanced-<wbr>mesh</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="core_mesh.html">core/mesh</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="core_program.html">core/program</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="core_texture.html">core/texture</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="core_transform.html">core/transform</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="extra_swap_renderer.html">extra/swap-<wbr>renderer</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="geometry_utils.html">geometry-<wbr>utils</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="geometry_utils_build_plane.html">geometry-<wbr>utils/build-<wbr>plane</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="geometry_utils_create_box.html">geometry-<wbr>utils/create-<wbr>box</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="geometry_utils_create_circle.html">geometry-<wbr>utils/create-<wbr>circle</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="geometry_utils_create_plane.html">geometry-<wbr>utils/create-<wbr>plane</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="geometry_utils_create_sphere.html">geometry-<wbr>utils/create-<wbr>sphere</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="geometry_utils_create_torus.html">geometry-<wbr>utils/create-<wbr>torus</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="index.html">index</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="utils_gl_constants.html">utils/gl-<wbr>constants</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="utils_gl_utils.html">utils/gl-<wbr>utils</a>
-					</li>
 					<li class="current tsd-kind-module">
 						<a href="utils_math.html">utils/math</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="utils_shader_snippets.html">utils/shader-<wbr>snippets</a>
 					</li>
 				</ul>
 			</nav>
@@ -229,6 +258,15 @@
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
 						<a href="utils_math.html#ispowerof2" class="tsd-kind-icon">is<wbr>Power<wbr>Of2</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="utils_math.html#mapnumberrange" class="tsd-kind-icon">map<wbr>Number<wbr>Range</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="utils_math.html#normalizenumber" class="tsd-kind-icon">normalize<wbr>Number</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="utils_math.html#trianglewave" class="tsd-kind-icon">triangle<wbr>Wave</a>
 					</li>
 				</ul>
 			</nav>

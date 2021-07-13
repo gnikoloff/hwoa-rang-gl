@@ -23,19 +23,10 @@ export interface Box {
      * @defaultValue 1
      */
     depthSegments?: number;
-    /**
-     * @defaultValue false
-     */
-    separateFaces?: boolean;
 }
 /**
  * Generates geometry data for a box
  * @param {Box} params
- * @returns {{ vertices, normal, uv, indices }}
+ * @returns {[{ vertices, normal, uv, indices, orientation }]}
  */
-export declare function createBox(params?: Box): any[] | {
-    vertices: Float32Array;
-    normal: Float32Array;
-    uv: Float32Array;
-    indices: Uint32Array | Uint16Array;
-};
+export declare function createBoxSeparateFace(params?: Box): any[];

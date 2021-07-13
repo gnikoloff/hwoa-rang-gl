@@ -109,6 +109,7 @@
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="core_geometry.geometry.html#addattribute" class="tsd-kind-icon">add<wbr>Attribute</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="core_geometry.geometry.html#addindex" class="tsd-kind-icon">add<wbr>Index</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="core_geometry.geometry.html#delete" class="tsd-kind-icon">delete</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="core_geometry.geometry.html#updateattribute" class="tsd-kind-icon">update<wbr>Attribute</a></li>
 							</ul>
 						</section>
 					</div>
@@ -126,7 +127,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/geometry.ts#L16">core/geometry.ts:16</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/geometry.ts#L16">core/geometry.ts:16</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -148,7 +149,7 @@
 					<div class="tsd-signature tsd-kind-icon">#gl<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">WebGLRenderingContext</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/geometry.ts#L13">core/geometry.ts:13</a></li>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/geometry.ts#L13">core/geometry.ts:13</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -158,7 +159,7 @@
 					<div class="tsd-signature tsd-kind-icon">attributes<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Map</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/geometry.ts#L15">core/geometry.ts:15</a></li>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/geometry.ts#L15">core/geometry.ts:15</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -168,7 +169,7 @@
 					<div class="tsd-signature tsd-kind-icon">vertex<wbr>Count<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 0</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/geometry.ts#L16">core/geometry.ts:16</a></li>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/geometry.ts#L16">core/geometry.ts:16</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -185,7 +186,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/geometry.ts#L41">core/geometry.ts:41</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/geometry.ts#L41">core/geometry.ts:41</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -221,7 +222,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/geometry.ts#L27">core/geometry.ts:27</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/geometry.ts#L27">core/geometry.ts:27</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -251,7 +252,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/geometry.ts#L74">core/geometry.ts:74</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/geometry.ts#L106">core/geometry.ts:106</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -265,6 +266,50 @@
 						</li>
 					</ul>
 				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="updateattribute" class="tsd-anchor"></a>
+					<h3>update<wbr>Attribute</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">update<wbr>Attribute<span class="tsd-signature-symbol">(</span>key<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, index<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, size<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, subTypeArray<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Float32Array</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="core_geometry.geometry.html" class="tsd-signature-type" data-tsd-kind="Class">Geometry</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/geometry.ts#L79">core/geometry.ts:79</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>key: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Name of attribute. Must match attribute name in your GLSL program</p>
+									</div>
+								</li>
+								<li>
+									<h5>index: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Index to start updating your typed array from</p>
+									</div>
+								</li>
+								<li>
+									<h5>size: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>How many items are to be updated</p>
+									</div>
+								</li>
+								<li>
+									<h5>subTypeArray: <span class="tsd-signature-type">Float32Array</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The whole or partial array to update your attribute with</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="core_geometry.geometry.html" class="tsd-signature-type" data-tsd-kind="Class">Geometry</a></h4>
+						</li>
+					</ul>
+				</section>
 			</section>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
@@ -273,74 +318,8 @@
 					<li class=" ">
 						<a href="../modules.html">Exports</a>
 					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/camera_camera_controller.html">camera/camera-<wbr>controller</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/camera_orthographic_camera.html">camera/orthographic-<wbr>camera</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/camera_perspective_camera.html">camera/perspective-<wbr>camera</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/core_framebuffer.html">core/framebuffer</a>
-					</li>
 					<li class="current tsd-kind-module">
 						<a href="../modules/core_geometry.html">core/geometry</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/core_instanced_mesh.html">core/instanced-<wbr>mesh</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/core_mesh.html">core/mesh</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/core_program.html">core/program</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/core_texture.html">core/texture</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/core_transform.html">core/transform</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/extra_swap_renderer.html">extra/swap-<wbr>renderer</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/geometry_utils.html">geometry-<wbr>utils</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/geometry_utils_build_plane.html">geometry-<wbr>utils/build-<wbr>plane</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/geometry_utils_create_box.html">geometry-<wbr>utils/create-<wbr>box</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/geometry_utils_create_circle.html">geometry-<wbr>utils/create-<wbr>circle</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/geometry_utils_create_plane.html">geometry-<wbr>utils/create-<wbr>plane</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/geometry_utils_create_sphere.html">geometry-<wbr>utils/create-<wbr>sphere</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/geometry_utils_create_torus.html">geometry-<wbr>utils/create-<wbr>torus</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/index.html">index</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/utils_gl_constants.html">utils/gl-<wbr>constants</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/utils_gl_utils.html">utils/gl-<wbr>utils</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/utils_math.html">utils/math</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/utils_shader_snippets.html">utils/shader-<wbr>snippets</a>
 					</li>
 				</ul>
 			</nav>
@@ -371,6 +350,9 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="core_geometry.geometry.html#delete" class="tsd-kind-icon">delete</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="core_geometry.geometry.html#updateattribute" class="tsd-kind-icon">update<wbr>Attribute</a>
 							</li>
 						</ul>
 					</li>

@@ -34,5 +34,6 @@ export declare function createIndexBuffer(gl: WebGLRenderingContext, indices: Ui
  * Obtains and returns a WebGL extension if available. Caches it in-memory for future use.
  * @param {WebGLRenderingContext)} gl
  * @param {string} extensionName
+ * @param {boolean} caching
  */
-export declare function getExtension(gl: WebGLRenderingContext, extensionName: string): any;
+export declare function getExtension(gl: WebGLRenderingContext, extensionName: string, caching?: boolean): any;

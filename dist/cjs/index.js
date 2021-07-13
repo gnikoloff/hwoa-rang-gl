@@ -154,13 +154,16 @@
      * Obtains and returns a WebGL extension if available. Caches it in-memory for future use.
      * @param {WebGLRenderingContext)} gl
      * @param {string} extensionName
+     * @param {boolean} caching
      */
-    function getExtension(gl, extensionName) {
-        if (cachedExtensions.has(extensionName)) {
+    function getExtension(gl, extensionName, caching = false) {
+        if (caching && cachedExtensions.has(extensionName)) {
             return cachedExtensions.get(extensionName);
         }
         const extension = gl.getExtension(extensionName);
-        cachedExtensions.set(extensionName, extension);
+        if (caching) {
+            cachedExtensions.set(extensionName, extension);
+        }
         return extension;
     }
 
@@ -2181,6 +2184,10 @@
             this.near = near;
             this.far = far;
             this.updateProjectionMatrix();
+        }
+        setPosition({ x = this.position[0], y = this.position[1], z = this.position[2], }) {
+            this.position = [x, y, z];
+            return this;
         }
         updateViewMatrix() {
             lookAt(this.viewMatrix, this.position, this.lookAtPosition, PerspectiveCamera.UP_VECTOR);

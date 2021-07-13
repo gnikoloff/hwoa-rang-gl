@@ -25,6 +25,15 @@ export class PerspectiveCamera {
     this.updateProjectionMatrix()
   }
 
+  setPosition({
+    x = this.position[0],
+    y = this.position[1],
+    z = this.position[2],
+  }) {
+    this.position = [x, y, z]
+    return this
+  }
+
   updateViewMatrix(): this {
     mat4.lookAt(
       this.viewMatrix,

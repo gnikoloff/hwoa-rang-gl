@@ -11,6 +11,11 @@ export declare class PerspectiveCamera {
     near: number;
     far: number;
     constructor(fieldOfView: number, aspect: number, near: number, far: number);
+    setPosition({ x, y, z, }: {
+        x?: number | undefined;
+        y?: number | undefined;
+        z?: number | undefined;
+    }): this;
     updateViewMatrix(): this;
     updateProjectionMatrix(): this;
     lookAt(target: [number, number, number]): this;

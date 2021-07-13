@@ -94,7 +94,9 @@
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="core_framebuffer.framebuffer.html#_depthbuffer" class="tsd-kind-icon">#depth<wbr>Buffer</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="core_framebuffer.framebuffer.html#_gl" class="tsd-kind-icon">#gl</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="core_framebuffer.framebuffer.html#_height" class="tsd-kind-icon">#height</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="core_framebuffer.framebuffer.html#_usedepthrenderbuffer" class="tsd-kind-icon">#use<wbr>Depth<wbr>Render<wbr>Buffer</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="core_framebuffer.framebuffer.html#_width" class="tsd-kind-icon">#width</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="core_framebuffer.framebuffer.html#depthtexture" class="tsd-kind-icon">depth<wbr>Texture</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="core_framebuffer.framebuffer.html#texture" class="tsd-kind-icon">texture</a></li>
 							</ul>
 						</section>
@@ -117,13 +119,13 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Framebuffer<span class="tsd-signature-symbol">(</span>gl<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WebGLRenderingContext</span>, __namedParameters<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">FramebufferInterface</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="core_framebuffer.framebuffer.html" class="tsd-signature-type" data-tsd-kind="Class">Framebuffer</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Framebuffer<span class="tsd-signature-symbol">(</span>gl<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WebGLRenderingContext</span>, params<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">FramebufferOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="core_framebuffer.framebuffer.html" class="tsd-signature-type" data-tsd-kind="Class">Framebuffer</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/framebuffer.ts#L56">core/framebuffer.ts:56</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/framebuffer.ts#L67">core/framebuffer.ts:67</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -132,7 +134,7 @@
 									<h5>gl: <span class="tsd-signature-type">WebGLRenderingContext</span></h5>
 								</li>
 								<li>
-									<h5>__namedParameters: <span class="tsd-signature-type">FramebufferInterface</span><span class="tsd-signature-symbol"> = ...</span></h5>
+									<h5>params: <span class="tsd-signature-type">FramebufferOptions</span><span class="tsd-signature-symbol"> = ...</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="core_framebuffer.framebuffer.html" class="tsd-signature-type" data-tsd-kind="Class">Framebuffer</a></h4>
@@ -148,7 +150,7 @@
 					<div class="tsd-signature tsd-kind-icon">#buffer<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">WebGLFramebuffer</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/framebuffer.ts#L49">core/framebuffer.ts:49</a></li>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/framebuffer.ts#L58">core/framebuffer.ts:58</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -158,7 +160,7 @@
 					<div class="tsd-signature tsd-kind-icon">#depth<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/framebuffer.ts#L54">core/framebuffer.ts:54</a></li>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/framebuffer.ts#L63">core/framebuffer.ts:63</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -168,7 +170,7 @@
 					<div class="tsd-signature tsd-kind-icon">#depth<wbr>Buffer<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">WebGLRenderbuffer</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/framebuffer.ts#L50">core/framebuffer.ts:50</a></li>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/framebuffer.ts#L59">core/framebuffer.ts:59</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -178,7 +180,7 @@
 					<div class="tsd-signature tsd-kind-icon">#gl<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">WebGLRenderingContext</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/framebuffer.ts#L48">core/framebuffer.ts:48</a></li>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/framebuffer.ts#L57">core/framebuffer.ts:57</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -188,7 +190,17 @@
 					<div class="tsd-signature tsd-kind-icon">#height<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/framebuffer.ts#L53">core/framebuffer.ts:53</a></li>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/framebuffer.ts#L62">core/framebuffer.ts:62</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="_usedepthrenderbuffer" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> #use<wbr>Depth<wbr>Render<wbr>Buffer</h3>
+					<div class="tsd-signature tsd-kind-icon">#use<wbr>Depth<wbr>Render<wbr>Buffer<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/framebuffer.ts#L64">core/framebuffer.ts:64</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -198,7 +210,17 @@
 					<div class="tsd-signature tsd-kind-icon">#width<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/framebuffer.ts#L52">core/framebuffer.ts:52</a></li>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/framebuffer.ts#L61">core/framebuffer.ts:61</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="depthtexture" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> depth<wbr>Texture</h3>
+					<div class="tsd-signature tsd-kind-icon">depth<wbr>Texture<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><a href="core_texture.texture.html" class="tsd-signature-type" data-tsd-kind="Class">Texture</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/framebuffer.ts#L67">core/framebuffer.ts:67</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -208,7 +230,7 @@
 					<div class="tsd-signature tsd-kind-icon">texture<span class="tsd-signature-symbol">:</span> <a href="core_texture.texture.html" class="tsd-signature-type" data-tsd-kind="Class">Texture</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/framebuffer.ts#L56">core/framebuffer.ts:56</a></li>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/framebuffer.ts#L66">core/framebuffer.ts:66</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -225,7 +247,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/framebuffer.ts#L100">core/framebuffer.ts:100</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/framebuffer.ts#L112">core/framebuffer.ts:112</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="core_framebuffer.framebuffer.html" class="tsd-signature-type" data-tsd-kind="Class">Framebuffer</a></h4>
@@ -242,7 +264,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/framebuffer.ts#L157">core/framebuffer.ts:157</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/framebuffer.ts#L191">core/framebuffer.ts:191</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -259,7 +281,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/framebuffer.ts#L150">core/framebuffer.ts:150</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/framebuffer.ts#L184">core/framebuffer.ts:184</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="core_framebuffer.framebuffer.html" class="tsd-signature-type" data-tsd-kind="Class">Framebuffer</a></h4>
@@ -276,7 +298,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/framebuffer.ts#L105">core/framebuffer.ts:105</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/framebuffer.ts#L117">core/framebuffer.ts:117</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="core_framebuffer.framebuffer.html" class="tsd-signature-type" data-tsd-kind="Class">Framebuffer</a></h4>
@@ -293,7 +315,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/core/framebuffer.ts#L110">core/framebuffer.ts:110</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/framebuffer.ts#L122">core/framebuffer.ts:122</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -320,74 +342,8 @@
 					<li class=" ">
 						<a href="../modules.html">Exports</a>
 					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/camera_camera_controller.html">camera/camera-<wbr>controller</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/camera_orthographic_camera.html">camera/orthographic-<wbr>camera</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/camera_perspective_camera.html">camera/perspective-<wbr>camera</a>
-					</li>
 					<li class="current tsd-kind-module">
 						<a href="../modules/core_framebuffer.html">core/framebuffer</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/core_geometry.html">core/geometry</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/core_instanced_mesh.html">core/instanced-<wbr>mesh</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/core_mesh.html">core/mesh</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/core_program.html">core/program</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/core_texture.html">core/texture</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/core_transform.html">core/transform</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/extra_swap_renderer.html">extra/swap-<wbr>renderer</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/geometry_utils.html">geometry-<wbr>utils</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/geometry_utils_build_plane.html">geometry-<wbr>utils/build-<wbr>plane</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/geometry_utils_create_box.html">geometry-<wbr>utils/create-<wbr>box</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/geometry_utils_create_circle.html">geometry-<wbr>utils/create-<wbr>circle</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/geometry_utils_create_plane.html">geometry-<wbr>utils/create-<wbr>plane</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/geometry_utils_create_sphere.html">geometry-<wbr>utils/create-<wbr>sphere</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/geometry_utils_create_torus.html">geometry-<wbr>utils/create-<wbr>torus</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/index.html">index</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/utils_gl_constants.html">utils/gl-<wbr>constants</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/utils_gl_utils.html">utils/gl-<wbr>utils</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/utils_math.html">utils/math</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/utils_shader_snippets.html">utils/shader-<wbr>snippets</a>
 					</li>
 				</ul>
 			</nav>
@@ -417,7 +373,13 @@
 								<a href="core_framebuffer.framebuffer.html#_height" class="tsd-kind-icon">#height</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="core_framebuffer.framebuffer.html#_usedepthrenderbuffer" class="tsd-kind-icon">#use<wbr>Depth<wbr>Render<wbr>Buffer</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
 								<a href="core_framebuffer.framebuffer.html#_width" class="tsd-kind-icon">#width</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="core_framebuffer.framebuffer.html#depthtexture" class="tsd-kind-icon">depth<wbr>Texture</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="core_framebuffer.framebuffer.html#texture" class="tsd-kind-icon">texture</a>

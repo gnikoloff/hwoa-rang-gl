@@ -90,13 +90,13 @@
 					<a name="createbox" class="tsd-anchor"></a>
 					<h3>create<wbr>Box</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">create<wbr>Box<span class="tsd-signature-symbol">(</span>params<span class="tsd-signature-symbol">?: </span><a href="../interfaces/geometry_utils_create_box.box.html" class="tsd-signature-type" data-tsd-kind="Interface">Box</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span>indices<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Uint16Array</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Uint32Array</span><span class="tsd-signature-symbol">; </span>normal<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Float32Array</span><span class="tsd-signature-symbol">; </span>uv<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Float32Array</span><span class="tsd-signature-symbol">; </span>vertices<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Float32Array</span><span class="tsd-signature-symbol"> }</span></li>
+						<li class="tsd-signature tsd-kind-icon">create<wbr>Box<span class="tsd-signature-symbol">(</span>params<span class="tsd-signature-symbol">?: </span><a href="../interfaces/geometry_utils_create_box.box.html" class="tsd-signature-type" data-tsd-kind="Interface">Box</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>indices<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Uint16Array</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Uint32Array</span><span class="tsd-signature-symbol">; </span>normal<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Float32Array</span><span class="tsd-signature-symbol">; </span>uv<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Float32Array</span><span class="tsd-signature-symbol">; </span>vertices<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Float32Array</span><span class="tsd-signature-symbol"> }</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/581bc44/src/geometry-utils/create-box.ts#L39">geometry-utils/create-box.ts:39</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/geometry-utils/create-box.ts#L39">geometry-utils/create-box.ts:39</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -110,7 +110,21 @@
 									<h5>params: <a href="../interfaces/geometry_utils_create_box.box.html" class="tsd-signature-type" data-tsd-kind="Interface">Box</a><span class="tsd-signature-symbol"> = ...</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span>indices<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Uint16Array</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Uint32Array</span><span class="tsd-signature-symbol">; </span>normal<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Float32Array</span><span class="tsd-signature-symbol">; </span>uv<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Float32Array</span><span class="tsd-signature-symbol">; </span>vertices<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Float32Array</span><span class="tsd-signature-symbol"> }</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">{ </span>indices<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Uint16Array</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Uint32Array</span><span class="tsd-signature-symbol">; </span>normal<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Float32Array</span><span class="tsd-signature-symbol">; </span>uv<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Float32Array</span><span class="tsd-signature-symbol">; </span>vertices<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Float32Array</span><span class="tsd-signature-symbol"> }</span></h4>
+							<ul class="tsd-parameters">
+								<li class="tsd-parameter">
+									<h5>indices<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Uint16Array</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Uint32Array</span></h5>
+								</li>
+								<li class="tsd-parameter">
+									<h5>normal<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Float32Array</span></h5>
+								</li>
+								<li class="tsd-parameter">
+									<h5>uv<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Float32Array</span></h5>
+								</li>
+								<li class="tsd-parameter">
+									<h5>vertices<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Float32Array</span></h5>
+								</li>
+							</ul>
 						</li>
 					</ul>
 				</section>
@@ -122,74 +136,8 @@
 					<li class=" ">
 						<a href="../modules.html">Exports</a>
 					</li>
-					<li class=" tsd-kind-module">
-						<a href="camera_camera_controller.html">camera/camera-<wbr>controller</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="camera_orthographic_camera.html">camera/orthographic-<wbr>camera</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="camera_perspective_camera.html">camera/perspective-<wbr>camera</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="core_framebuffer.html">core/framebuffer</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="core_geometry.html">core/geometry</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="core_instanced_mesh.html">core/instanced-<wbr>mesh</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="core_mesh.html">core/mesh</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="core_program.html">core/program</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="core_texture.html">core/texture</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="core_transform.html">core/transform</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="extra_swap_renderer.html">extra/swap-<wbr>renderer</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="geometry_utils.html">geometry-<wbr>utils</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="geometry_utils_build_plane.html">geometry-<wbr>utils/build-<wbr>plane</a>
-					</li>
 					<li class="current tsd-kind-module">
 						<a href="geometry_utils_create_box.html">geometry-<wbr>utils/create-<wbr>box</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="geometry_utils_create_circle.html">geometry-<wbr>utils/create-<wbr>circle</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="geometry_utils_create_plane.html">geometry-<wbr>utils/create-<wbr>plane</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="geometry_utils_create_sphere.html">geometry-<wbr>utils/create-<wbr>sphere</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="geometry_utils_create_torus.html">geometry-<wbr>utils/create-<wbr>torus</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="index.html">index</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="utils_gl_constants.html">utils/gl-<wbr>constants</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="utils_gl_utils.html">utils/gl-<wbr>utils</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="utils_math.html">utils/math</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="utils_shader_snippets.html">utils/shader-<wbr>snippets</a>
 					</li>
 				</ul>
 			</nav>
