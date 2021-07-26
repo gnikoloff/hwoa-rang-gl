@@ -8,6 +8,10 @@
   "files": [
     "dist"
   ],
+  "exports": {
+    "require": "./dist/esm/index.js",
+    "import": "./dist/cjs/index.js"
+  },
   "scripts": {
     "lint": "eslint src",
     "watch": "rollup -c -w",
