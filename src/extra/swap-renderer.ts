@@ -88,12 +88,12 @@ export class SwapRenderer {
     name: string,
     width: number,
     height: number,
-    data: Float32Array | null,
+    data: Float32Array | null = null,
     filtering = this.#gl.NEAREST,
-    inputType: GLenum,
+    inputType: GLenum = this.#textureType,
   ): this {
     const texture = new Texture(this.#gl, {
-      type: inputType || this.#textureType,
+      type: inputType,
       format: this.#gl.RGBA,
       minFilter: filtering,
       magFilter: filtering,
