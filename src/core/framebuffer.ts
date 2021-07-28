@@ -53,6 +53,9 @@ interface FramebufferOptions {
   inputTexture?: Texture
 }
 
+let _supportsRenderToFloatingPointTexture: boolean | null = null
+let _supportsRenderToHalfFloatingPointTexture: boolean | null = null
+
 export class Framebuffer {
   #gl: WebGLRenderingContext
   #buffer: WebGLFramebuffer | null
@@ -65,6 +68,60 @@ export class Framebuffer {
 
   texture: Texture
   depthTexture?: Texture
+
+  static supportRenderingToFloat(gl) {
+    if (_supportsRenderToFloatingPointTexture !== null) {
+      return _supportsRenderToFloatingPointTexture
+    }
+    getExtension(gl, 'OES_texture_float')
+
+    const texture = new Texture(gl, {
+      format: gl.RGBA,
+      type: gl.FLOAT,
+    })
+      .bind()
+      .fromSize(1, 1)
+
+    const framebuffer = new Framebuffer(gl, {
+      depth: false,
+      inputTexture: texture,
+    }).bind()
+
+    const framebufferStatus = framebuffer.checkCompleteness()
+
+    framebuffer.unbind()
+
+    _supportsRenderToFloatingPointTexture =
+      framebufferStatus === gl.FRAMEBUFFER_COMPLETE
+    return _supportsRenderToFloatingPointTexture
+  }
+
+  static supportRenderingToHalfFloat(gl) {
+    if (_supportsRenderToHalfFloatingPointTexture !== null) {
+      return _supportsRenderToHalfFloatingPointTexture
+    }
+    const ext = getExtension(gl, 'OES_texture_half_float')
+
+    const texture = new Texture(gl, {
+      format: gl.RGBA,
+      type: ext.HALF_FLOAT_OES,
+    })
+      .bind()
+      .fromSize(1, 1)
+
+    const framebuffer = new Framebuffer(gl, {
+      depth: false,
+      inputTexture: texture,
+    }).bind()
+
+    const framebufferStatus = framebuffer.checkCompleteness()
+
+    framebuffer.unbind()
+
+    _supportsRenderToHalfFloatingPointTexture =
+      framebufferStatus === gl.FRAMEBUFFER_COMPLETE
+    return _supportsRenderToHalfFloatingPointTexture
+  }
 
   constructor(gl: WebGLRenderingContext, params: FramebufferOptions = {}) {
     const {
@@ -117,6 +174,10 @@ export class Framebuffer {
   unbind(): this {
     this.#gl.bindFramebuffer(this.#gl.FRAMEBUFFER, null)
     return this
+  }
+
+  checkCompleteness() {
+    return this.#gl.checkFramebufferStatus(this.#gl.FRAMEBUFFER)
   }
 
   updateWithSize(width: number, height: number, updateTexture = false): this {

@@ -27,15 +27,12 @@ export class SwapRenderer {
     this.#camera.position = [0, 0, 1]
     this.#camera.lookAt([0, 0, 0])
 
-    const ext = getExtension(gl, 'WEBGL_color_buffer_float')
-    getExtension(gl, 'OES_texture_float')
-    if (ext) {
+    if (Framebuffer.supportRenderingToFloat(gl)) {
       this.#textureType = gl.FLOAT
     } else {
-      const ext = getExtension(gl, 'EXT_color_buffer_half_float')
-      const ext2 = getExtension(gl, 'OES_texture_half_float')
-      if (ext) {
-        this.#textureType = ext2.HALF_FLOAT_OES
+      if (Framebuffer.supportRenderingToHalfFloat(gl)) {
+        const ext = getExtension(gl, 'OES_texture_half_float')
+        this.#textureType = ext.HALF_FLOAT_OES
       } else {
         this.#textureType = gl.UNSIGNED_BYTE
       }
@@ -88,7 +85,7 @@ export class SwapRenderer {
     name: string,
     width: number,
     height: number,
-    data: Float32Array | null = null,
+    data: Float32Array | Uint16Array | null = null,
     filtering = this.#gl.NEAREST,
     inputType: GLenum = this.#textureType,
   ): this {
@@ -99,6 +96,7 @@ export class SwapRenderer {
       magFilter: filtering,
     })
     texture.bind()
+    console.log(width, height)
     if (data) {
       texture.fromData(data, width, height)
     } else {
