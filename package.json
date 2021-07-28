@@ -1,6 +1,6 @@
 {
   "name": "hwoa-rang-gl",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "WebGL libary",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -8,6 +8,10 @@
   "files": [
     "dist"
   ],
+  "exports": {
+    "require": "./dist/cjs/index.js",
+    "import": "./dist/esm/index.js"
+  },
   "scripts": {
     "lint": "eslint src",
     "watch": "rollup -c -w",
