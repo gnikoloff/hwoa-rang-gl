@@ -101,7 +101,10 @@ export class Framebuffer {
       return _supportsRenderToHalfFloatingPointTexture
     }
     const ext = getExtension(gl, 'OES_texture_half_float')
-
+    if (!ext) {
+      _supportsRenderToHalfFloatingPointTexture = false
+      return _supportsRenderToHalfFloatingPointTexture
+    }
     const texture = new Texture(gl, {
       format: gl.RGBA,
       type: ext.HALF_FLOAT_OES,
