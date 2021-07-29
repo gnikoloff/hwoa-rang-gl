@@ -135,6 +135,7 @@ export class SwapRenderer {
     programName: string,
     vertexShaderSource: string,
     fragmentShaderSource: string,
+    defines: { [key: string]: string } = {},
   ): this {
     const { indices, vertices, uv } = createPlane()
     const geometry = new Geometry(this.#gl)
@@ -145,6 +146,7 @@ export class SwapRenderer {
 
     const mesh = new Mesh(this.#gl, {
       geometry,
+      defines,
       vertexShaderSource,
       fragmentShaderSource,
     })
