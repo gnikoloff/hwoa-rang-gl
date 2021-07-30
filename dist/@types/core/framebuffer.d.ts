@@ -54,9 +54,12 @@ export declare class Framebuffer {
     #private;
     texture: Texture;
     depthTexture?: Texture;
+    static supportRenderingToFloat(gl: any): boolean;
+    static supportRenderingToHalfFloat(gl: any): boolean;
     constructor(gl: WebGLRenderingContext, params?: FramebufferOptions);
     bind(): this;
     unbind(): this;
+    checkCompleteness(): number;
     updateWithSize(width: number, height: number, updateTexture?: boolean): this;
     reset(): this;
     delete(): void;
