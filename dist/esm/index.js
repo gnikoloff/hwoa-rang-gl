@@ -1641,6 +1641,8 @@ class CubeTexture extends Texture {
 _targets = new WeakMap();
 
 var _gl$4, _buffer, _depthBuffer, _width, _height, _depth, _useDepthRenderBuffer;
+let _supportsRenderToFloatingPointTexture = null;
+let _supportsRenderToHalfFloatingPointTexture = null;
 class Framebuffer {
     constructor(gl, params = {}) {
         _gl$4.set(this, void 0);
@@ -1675,6 +1677,52 @@ class Framebuffer {
         __classPrivateFieldSet(this, _buffer, gl.createFramebuffer());
         this.updateWithSize(__classPrivateFieldGet(this, _width), __classPrivateFieldGet(this, _height));
     }
+    static supportRenderingToFloat(gl) {
+        if (_supportsRenderToFloatingPointTexture !== null) {
+            return _supportsRenderToFloatingPointTexture;
+        }
+        getExtension(gl, 'OES_texture_float');
+        const texture = new Texture(gl, {
+            format: gl.RGBA,
+            type: gl.FLOAT,
+        })
+            .bind()
+            .fromSize(1, 1);
+        const framebuffer = new Framebuffer(gl, {
+            depth: false,
+            inputTexture: texture,
+        }).bind();
+        const framebufferStatus = framebuffer.checkCompleteness();
+        framebuffer.unbind();
+        _supportsRenderToFloatingPointTexture =
+            framebufferStatus === gl.FRAMEBUFFER_COMPLETE;
+        return _supportsRenderToFloatingPointTexture;
+    }
+    static supportRenderingToHalfFloat(gl) {
+        if (_supportsRenderToHalfFloatingPointTexture !== null) {
+            return _supportsRenderToHalfFloatingPointTexture;
+        }
+        const ext = getExtension(gl, 'OES_texture_half_float');
+        if (!ext) {
+            _supportsRenderToHalfFloatingPointTexture = false;
+            return _supportsRenderToHalfFloatingPointTexture;
+        }
+        const texture = new Texture(gl, {
+            format: gl.RGBA,
+            type: ext.HALF_FLOAT_OES,
+        })
+            .bind()
+            .fromSize(1, 1);
+        const framebuffer = new Framebuffer(gl, {
+            depth: false,
+            inputTexture: texture,
+        }).bind();
+        const framebufferStatus = framebuffer.checkCompleteness();
+        framebuffer.unbind();
+        _supportsRenderToHalfFloatingPointTexture =
+            framebufferStatus === gl.FRAMEBUFFER_COMPLETE;
+        return _supportsRenderToHalfFloatingPointTexture;
+    }
     bind() {
         __classPrivateFieldGet(this, _gl$4).bindFramebuffer(__classPrivateFieldGet(this, _gl$4).FRAMEBUFFER, __classPrivateFieldGet(this, _buffer));
         return this;
@@ -1682,6 +1730,9 @@ class Framebuffer {
     unbind() {
         __classPrivateFieldGet(this, _gl$4).bindFramebuffer(__classPrivateFieldGet(this, _gl$4).FRAMEBUFFER, null);
         return this;
+    }
+    checkCompleteness() {
+        return __classPrivateFieldGet(this, _gl$4).checkFramebufferStatus(__classPrivateFieldGet(this, _gl$4).FRAMEBUFFER);
     }
     updateWithSize(width, height, updateTexture = false) {
         this.bind();
@@ -2219,6 +2270,9 @@ class OrthographicCamera {
         this.near = near;
         this.far = far;
         this.updateProjectionMatrix();
+    }
+    setPosition({ x = this.position[0], y = this.position[1], z = this.position[2] }) {
+        this.position = [x, y, z];
     }
     updateViewMatrix() {
         lookAt(this.viewMatrix, this.position, this.lookAtPosition, OrthographicCamera.UP_VECTOR);
@@ -3092,16 +3146,13 @@ class SwapRenderer {
         __classPrivateFieldSet(this, _camera, new OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0.1, 2));
         __classPrivateFieldGet(this, _camera).position = [0, 0, 1];
         __classPrivateFieldGet(this, _camera).lookAt([0, 0, 0]);
-        const ext = getExtension(gl, 'WEBGL_color_buffer_float');
-        getExtension(gl, 'OES_texture_float');
-        if (ext) {
+        if (Framebuffer.supportRenderingToFloat(gl)) {
             __classPrivateFieldSet(this, _textureType, gl.FLOAT);
         }
         else {
-            const ext = getExtension(gl, 'EXT_color_buffer_half_float');
-            const ext2 = getExtension(gl, 'OES_texture_half_float');
-            if (ext) {
-                __classPrivateFieldSet(this, _textureType, ext2.HALF_FLOAT_OES);
+            if (Framebuffer.supportRenderingToHalfFloat(gl)) {
+                const ext = getExtension(gl, 'OES_texture_half_float');
+                __classPrivateFieldSet(this, _textureType, ext.HALF_FLOAT_OES);
             }
             else {
                 __classPrivateFieldSet(this, _textureType, gl.UNSIGNED_BYTE);
@@ -3144,9 +3195,9 @@ class SwapRenderer {
      * @param {GLenum} inputType
      * @returns {this}
      */
-    createTexture(name, width, height, data, filtering = __classPrivateFieldGet(this, _gl$5).NEAREST, inputType) {
+    createTexture(name, width, height, data = null, filtering = __classPrivateFieldGet(this, _gl$5).NEAREST, inputType = __classPrivateFieldGet(this, _textureType)) {
         const texture = new Texture(__classPrivateFieldGet(this, _gl$5), {
-            type: inputType || __classPrivateFieldGet(this, _textureType),
+            type: inputType,
             format: __classPrivateFieldGet(this, _gl$5).RGBA,
             minFilter: filtering,
             magFilter: filtering,
@@ -3185,7 +3236,7 @@ class SwapRenderer {
      * @param {string} fragmentShaderSource
      * @returns {this}
      */
-    createProgram(programName, vertexShaderSource, fragmentShaderSource) {
+    createProgram(programName, vertexShaderSource, fragmentShaderSource, defines = {}) {
         const { indices, vertices, uv } = createPlane();
         const geometry = new Geometry(__classPrivateFieldGet(this, _gl$5));
         geometry
@@ -3194,6 +3245,7 @@ class SwapRenderer {
             .addAttribute('uv', { typedArray: uv, size: 2 });
         const mesh = new Mesh(__classPrivateFieldGet(this, _gl$5), {
             geometry,
+            defines,
             vertexShaderSource,
             fragmentShaderSource,
         });
