@@ -31,7 +31,7 @@ export declare class SwapRenderer {
      * @param {GLenum} inputType
      * @returns {this}
      */
-    createTexture(name: string, width: number, height: number, data: Float32Array | null, filtering: number | undefined, inputType: GLenum): this;
+    createTexture(name: string, width: number, height: number, data?: Float32Array | Uint16Array | null, filtering?: number, inputType?: GLenum): this;
     /**
      * @param {string} name Name for referencing later
      * @param {number} width
@@ -45,7 +45,9 @@ export declare class SwapRenderer {
      * @param {string} fragmentShaderSource
      * @returns {this}
      */
-    createProgram(programName: string, vertexShaderSource: string, fragmentShaderSource: string): this;
+    createProgram(programName: string, vertexShaderSource: string, fragmentShaderSource: string, defines?: {
+        [key: string]: string;
+    }): this;
     /**
      * Binds a program for use
      * @param {string} programName

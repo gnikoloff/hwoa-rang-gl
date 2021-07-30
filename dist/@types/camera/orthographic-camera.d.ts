@@ -13,6 +13,11 @@ export declare class OrthographicCamera {
     projectionMatrix: mat4;
     viewMatrix: mat4;
     constructor(left: number, right: number, top: number, bottom: number, near: number, far: number);
+    setPosition({ x, y, z }: {
+        x?: number | undefined;
+        y?: number | undefined;
+        z?: number | undefined;
+    }): void;
     updateViewMatrix(): this;
     updateProjectionMatrix(): this;
     lookAt(target: [number, number, number]): this;

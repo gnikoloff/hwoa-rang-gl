@@ -1,4 +1,5 @@
 import { Mesh } from './mesh';
+import { Geometry } from './geometry';
 import { MeshInterface } from './Mesh';
 export declare class InstancedMesh extends Mesh {
     #private;
@@ -15,6 +16,29 @@ export declare class InstancedMesh extends Mesh {
     draw(): this;
 }
 interface InstancedMeshInterface extends MeshInterface {
+    geometry: Geometry;
+    /**
+     * Uniforms as object list
+     * @example
+     * ```
+     * { type: 'int', value: 1 }
+     * { type: 'vec4', value: [0, 1, 2, 3] }
+     * ```
+     * @defaultValue {}
+     */
+    uniforms?: Record<string, unknown>;
+    /**
+     * TODO
+     */
+    defines?: Record<string, unknown>;
+    /**
+     * Vertex shader program as string
+     */
+    vertexShaderSource: string;
+    /**
+     * Fragment shader program as string
+     */
+    fragmentShaderSource: string;
     instanceCount?: number;
 }
 export {};
