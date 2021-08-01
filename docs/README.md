@@ -29,6 +29,7 @@
 ### Used in:
 
 - [https://georgi-nikolov.com](https://georgi-nikolov.com)
+- [https://gpgpu-boxes.georgi-nikolov.com/](https://gpgpu-boxes.georgi-nikolov.com/)
 
 ### Tools used
 
