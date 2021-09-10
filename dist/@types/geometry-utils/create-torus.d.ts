@@ -14,11 +14,11 @@ interface Torus {
     /**
      * @defaultValue Math.PI * 2
      */
-    radialSegments?: 8;
+    radialSegments?: number;
     /**
      * @defaultValue Math.PI * 2
      */
-    tubularSegments?: 6;
+    tubularSegments?: number;
 }
 /**
  * @description Generate torus geometry

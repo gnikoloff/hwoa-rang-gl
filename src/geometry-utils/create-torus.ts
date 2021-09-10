@@ -16,11 +16,11 @@ interface Torus {
   /**
    * @defaultValue Math.PI * 2
    */
-  radialSegments?: 8
+  radialSegments?: number
   /**
    * @defaultValue Math.PI * 2
    */
-  tubularSegments?: 6
+  tubularSegments?: number
 }
 
 /**
@@ -28,7 +28,7 @@ interface Torus {
  * @param {Torus} params
  * @returns {{ vertices, normal, uv, indices }}
  */
-export function createTorus (params: Torus = {}) {
+export function createTorus(params: Torus = {}) {
   const {
     radius = 0.5,
     tube = 0.35,
@@ -49,25 +49,23 @@ export function createTorus (params: Torus = {}) {
   const vertex = vec3.create()
   const normal = vec3.create()
 
-  for ( let j = 0; j <= radialSegments; j ++ ) {
-
-    for ( let i = 0; i <= tubularSegments; i ++ ) {
-
-      const u = i / tubularSegments * arc
-      const v = j / radialSegments * Math.PI * 2
+  for (let j = 0; j <= radialSegments; j++) {
+    for (let i = 0; i <= tubularSegments; i++) {
+      const u = (i / tubularSegments) * arc
+      const v = (j / radialSegments) * Math.PI * 2
 
       // vertex
 
-      vertex[0] = ( radius + tube * Math.cos( v ) ) * Math.cos( u )
-      vertex[1] = ( radius + tube * Math.cos( v ) ) * Math.sin( u )
-      vertex[2] = tube * Math.sin( v )
+      vertex[0] = (radius + tube * Math.cos(v)) * Math.cos(u)
+      vertex[1] = (radius + tube * Math.cos(v)) * Math.sin(u)
+      vertex[2] = tube * Math.sin(v)
 
       vertices.push(vertex[0], vertex[1], vertex[2])
 
       // normal
 
-      center[0] = radius * Math.cos( u )
-      center[1] = radius * Math.sin( u )
+      center[0] = radius * Math.cos(u)
+      center[1] = radius * Math.sin(u)
 
       vec3.sub(normal, vertex, center)
       vec3.normalize(normal, normal)
@@ -77,31 +75,25 @@ export function createTorus (params: Torus = {}) {
       // uv
 
       uvs.push(i / tubularSegments, j / radialSegments)
-
     }
-
   }
 
   // generate indices
 
-  for ( let j = 1; j <= radialSegments; j ++ ) {
-
-    for ( let i = 1; i <= tubularSegments; i ++ ) {
-
+  for (let j = 1; j <= radialSegments; j++) {
+    for (let i = 1; i <= tubularSegments; i++) {
       // indices
 
-      const a = ( tubularSegments + 1 ) * j + i - 1
-      const b = ( tubularSegments + 1 ) * ( j - 1 ) + i - 1
-      const c = ( tubularSegments + 1 ) * ( j - 1 ) + i
-      const d = ( tubularSegments + 1 ) * j + i
+      const a = (tubularSegments + 1) * j + i - 1
+      const b = (tubularSegments + 1) * (j - 1) + i - 1
+      const c = (tubularSegments + 1) * (j - 1) + i
+      const d = (tubularSegments + 1) * j + i
 
       // faces
 
-      indices.push( a, b, d );
-      indices.push( b, c, d );
-
+      indices.push(a, b, d)
+      indices.push(b, c, d)
     }
-
   }
 
   const num = (radialSegments + 1) * (tubularSegments + 1)
