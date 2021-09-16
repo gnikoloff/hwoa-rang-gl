@@ -175,6 +175,12 @@ export class CameraController {
       document.body.appendChild(this._outputEl)
     }
   }
+
+  lookAt([x, y, z]) {
+    vec3.set(this.target, x, y, z)
+    return this
+  }
+
   setEventHandler(): void {
     this.domElement.addEventListener(
       'contextmenu',
