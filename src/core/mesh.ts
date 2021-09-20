@@ -1,4 +1,4 @@
-import { Transform } from './transform'
+import { SceneObject } from './scene-object'
 import { Program } from './program'
 import { Geometry } from './geometry'
 import { PerspectiveCamera } from '../camera/perspective-camera'
@@ -22,7 +22,7 @@ import { UniformType } from './program'
  *
  * @public
  */
-export class Mesh extends Transform {
+export class Mesh extends SceneObject {
   #gl: WebGLRenderingContext
   #geometry: Geometry
 

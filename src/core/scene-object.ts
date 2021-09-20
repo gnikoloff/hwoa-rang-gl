@@ -1,0 +1,41 @@
+import { mat4, ReadonlyMat4 } from 'gl-matrix'
+import { Transform } from './transform'
+
+/**
+ * SceneObject that can have SceneObjects as children. Allows for proper scene graph.
+ *
+ * @public
+ */
+export class SceneObject extends Transform {
+  parentNode: SceneObject | null = null
+  children: SceneObject[] = []
+
+  worldMatrix = mat4.create()
+  normalMatrix = mat4.create()
+
+  setParent = (parentNode: SceneObject | null = null) => {
+    if (this.parentNode) {
+      const idx = this.parentNode.children.indexOf(this)
+      if (idx >= 0) {
+        this.parentNode.children.splice(idx, 1)
+      }
+    }
+    if (parentNode) {
+      parentNode.children.push(this)
+    }
+    this.parentNode = parentNode
+  }
+
+  updateWorldMatrix = (parentWorldMatrix: ReadonlyMat4 | null = null) => {
+    if (parentWorldMatrix) {
+      mat4.mul(this.worldMatrix, parentWorldMatrix, this.modelMatrix)
+    } else {
+      mat4.copy(this.worldMatrix, this.modelMatrix)
+    }
+    mat4.invert(this.normalMatrix, this.worldMatrix)
+    mat4.transpose(this.normalMatrix, this.normalMatrix)
+    this.children.forEach((child) => {
+      child.updateWorldMatrix(this.worldMatrix)
+    })
+  }
+}

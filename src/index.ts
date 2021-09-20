@@ -1,6 +1,7 @@
 export { Program } from './core/program'
 export { Geometry } from './core/geometry'
 export { Transform } from './core/transform'
+export { SceneObject } from './core/scene-object'
 export { Mesh } from './core/mesh'
 export { InstancedMesh } from './core/instanced-mesh'
 export { Texture } from './core/texture'

@@ -1,4 +1,4 @@
-import { mat4, vec3 } from 'gl-matrix'
+import { mat4, ReadonlyMat4, vec3 } from 'gl-matrix'
 
 /**
  * Base transform class to handle vectors and matrices
@@ -12,7 +12,15 @@ export class Transform {
 
   public modelMatrix = mat4.create()
 
-  public shouldUpdate = false
+  public shouldUpdate = true
+
+  /**
+   * @returns {this}
+   */
+  copyFromMatrix(matrix: ReadonlyMat4) {
+    mat4.copy(this.modelMatrix, matrix)
+    return this
+  }
 
   /**
    * @returns {this}
