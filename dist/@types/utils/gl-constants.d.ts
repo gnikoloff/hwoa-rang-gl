@@ -20,3 +20,5 @@ export const POINTS: 0;
 export const LINES: 1;
 export const TRIANGLES: 4;
 export const STATIC_DRAW: 35044;
+export const TEXTURE_FILTER_NEAREST: 9728;
+export const TEXTURE_FILTER_LINEAR: 9729;

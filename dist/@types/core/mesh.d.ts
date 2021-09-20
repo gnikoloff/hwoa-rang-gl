@@ -1,4 +1,4 @@
-import { Transform } from './transform';
+import { SceneObject } from './scene-object';
 import { Program } from './program';
 import { Geometry } from './geometry';
 import { PerspectiveCamera } from '../camera/perspective-camera';
@@ -9,7 +9,7 @@ import { UniformType } from './program';
  *
  * @public
  */
-export declare class Mesh extends Transform {
+export declare class Mesh extends SceneObject {
     #private;
     protected vaoExtension: OES_vertex_array_objectInterface;
     protected hasIndices: boolean;

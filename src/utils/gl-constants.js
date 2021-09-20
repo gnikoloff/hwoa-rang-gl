@@ -25,3 +25,6 @@ export const LINES = 0x0001
 export const TRIANGLES = 0x0004
 
 export const STATIC_DRAW = 0x88e4
+
+export const TEXTURE_FILTER_NEAREST = 0x2600
+export const TEXTURE_FILTER_LINEAR = 0x2601

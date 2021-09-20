@@ -40,6 +40,7 @@ export declare class CameraController {
     private _isDebug;
     private _outputEl;
     constructor(camera: PerspectiveCamera, domElement?: HTMLElement, isDebug?: boolean);
+    lookAt([x, y, z]: [any, any, any]): this;
     setEventHandler(): void;
     removeEventHandler(): void;
     startTick(): void;
