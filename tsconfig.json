@@ -15,7 +15,7 @@
     "moduleResolution": "node",
   },
   "include": [
-    "src",
+    "src/**/*",
     "node_modules/webgl-strict-types/index.d.ts"
-  ],
+  ]
 }
