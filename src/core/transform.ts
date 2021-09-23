@@ -19,6 +19,7 @@ export class Transform {
    */
   copyFromMatrix(matrix: ReadonlyMat4) {
     mat4.copy(this.modelMatrix, matrix)
+    this.shouldUpdate = false
     return this
   }
 

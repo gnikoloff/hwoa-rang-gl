@@ -7,6 +7,8 @@ import { Transform } from './transform'
  * @public
  */
 export class SceneObject extends Transform {
+  protected renderable = false
+
   parentNode: SceneObject | null = null
   children: SceneObject[] = []
 
@@ -26,7 +28,10 @@ export class SceneObject extends Transform {
     this.parentNode = parentNode
   }
 
-  updateWorldMatrix = (parentWorldMatrix: ReadonlyMat4 | null = null) => {
+  updateWorldMatrix = (parentWorldMatrix: ReadonlyMat4 | null = null): this => {
+    if (this.shouldUpdate) {
+      this.updateModelMatrix()
+    }
     if (parentWorldMatrix) {
       mat4.mul(this.worldMatrix, parentWorldMatrix, this.modelMatrix)
     } else {
@@ -37,5 +42,12 @@ export class SceneObject extends Transform {
     this.children.forEach((child) => {
       child.updateWorldMatrix(this.worldMatrix)
     })
+    return this
+  }
+
+  traverseGraph = (callback, node: SceneObject = this): this => {
+    callback(node)
+    this.children.forEach((child) => child.traverseGraph(callback))
+    return this
   }
 }
