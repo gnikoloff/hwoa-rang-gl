@@ -90,11 +90,15 @@ export class CameraController {
   private _isDebug = false
   private _outputEl!: HTMLDivElement
 
+  private mouseWheelForce = 1
+
   constructor(
     camera: PerspectiveCamera,
     domElement = document.body,
     isDebug = false,
+    mouseWheelForce = 1,
   ) {
+    this.mouseWheelForce = mouseWheelForce
     if (!camera) {
       console.error('camera is undefined')
     }
@@ -367,10 +371,11 @@ export class CameraController {
     // this.update();
   }
   _mouseWheelHandler(event: WheelEvent): void {
+    const force = this.mouseWheelForce
     if (event.deltaY > 0) {
-      this.targetRadiusDampedAction.addForce(1)
+      this.targetRadiusDampedAction.addForce(force)
     } else {
-      this.targetRadiusDampedAction.addForce(-1)
+      this.targetRadiusDampedAction.addForce(-force)
     }
   }
 
