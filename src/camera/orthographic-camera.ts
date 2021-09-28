@@ -37,8 +37,13 @@ export class OrthographicCamera {
     this.updateProjectionMatrix()
   }
 
-  setPosition ({x = this.position[0], y = this.position[1], z = this.position[2]}) {
+  setPosition({
+    x = this.position[0],
+    y = this.position[1],
+    z = this.position[2],
+  }): this {
     this.position = [x, y, z]
+    return this
   }
 
   updateViewMatrix(): this {
