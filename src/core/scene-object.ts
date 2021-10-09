@@ -15,7 +15,7 @@ export class SceneObject extends Transform {
   worldMatrix = mat4.create()
   normalMatrix = mat4.create()
 
-  setParent = (parentNode: SceneObject | null = null) => {
+  setParent = (parentNode: SceneObject | null = null): this => {
     if (this.parentNode) {
       const idx = this.parentNode.children.indexOf(this)
       if (idx >= 0) {
@@ -26,6 +26,7 @@ export class SceneObject extends Transform {
       parentNode.children.push(this)
     }
     this.parentNode = parentNode
+    return this
   }
 
   updateWorldMatrix = (parentWorldMatrix: ReadonlyMat4 | null = null): this => {

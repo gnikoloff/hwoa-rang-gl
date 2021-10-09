@@ -6,10 +6,12 @@ import { Transform } from './transform';
  * @public
  */
 export declare class SceneObject extends Transform {
+    protected renderable: boolean;
     parentNode: SceneObject | null;
     children: SceneObject[];
     worldMatrix: mat4;
     normalMatrix: mat4;
-    setParent: (parentNode?: SceneObject | null) => void;
-    updateWorldMatrix: (parentWorldMatrix?: ReadonlyMat4 | null) => void;
+    setParent: (parentNode?: SceneObject | null) => this;
+    updateWorldMatrix: (parentWorldMatrix?: ReadonlyMat4 | null) => this;
+    traverseGraph: (callback: any, node?: SceneObject) => this;
 }
