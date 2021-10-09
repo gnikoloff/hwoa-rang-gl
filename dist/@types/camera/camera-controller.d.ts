@@ -39,7 +39,8 @@ export declare class CameraController {
     private _paused;
     private _isDebug;
     private _outputEl;
-    constructor(camera: PerspectiveCamera, domElement?: HTMLElement, isDebug?: boolean);
+    private mouseWheelForce;
+    constructor(camera: PerspectiveCamera, domElement?: HTMLElement, isDebug?: boolean, mouseWheelForce?: number);
     lookAt([x, y, z]: [any, any, any]): this;
     setEventHandler(): void;
     removeEventHandler(): void;
