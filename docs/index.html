@@ -1,228 +1,270 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <style>
-    :root {
-      --border-color: rgba(0, 0, 0, 0.12);
-      --font-stack: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
-    }
-    h1 {
-      font-size: 32px;
-      margin-bottom: 0.3rem;
-    }
-    h2 {
-      font-size: 21px;
-    }
-    code {
-      background-color: rgba(0, 0, 0, 0.075);
-      padding: 4px 8px;
-      border-radius: 6px;
-    }
-    body {
-      font-family: var(--font-stack);
-      line-height: 1.6;
-    }
-    article {
-      max-width: 800px;
-      padding: 0 16px;
-      margin: 0 auto;
-    }
-    .app-header {
-      padding-bottom: 1.5rem;
-      border-bottom: 1px solid var(--border-color);
-    }
-    .hero-unit {
-      width: 100%;
-    }
-    .subheading {
-      display: flex;
-      align-items: baseline;
-    }
-    .npm-link {
-      text-decoration: none;
-    }
-    .projects {
-      display: flex;
-      flex-wrap: wrap;
-    }
-    .project {
-      width: 100%;
-    }
-    
-    @media (min-width: 600px) {
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+      :root {
+        --border-color: rgba(0, 0, 0, 0.12);
+        --font-stack: -apple-system, BlinkMacSystemFont, avenir next, avenir,
+          segoe ui, helvetica neue, helvetica, Ubuntu, roboto, noto, arial,
+          sans-serif;
+      }
+      h1 {
+        font-size: 32px;
+        margin-bottom: 0.3rem;
+      }
+      h2 {
+        font-size: 21px;
+      }
+      code {
+        background-color: rgba(0, 0, 0, 0.075);
+        padding: 4px 8px;
+        border-radius: 6px;
+      }
+      body {
+        font-family: var(--font-stack);
+        line-height: 1.6;
+      }
+      article {
+        max-width: 800px;
+        padding: 0 16px;
+        margin: 0 auto;
+      }
+      .app-header {
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+      }
+      .hero-unit {
+        width: 100%;
+      }
+      .subheading {
+        display: flex;
+        align-items: baseline;
+      }
+      .npm-link {
+        text-decoration: none;
+      }
+      .projects {
+        display: flex;
+        flex-wrap: wrap;
+      }
       .project {
-        padding: 10px;
-        box-sizing: border-box;
-        width: calc(100% / 2);
-      } 
-    }
+        width: 100%;
+      }
 
-    .project h5 {
-      margin: 0;
-      font-weight: 400;
-    }
+      @media (min-width: 600px) {
+        .project {
+          padding: 10px;
+          box-sizing: border-box;
+          width: calc(100% / 2);
+        }
+      }
 
-    .project img {
-      width: 100%;
-      margin-bottom: 0.5rem;
-    }
-  </style>
+      .project h5 {
+        margin: 0;
+        font-weight: 400;
+      }
 
-  <!-- Primary Meta Tags -->
-  <title>hwoa-rang-gl</title>
-  <meta name="title" content="hwoa-rang-gl">
-  <meta name="description" content="Lightweight WebGL library written in typescript">
+      .project img {
+        width: 100%;
+        margin-bottom: 0.5rem;
+      }
+    </style>
 
-  <!-- Open Graph / Facebook -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://gnikoloff.github.io/hwoa-rang-gl/">
-  <meta property="og:title" content="hwoa-rang-gl">
-  <meta property="og:description" content="Lightweight WebGL library written in typescript">
-  <meta property="og:image" content="https://gnikoloff.github.io/hwoa-rang-gl/examples/dist/assets/textures/social-preview-hwoa-rang-gl.png">
-
-  <!-- Twitter -->
-  <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:url" content="https://gnikoloff.github.io/hwoa-rang-gl/">
-  <meta property="twitter:title" content="hwoa-rang-gl">
-  <meta property="twitter:description" content="Lightweight WebGL library written in typescript">
-  <meta property="twitter:image" content="https://gnikoloff.github.io/hwoa-rang-gl/examples/dist/assets/textures/social-preview-hwoa-rang-gl.png">
-
-</head>
-<body>
-  <article class="content">
-    <img
-      class="hero-unit"
-      src="https://gnikoloff.github.io/hwoa-rang-gl/examples/dist/assets/textures/hwoa-rang-gl-preview.png"
-      alt="Preview hwoa-rang-gl renders"
+    <!-- Primary Meta Tags -->
+    <title>hwoa-rang-gl</title>
+    <meta name="title" content="hwoa-rang-gl" />
+    <meta
+      name="description"
+      content="Lightweight WebGL library written in typescript"
     />
-    <header class="app-header">
-      <h1>hwoa-rang-gl</h1>
-      <div class="subheading">
-        <h2>webgl library</h2>
-      </div>
-      <a
-        class="npm-link"
-        href="https://www.npmjs.com/package/hwoa-rang-gl"
-        target="_blank"
-      >
-        <img src="https://img.shields.io/npm/v/hwoa-rang-gl" />
-      </a>
-      <a
-        class="npm-link"
-        href="https://www.npmjs.com/package/hwoa-rang-gl"
-        target="_blank"
-      >
-        <img src="https://img.shields.io/npm/l/hwoa-rang-gl" />
-      </a>
-      <a
-        class="npm-link"
-        href="https://bundlephobia.com/result?p=hwoa-rang-gl@0.0.3"
-        target="_blank"
-      >
-        <img src="https://badgen.net/bundlephobia/minzip/hwoa-rang-gl" alt="size" />
-      </a>
-      <a
-        class="npm-link"
-      >
-        <img src="https://badgen.net/npm/types/hwoa-rang-gl" alt="size" />
-      </a>
-    </header>
 
-    <h3>Install</h3>
-    <code>npm i hwoa-rang-gl</code>
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:url"
+      content="https://gnikoloff.github.io/hwoa-rang-gl/"
+    />
+    <meta property="og:title" content="hwoa-rang-gl" />
+    <meta
+      property="og:description"
+      content="Lightweight WebGL library written in typescript"
+    />
+    <meta
+      property="og:image"
+      content="https://gnikoloff.github.io/hwoa-rang-gl/examples/dist/assets/textures/social-preview-hwoa-rang-gl.png"
+    />
 
-    <h3>Source Code</h3>
-    <a href="https://github.com/gnikoloff/hwoa-rang-gl">hwoa-rang-gl/source</a>
-
-    <h3>API Documentation</h3>
-    <a href="docs">hwoa-rang-gl/docs</a>
-
-    <h3>Examples</h3>
-    <a href="examples/dist">hwoa-rang-gl/examples</a>
-
-    <h3>Tutorials</h3>
-    <a href="https://gnikoloff.github.io/hwoa-rang-gl-tutorials/">hwoa-rang-gl/tutorials</a>
-
-    <h3>Used in:</h3>
-    <div class="projects">
-      <div class="project">
-        <a target="_blank" href="https://georgi-nikolov.com">
-          <img src="https://2021.georgi-nikolov.com/assets/georgi-nikolov-social-preview.png" />
-          <h5>Georgi Nikolov personal website</h5>
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta
+      property="twitter:url"
+      content="https://gnikoloff.github.io/hwoa-rang-gl/"
+    />
+    <meta property="twitter:title" content="hwoa-rang-gl" />
+    <meta
+      property="twitter:description"
+      content="Lightweight WebGL library written in typescript"
+    />
+    <meta
+      property="twitter:image"
+      content="https://gnikoloff.github.io/hwoa-rang-gl/examples/dist/assets/textures/social-preview-hwoa-rang-gl.png"
+    />
+  </head>
+  <body>
+    <article class="content">
+      <img
+        class="hero-unit"
+        src="https://gnikoloff.github.io/hwoa-rang-gl/examples/dist/assets/textures/hwoa-rang-gl-preview.png"
+        alt="Preview hwoa-rang-gl renders"
+      />
+      <header class="app-header">
+        <h1>hwoa-rang-gl</h1>
+        <div class="subheading">
+          <h2>webgl library</h2>
+        </div>
+        <a
+          class="npm-link"
+          href="https://www.npmjs.com/package/hwoa-rang-gl"
+          target="_blank"
+        >
+          <img src="https://img.shields.io/npm/v/hwoa-rang-gl" />
         </a>
-      </div>
-      <div class="project">
-        <a target="_blank" href="https://gpgpu-boxes.georgi-nikolov.com/">
-          <img src="https://gpgpu-boxes.georgi-nikolov.com/assets/hwoa-rang-gl-demo-social.png" />
-          <h5>GPGPU Animation and Deferred Shading Boxes</h5>
+        <a
+          class="npm-link"
+          href="https://www.npmjs.com/package/hwoa-rang-gl"
+          target="_blank"
+        >
+          <img src="https://img.shields.io/npm/l/hwoa-rang-gl" />
         </a>
+        <a
+          class="npm-link"
+          href="https://bundlephobia.com/result?p=hwoa-rang-gl@0.0.3"
+          target="_blank"
+        >
+          <img
+            src="https://badgen.net/bundlephobia/minzip/hwoa-rang-gl"
+            alt="size"
+          />
+        </a>
+        <a class="npm-link">
+          <img src="https://badgen.net/npm/types/hwoa-rang-gl" alt="size" />
+        </a>
+      </header>
+
+      <h3>Install</h3>
+      <code>npm i hwoa-rang-gl</code>
+
+      <h3>Source Code</h3>
+      <a href="https://github.com/gnikoloff/hwoa-rang-gl"
+        >hwoa-rang-gl/source</a
+      >
+
+      <h3>API Documentation</h3>
+      <a href="docs">hwoa-rang-gl/docs</a>
+
+      <h3>Examples</h3>
+      <a href="examples/dist">hwoa-rang-gl/examples</a>
+
+      <h3>Tutorials</h3>
+      <a href="https://gnikoloff.github.io/hwoa-rang-gl-tutorials/"
+        >hwoa-rang-gl/tutorials</a
+      >
+
+      <h3>Used in:</h3>
+      <div class="projects">
+        <div class="project">
+          <a target="_blank" href="https://2021.georgi-nikolov.com">
+            <img
+              src="https://2021.georgi-nikolov.com/assets/georgi-nikolov-social-preview.png"
+            />
+            <h5>Georgi Nikolov personal website</h5>
+          </a>
+        </div>
+        <div class="project">
+          <a target="_blank" href="https://gpgpu-boxes.georgi-nikolov.com/">
+            <img
+              src="https://gpgpu-boxes.georgi-nikolov.com/assets/hwoa-rang-gl-demo-social.png"
+            />
+            <h5>GPGPU Animation and Deferred Shading Boxes</h5>
+          </a>
+        </div>
       </div>
-    </div>
 
-    <h3>Tools used</h3>
-    <ul>
-      <li>
-        <a href="https://www.typescriptlang.org/">Typescript</a>
-      </li>
-      <li>
-        <a href="https://glmatrix.net/">glMatrix</a>
-      </li>
-      <li>
-        <a href="https://github.com/greggman/webgl-lint">WebGL Lint</a>
-      </li>
-      <li>
-        <a href="https://spector.babylonjs.com/">Spector.js</a>
-      </li>
-    </ul>
+      <h3>Tools used</h3>
+      <ul>
+        <li>
+          <a href="https://www.typescriptlang.org/">Typescript</a>
+        </li>
+        <li>
+          <a href="https://glmatrix.net/">glMatrix</a>
+        </li>
+        <li>
+          <a href="https://github.com/greggman/webgl-lint">WebGL Lint</a>
+        </li>
+        <li>
+          <a href="https://spector.babylonjs.com/">Spector.js</a>
+        </li>
+      </ul>
 
-    <h3>References</h3>
-    <ul>
-      <li>
-        <a href="https://github.com/kenjiSpecial/tubugl">tubugl</a>
-      </li>
-      <li>
-        <a href="https://github.com/oframe/ogl">ogl</a>
-      </li>
-      <li>
-        <a href="https://github.com/tsherif/webgl2examples">WebGL2 examples</a>
-      </li>
-      <li>
-        <a href="https://github.com/mrdoob/three.js/">three.js</a>
-      </li>
-    </ul>
+      <h3>References</h3>
+      <ul>
+        <li>
+          <a href="https://github.com/kenjiSpecial/tubugl">tubugl</a>
+        </li>
+        <li>
+          <a href="https://github.com/oframe/ogl">ogl</a>
+        </li>
+        <li>
+          <a href="https://github.com/tsherif/webgl2examples"
+            >WebGL2 examples</a
+          >
+        </li>
+        <li>
+          <a href="https://github.com/mrdoob/three.js/">three.js</a>
+        </li>
+      </ul>
 
-    <h3>Resources</h3>
-    <ul>
-      <li>
-        <a href="https://webglfundamentals.org/">WebGL fundamentals</a>
-      </li>
-      <li>
-        <a href="https://blog.tojicode.com/">TojiCode</a>
-      </li>
-      <li>
-        <a href="http://ogldev.atspace.co.uk/">Modern OpenGL Tutorials</a>
-      </li>
-      <li>
-        <a href="https://www.haroldserrano.com/blog/understanding-opengl-objects">Understanding OpenGL Objects</a>
-      </li>
-      <li>
-        <a href="https://www.learnopengles.com/tag/mipmap/">Learn OpenGL ES</a>
-      </li>
-    </ul>
+      <h3>Resources</h3>
+      <ul>
+        <li>
+          <a href="https://webglfundamentals.org/">WebGL fundamentals</a>
+        </li>
+        <li>
+          <a href="https://blog.tojicode.com/">TojiCode</a>
+        </li>
+        <li>
+          <a href="http://ogldev.atspace.co.uk/">Modern OpenGL Tutorials</a>
+        </li>
+        <li>
+          <a
+            href="https://www.haroldserrano.com/blog/understanding-opengl-objects"
+            >Understanding OpenGL Objects</a
+          >
+        </li>
+        <li>
+          <a href="https://www.learnopengles.com/tag/mipmap/"
+            >Learn OpenGL ES</a
+          >
+        </li>
+      </ul>
+    </article>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=UA-194827080-3"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || []
+      function gtag() {
+        dataLayer.push(arguments)
+      }
+      gtag('js', new Date())
 
-  </article>
-  <!-- Global site tag (gtag.js) - Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-194827080-3"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'UA-194827080-3');
-  </script>
-</body>
+      gtag('config', 'UA-194827080-3')
+    </script>
+  </body>
 </html>
