@@ -1,4 +1,5 @@
 import { mat4, ReadonlyMat4 } from 'gl-matrix'
+import { uid } from 'uid'
 import { Transform } from './transform'
 
 /**
@@ -14,6 +15,14 @@ export class SceneObject extends Transform {
 
   worldMatrix = mat4.create()
   normalMatrix = mat4.create()
+
+  uid = uid(9)
+  name?: string
+
+  constructor(name: string | undefined = undefined) {
+    super()
+    this.name = name
+  }
 
   setParent = (parentNode: SceneObject | null = null): this => {
     if (this.parentNode) {
