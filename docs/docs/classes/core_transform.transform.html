@@ -82,7 +82,7 @@
 						<span class="target">Transform</span>
 						<ul class="tsd-hierarchy">
 							<li>
-								<a href="core_mesh.mesh.html" class="tsd-signature-type" data-tsd-kind="Class">Mesh</a>
+								<a href="core_scene_object.sceneobject.html" class="tsd-signature-type" data-tsd-kind="Class">SceneObject</a>
 							</li>
 						</ul>
 					</li>
@@ -111,6 +111,7 @@
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="core_transform.transform.html#copyfrommatrix" class="tsd-kind-icon">copy<wbr>From<wbr>Matrix</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="core_transform.transform.html#setposition" class="tsd-kind-icon">set<wbr>Position</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="core_transform.transform.html#setrotation" class="tsd-kind-icon">set<wbr>Rotation</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="core_transform.transform.html#setscale" class="tsd-kind-icon">set<wbr>Scale</a></li>
@@ -145,7 +146,7 @@
 					<div class="tsd-signature tsd-kind-icon">model<wbr>Matrix<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">mat4</span><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/transform.ts#L13">core/transform.ts:13</a></li>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/78a6ba0/src/core/transform.ts#L13">core/transform.ts:13</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -155,7 +156,7 @@
 					<div class="tsd-signature tsd-kind-icon">position<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">vec3</span><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/transform.ts#L9">core/transform.ts:9</a></li>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/78a6ba0/src/core/transform.ts#L9">core/transform.ts:9</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -165,7 +166,7 @@
 					<div class="tsd-signature tsd-kind-icon">rotation<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">vec3</span><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/transform.ts#L10">core/transform.ts:10</a></li>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/78a6ba0/src/core/transform.ts#L10">core/transform.ts:10</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -175,23 +176,46 @@
 					<div class="tsd-signature tsd-kind-icon">scale<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">vec3</span><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/transform.ts#L11">core/transform.ts:11</a></li>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/78a6ba0/src/core/transform.ts#L11">core/transform.ts:11</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="shouldupdate" class="tsd-anchor"></a>
 					<h3>should<wbr>Update</h3>
-					<div class="tsd-signature tsd-kind-icon">should<wbr>Update<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></div>
+					<div class="tsd-signature tsd-kind-icon">should<wbr>Update<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = true</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/transform.ts#L15">core/transform.ts:15</a></li>
+							<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/78a6ba0/src/core/transform.ts#L15">core/transform.ts:15</a></li>
 						</ul>
 					</aside>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="copyfrommatrix" class="tsd-anchor"></a>
+					<h3>copy<wbr>From<wbr>Matrix</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">copy<wbr>From<wbr>Matrix<span class="tsd-signature-symbol">(</span>matrix<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ReadonlyMat4</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="core_transform.transform.html" class="tsd-signature-type" data-tsd-kind="Class">Transform</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/78a6ba0/src/core/transform.ts#L20">core/transform.ts:20</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>matrix: <span class="tsd-signature-type">ReadonlyMat4</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="core_transform.transform.html" class="tsd-signature-type" data-tsd-kind="Class">Transform</a></h4>
+						</li>
+					</ul>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
 					<a name="setposition" class="tsd-anchor"></a>
 					<h3>set<wbr>Position</h3>
@@ -202,7 +226,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/transform.ts#L20">core/transform.ts:20</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/78a6ba0/src/core/transform.ts#L29">core/transform.ts:29</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -236,7 +260,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/transform.ts#L46">core/transform.ts:46</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/78a6ba0/src/core/transform.ts#L55">core/transform.ts:55</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -275,7 +299,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/transform.ts#L35">core/transform.ts:35</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/78a6ba0/src/core/transform.ts#L44">core/transform.ts:44</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -314,7 +338,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/e0666dd/src/core/transform.ts#L61">core/transform.ts:61</a></li>
+									<li>Defined in <a href="https://github.com/gnikoloff/hwoa-rang-gl/blob/78a6ba0/src/core/transform.ts#L70">core/transform.ts:70</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -363,6 +387,9 @@
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="core_transform.transform.html#shouldupdate" class="tsd-kind-icon">should<wbr>Update</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="core_transform.transform.html#copyfrommatrix" class="tsd-kind-icon">copy<wbr>From<wbr>Matrix</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="core_transform.transform.html#setposition" class="tsd-kind-icon">set<wbr>Position</a>
