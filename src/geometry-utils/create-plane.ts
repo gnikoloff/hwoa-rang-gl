@@ -1,6 +1,6 @@
 import { buildPlane } from './build-plane'
 
-interface Plane {
+export interface Plane {
   /**
    * @defaultValue 1
    */

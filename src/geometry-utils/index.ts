@@ -4,6 +4,7 @@ import { createRoundedBox } from './create-rounded-box'
 import { createRoundedBoxSeparateFace } from './create-rounded-box-separate-faces'
 import { createCircle } from './create-circle'
 import { createPlane } from './create-plane'
+import { createInterleavedPlane } from './create-interleaved-plane'
 import { createSphere } from './create-sphere'
 import { createTorus } from './create-torus'
 
@@ -13,6 +14,7 @@ export { createRoundedBoxSeparateFace }
 export { createRoundedBox }
 export { createCircle }
 export { createPlane }
+export { createInterleavedPlane }
 export { createSphere }
 export { createTorus }
 
@@ -26,6 +28,7 @@ export const GeometryUtils = {
   createRoundedBox,
   createCircle,
   createPlane,
+  createInterleavedPlane,
   createSphere,
   createTorus,
 }
